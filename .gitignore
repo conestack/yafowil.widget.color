@@ -1,0 +1,16 @@
+*.egg-info
+*.pyc
+*.pyo
+*#*
+*~
+/bin/
+/coverage/
+/dist/
+/include/
+/karma/
+/lib/
+/lib64
+/local/
+/node_modules/
+/package-lock.json
+/pyvenv.cfg
