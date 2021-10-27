@@ -21,6 +21,7 @@ npm --save-dev install \
     rollup-plugin-cleanup \
     rollup-plugin-terser
 
+npm --save install @jaames/iro
 npm --no-save install https://github.com/jquery/jquery#main
 
 python3 -m venv .

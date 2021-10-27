@@ -5,6 +5,10 @@ import os
 
 resourcedir = os.path.join(os.path.dirname(__file__), 'resources')
 js = [{
+    'group': 'yafowil.widget.color.dependencies',
+    'resource': 'iro/iro.js',
+    'order': 20,
+}, {
     'group': 'yafowil.widget.color.common',
     'resource': 'widget.js',
     'order': 21,

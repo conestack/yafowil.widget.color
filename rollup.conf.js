@@ -21,14 +21,16 @@ export default args => {
             format: 'iife',
             outro: outro,
             globals: {
-                jquery: 'jQuery'
+                jquery: 'jQuery',
+                iro: 'iro'
             },
             interop: 'default',
             sourcemap: true,
             sourcemapExcludeSources: true
         }],
         external: [
-            'jquery'
+            'jquery',
+            'iro'
         ]
     };
     if (args.configDebug !== true) {
@@ -40,7 +42,8 @@ export default args => {
             ],
             outro: outro,
             globals: {
-                jquery: 'jQuery'
+                jquery: 'jQuery',
+                iro: 'iro'
             },
             interop: 'default',
             sourcemap: true,
