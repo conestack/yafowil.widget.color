@@ -25,7 +25,12 @@
             });
             this.elem.val(this.color);
             this.color_elem.css('background', this.color);
-            let recent_colors_container = this.recent_colors_container = $('<div class="color-picker-recent" />');
+            let add_color_btn = this.add_color_btn = $('<button class="add_color">+ Add</button>');
+            this.picker_elem.append(add_color_btn);
+            this.add_color_btn.on('click', this.create_swatch.bind(this));
+            let recent_colors_container = this.recent_colors_container = $(`
+            <div class="color-picker-recent"></div>
+        `);
             this.picker_elem.append(recent_colors_container);
             this.trigger_handle = this.trigger_handle.bind(this);
             elem.on('focus', this.trigger_handle);
@@ -52,7 +57,16 @@
             }
             console.log(this.color_swatches);
         }
-        create_swatch(hsl, color) {
+        create_swatch(e) {
+            console.log('CLOK');
+            if(e) {
+                e.preventDefault();
+                this.recent_colors_container.show();
+            }
+            let hsl = this.picker.color.hsl;
+            let color = this.picker.color.hexString;
+            console.log(color);
+            console.log(hsl);
             let current_color_swatch = $(`
             <div class="color-swatch" id="${color}" style="background:${color}"/>
         `);
@@ -76,9 +90,8 @@
                 this.picker_elem.hide();
                 this.elem.blur();
                 this.color = this.picker.color.hexString;
-                this.hsl = this.picker.color.hsl;
                 this.recent_colors_container.show();
-                this.create_swatch(this.hsl, this.color);
+                this.create_swatch();
             } else {
                 let target = this.picker_elem;
                 if(!target.is(e.target) &&

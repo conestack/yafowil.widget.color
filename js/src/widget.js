@@ -24,13 +24,20 @@ export class ColorWidget {
 
         let close_btn = this.close_btn = $('<button class="close-button">✕</button>');
         this.picker_elem.append(close_btn);
+
         this.picker = new iro.ColorPicker(picker_elem.get(0), {
             color: this.color
         });
         this.elem.val(this.color);
         this.color_elem.css('background', this.color);
 
-        let recent_colors_container = this.recent_colors_container = $('<div class="color-picker-recent" />');
+        let add_color_btn = this.add_color_btn = $('<button class="add_color">+ Add</button>');
+        this.picker_elem.append(add_color_btn);
+        this.add_color_btn.on('click', this.create_swatch.bind(this));
+
+        let recent_colors_container = this.recent_colors_container = $(`
+            <div class="color-picker-recent"></div>
+        `);
         this.picker_elem.append(recent_colors_container);
 
         this.trigger_handle = this.trigger_handle.bind(this);
@@ -60,11 +67,17 @@ export class ColorWidget {
         } else {
             this.picker_elem.hide();
         }
-
-        console.log(this.color_swatches)
     }
 
-    create_swatch(hsl, color) {
+    create_swatch(e) {
+        if(e) {
+            e.preventDefault();
+            this.recent_colors_container.show();
+        }
+
+        let hsl = this.picker.color.hsl;
+        let color = this.picker.color.hexString;
+
         let current_color_swatch = $(`
             <div class="color-swatch" id="${color}" style="background:${color}"/>
         `);
@@ -78,7 +91,6 @@ export class ColorWidget {
         this.color_swatches.push(color);
 
         current_color_swatch.on('click', () => {
-            console.log(color);
             this.color = color;
             this.picker.color.hsl = hsl;
         });
@@ -92,10 +104,9 @@ export class ColorWidget {
             this.picker_elem.hide();
             this.elem.blur();
             this.color = this.picker.color.hexString;
-            this.hsl = this.picker.color.hsl;
 
             this.recent_colors_container.show();
-            this.create_swatch(this.hsl, this.color);
+            this.create_swatch();
         } else {
             let target = this.picker_elem;
             if(!target.is(e.target) &&

@@ -14,7 +14,6 @@ div.color-picker-wrapper {
     position: absolute;
     z-index: 10;
     width: fit-content;
-    /* transform: translate(-10rem, 1rem); */
     padding: 20px;
     border: 1px solid rgb(226, 226, 226);
     border-radius: 10px;
@@ -36,7 +35,6 @@ button.close-button{
 div.color-picker-recent {
     width: 100%;
     padding: 5px;
-    margin-top: 2rem;
     display: none;
 }
 
@@ -47,4 +45,11 @@ div.color-swatch {
     margin: 2px;
     border-radius: 3px;
     box-shadow: inset 0px 0px 3px rgb(0 0 0 / 40%);
+}
+
+button.add_color {
+    background: none;
+    border: none;
+    display: block;
+    margin-top: 1rem;
 }
