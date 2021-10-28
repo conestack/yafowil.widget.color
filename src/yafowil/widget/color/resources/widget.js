@@ -15,6 +15,7 @@
             let color_elem = this.color_elem = $('<span class="color-picker-color" />');
             elem.after(color_elem);
             this.color = "#fff";
+            this.color_swatches = [];
             let picker_elem = this.picker_elem = $('<div class="color-picker-wrapper" />');
             this.color_elem.after(picker_elem);
             let close_btn = this.close_btn = $('<button class="close-button">✕</button>');
@@ -24,6 +25,8 @@
             });
             this.elem.val(this.color);
             this.color_elem.css('background', this.color);
+            let recent_colors_container = this.recent_colors_container = $('<div class="color-picker-recent" />');
+            this.picker_elem.append(recent_colors_container);
             this.trigger_handle = this.trigger_handle.bind(this);
             elem.on('focus', this.trigger_handle);
             color_elem.on('mousedown', this.trigger_handle);
@@ -47,6 +50,23 @@
             } else {
                 this.picker_elem.hide();
             }
+            console.log(this.color_swatches);
+        }
+        create_swatch(hsl, color) {
+            let current_color_swatch = $(`
+            <div class="color-swatch" id="${color}" style="background:${color}"/>
+        `);
+            if(this.color_swatches.length >= 12) {
+                this.color_swatches.shift();
+                $('div.color-swatch')[0].remove();
+            }
+            this.recent_colors_container.append(current_color_swatch);
+            this.color_swatches.push(color);
+            current_color_swatch.on('click', () => {
+                console.log(color);
+                this.color = color;
+                this.picker.color.hsl = hsl;
+            });
         }
         handle_events(e){
             if (e.type == 'keyup' &&
@@ -56,6 +76,9 @@
                 this.picker_elem.hide();
                 this.elem.blur();
                 this.color = this.picker.color.hexString;
+                this.hsl = this.picker.color.hsl;
+                this.recent_colors_container.show();
+                this.create_swatch(this.hsl, this.color);
             } else {
                 let target = this.picker_elem;
                 if(!target.is(e.target) &&
