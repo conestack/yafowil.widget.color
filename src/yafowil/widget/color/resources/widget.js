@@ -54,6 +54,7 @@
             {
                 e.preventDefault();
                 this.picker_elem.hide();
+                this.elem.blur();
                 this.color = this.picker.color.hexString;
             } else {
                 let target = this.picker_elem;
