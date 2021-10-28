@@ -5,7 +5,6 @@
         static initialize(context) {
             $('input.color-picker', context).each(function() {
                 new ColorWidget($(this));
-                $(this).attr('spellcheck', "false");
             });
         }
         constructor(elem) {
@@ -24,6 +23,7 @@
                 color: this.color
             });
             this.elem.val(this.color);
+            this.elem.attr('spellcheck', "false");
             this.color_elem.css('background', this.color);
             let add_color_btn = this.add_color_btn = $('<button class="add_color">+ Add</button>');
             this.picker_elem.append(add_color_btn);
@@ -34,14 +34,12 @@
             this.picker_elem.append(recent_colors_container);
             this.trigger_handle = this.trigger_handle.bind(this);
             elem.on('focus', this.trigger_handle);
-            color_elem.on('mousedown', this.trigger_handle);
+            color_elem.on('click', this.trigger_handle);
             this.picker.on('color:change', this.update_color.bind(this));
-            this.close_btn.off('click').on('click', (e) => {
-                e.preventDefault();
-                this.picker_elem.hide();
-            });
-            this.handle_events = this.handle_events.bind(this);
-            $(window).off('mousedown keyup', this.handle_events).on('mousedown keyup', this.handle_events);
+            this.hide_elem = this.hide_elem.bind(this);
+            this.close_btn.on('click', this.hide_elem);
+            this.handle_keypress = this.handle_keypress.bind(this);
+            this.handle_click = this.handle_click.bind(this);
         }
         update_color() {
             let current_color = this.picker.color.hexString;
@@ -52,21 +50,49 @@
             evt.preventDefault();
             if(this.picker_elem.css('display') === "none") {
                 this.picker_elem.show();
+                $(window).on('keyup', this.handle_keypress);
+                $(window).on('mousedown', this.handle_click);
             } else {
-                this.picker_elem.hide();
+                this.hide_elem();
             }
-            console.log(this.color_swatches);
+        }
+        handle_keypress(e) {
+            e.preventDefault();
+            if (e.key == "Enter") {
+                this.color = this.picker.color.hexString;
+                this.recent_colors_container.show();
+                this.create_swatch(e);
+                this.hide_elem();
+            } else if (e.key == "Escape"){
+                this.hide_elem();
+            }
+        }
+        handle_click(e) {
+            let target = this.picker_elem;
+            if(!target.is(e.target) &&
+                target.has(e.target).length === 0 &&
+                !this.color_elem.is(e.target) &&
+                target.css('display') === 'block')
+            {
+                this.hide_elem();
+            }
+        }
+        hide_elem(e) {
+            if(e) {
+                e.preventDefault();
+            }
+            this.picker_elem.hide();
+            this.elem.blur();
+            $(window).off('keyup', this.handle_keypress);
+            $(window).off('mousedown', this.handle_click);
         }
         create_swatch(e) {
-            console.log('CLOK');
             if(e) {
                 e.preventDefault();
                 this.recent_colors_container.show();
             }
             let hsl = this.picker.color.hsl;
             let color = this.picker.color.hexString;
-            console.log(color);
-            console.log(hsl);
             let current_color_swatch = $(`
             <div class="color-swatch" id="${color}" style="background:${color}"/>
         `);
@@ -77,31 +103,9 @@
             this.recent_colors_container.append(current_color_swatch);
             this.color_swatches.push(color);
             current_color_swatch.on('click', () => {
-                console.log(color);
                 this.color = color;
                 this.picker.color.hsl = hsl;
             });
-        }
-        handle_events(e){
-            if (e.type == 'keyup' &&
-               (e.key == "Enter" || e.key == "Escape"))
-            {
-                e.preventDefault();
-                this.picker_elem.hide();
-                this.elem.blur();
-                this.color = this.picker.color.hexString;
-                this.recent_colors_container.show();
-                this.create_swatch();
-            } else {
-                let target = this.picker_elem;
-                if(!target.is(e.target) &&
-                    target.has(e.target).length === 0 &&
-                    !this.color_elem.is(e.target) &&
-                    target.css('display') === 'block')
-                {
-                    this.picker_elem.hide();
-                }
-            }
         }
     }
 
