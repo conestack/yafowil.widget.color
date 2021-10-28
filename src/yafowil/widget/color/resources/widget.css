@@ -1,0 +1,9 @@
+span.color-picker-color {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    border: #ccc 3px solid;
+    background-color: #fff;
+    margin-left: 5px;
+    margin-bottom: -9px;
+}
