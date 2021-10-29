@@ -47,9 +47,25 @@ div.color-swatch {
     box-shadow: inset 0px 0px 3px rgb(0 0 0 / 40%);
 }
 
+div.color-swatch.selected {
+    box-shadow: 0px 0px 0px 2px #00b3ff;
+}
+
+div.buttons {
+    width: 100%;
+    height: 20px;
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+}
+
 button.add_color {
     background: none;
     border: none;
-    display: block;
-    margin-top: 1rem;
+    float:left;
+}
+
+button.remove_color {
+    background: none;
+    border: none;
+    float: right;
 }
