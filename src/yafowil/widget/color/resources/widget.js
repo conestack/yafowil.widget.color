@@ -35,7 +35,8 @@
             this.trigger_handle = this.trigger_handle.bind(this);
             elem.on('focus', this.trigger_handle);
             color_elem.on('click', this.trigger_handle);
-            this.picker.on('color:change', this.update_color.bind(this));
+            this.update_color = this.update_color.bind(this);
+            this.picker.on('color:change', this.update_color);
             this.hide_elem = this.hide_elem.bind(this);
             this.close_btn.on('click', this.hide_elem);
             this.handle_keypress = this.handle_keypress.bind(this);
@@ -78,6 +79,9 @@
             }
         }
         hide_elem(e) {
+            if(e) {
+                e.preventDefault();
+            }
             this.picker_elem.hide();
             this.elem.blur();
             $(window).off('keydown', this.handle_keypress);
