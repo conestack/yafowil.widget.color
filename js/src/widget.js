@@ -13,10 +13,9 @@ export class ColorWidget {
         this.picker = null;
         this.picker_elem = null;
         this.elem = elem;
+        this.elem.attr('spellcheck', "false"); // disable spellcheck on input
         let color_elem = this.color_elem = $('<span class="color-picker-color" />');
         elem.after(color_elem);
-        this.color = "#fff"; // color on init
-        this.color_swatches = []; // recent colours
 
         let picker_elem = this.picker_elem = $('<div class="color-picker-wrapper" />');
         this.color_elem.after(picker_elem);
@@ -24,11 +23,13 @@ export class ColorWidget {
         let close_btn = this.close_btn = $('<button class="close-button">✕</button>');
         this.picker_elem.append(close_btn);
 
+        // color related
+        this.color = "#ffffff"; // color on init
+        this.color_swatches = []; // recent colours
         this.picker = new iro.ColorPicker(picker_elem.get(0), {
             color: this.color
         });
         this.elem.val(this.color);
-        this.elem.attr('spellcheck', "false"); // disable spellcheck on input
         this.color_elem.css('background', this.color);
 
         let add_color_btn = this.add_color_btn = $('<button class="add_color">+ Add</button>');
@@ -63,7 +64,7 @@ export class ColorWidget {
         evt.preventDefault();
         if(this.picker_elem.css('display') === "none") {
             this.picker_elem.show();
-            $(window).on('keyup', this.handle_keypress);
+            $(window).on('keydown', this.handle_keypress);
             $(window).on('mousedown', this.handle_click);
         } else {
             this.hide_elem();
@@ -76,8 +77,8 @@ export class ColorWidget {
         if (e.key == "Enter") {
             this.color = this.picker.color.hexString;
             this.recent_colors_container.show();
-            this.create_swatch(e);
             this.hide_elem();
+            this.create_swatch();
         } else if (e.key == "Escape"){
             this.hide_elem();
         }
@@ -100,7 +101,7 @@ export class ColorWidget {
         }
         this.picker_elem.hide();
         this.elem.blur();
-        $(window).off('keyup', this.handle_keypress);
+        $(window).off('keydown', this.handle_keypress);
         $(window).off('mousedown', this.handle_click);
     }
 

@@ -11,19 +11,19 @@
             this.picker = null;
             this.picker_elem = null;
             this.elem = elem;
+            this.elem.attr('spellcheck', "false");
             let color_elem = this.color_elem = $('<span class="color-picker-color" />');
             elem.after(color_elem);
-            this.color = "#fff";
-            this.color_swatches = [];
             let picker_elem = this.picker_elem = $('<div class="color-picker-wrapper" />');
             this.color_elem.after(picker_elem);
             let close_btn = this.close_btn = $('<button class="close-button">✕</button>');
             this.picker_elem.append(close_btn);
+            this.color = "#ffffff";
+            this.color_swatches = [];
             this.picker = new iro.ColorPicker(picker_elem.get(0), {
                 color: this.color
             });
             this.elem.val(this.color);
-            this.elem.attr('spellcheck', "false");
             this.color_elem.css('background', this.color);
             let add_color_btn = this.add_color_btn = $('<button class="add_color">+ Add</button>');
             this.picker_elem.append(add_color_btn);
@@ -50,7 +50,7 @@
             evt.preventDefault();
             if(this.picker_elem.css('display') === "none") {
                 this.picker_elem.show();
-                $(window).on('keyup', this.handle_keypress);
+                $(window).on('keydown', this.handle_keypress);
                 $(window).on('mousedown', this.handle_click);
             } else {
                 this.hide_elem();
@@ -61,8 +61,8 @@
             if (e.key == "Enter") {
                 this.color = this.picker.color.hexString;
                 this.recent_colors_container.show();
-                this.create_swatch(e);
                 this.hide_elem();
+                this.create_swatch();
             } else if (e.key == "Escape"){
                 this.hide_elem();
             }
@@ -78,12 +78,9 @@
             }
         }
         hide_elem(e) {
-            if(e) {
-                e.preventDefault();
-            }
             this.picker_elem.hide();
             this.elem.blur();
-            $(window).off('keyup', this.handle_keypress);
+            $(window).off('keydown', this.handle_keypress);
             $(window).off('mousedown', this.handle_click);
         }
         create_swatch(e) {
