@@ -21,7 +21,19 @@
             this.color = "#ffffff";
             this.color_swatches = [];
             this.picker = new iro.ColorPicker(picker_elem.get(0), {
-                color: this.color
+                color: this.color,
+                layout: [
+                    {
+                        component: iro.ui.Box,
+                        options: {}
+                    },
+                    {
+                        component: iro.ui.Slider,
+                        options: {
+                            sliderType: 'hue'
+                        }
+                    },
+                  ]
             });
             this.elem.val(this.color);
             this.color_elem.css('background', this.color);
