@@ -121,17 +121,17 @@ export class ColorWidget {
             let hsl_display = this.hsl_display = $(`
                 <div class="hsl-display">
                   <div>
-                    h:
+                    H:
                     <input class="h" type="number" value="${hsl.h}"
                         min="0", max="360" />
                   </div>
                   <div>
-                    s:
+                    S:
                     <input class="s" type="number" value="${hsl.s}"
                         min="0", max="100" />
                   </div>
                   <div>
-                    l:
+                    L:
                     <input class="l" type="number" value="${hsl.l}"
                         min="0", max="100" />
                   </div>
@@ -145,7 +145,7 @@ export class ColorWidget {
         if (options.hex_display) {
             let hex_display = this.hex_display = $(`
                 <div class="hex-display">
-                  hex:
+                  HEX:
                   <input value="${this.picker.color.hexString}"
                     spellcheck="false" maxlength="7" />
                 </div>

@@ -27,8 +27,8 @@ button.close-button{
     background: none;
     border: none;
     position: absolute;
-    right: 5px;
-    top: 5px;
+    right: 0px;
+    top: 3px;
     opacity: .4;
 }
 
@@ -72,6 +72,8 @@ button.remove_color {
 
 div.hsl-display {
     margin: 7px;
+    display: flex;
+    justify-content: space-between;
 }
 
 div.hsl-display > div {
@@ -81,16 +83,22 @@ div.hsl-display > div {
 div.hsl-display input {
     display: inline-block;
     width: 50px;
-    margin: 0 2px;
+    margin-left: 6px;
+    padding-left: 5px;
     border: 1px solid #ccc;
     border-radius: 3px;
 }
 
 div.hex-display {
     margin: 7px;
+    display: flex;
+    align-items: center;
 }
 
 div.hex-display input {
     border: 1px solid #ccc;
     border-radius: 3px;
+    margin-left: 10px;
+    width: 100%;
+    padding-left: 5px;
 }
