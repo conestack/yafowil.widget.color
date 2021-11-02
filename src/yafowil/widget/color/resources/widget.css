@@ -69,3 +69,28 @@ button.remove_color {
     border: none;
     float: right;
 }
+
+div.hsl-display {
+    margin: 7px;
+}
+
+div.hsl-display > div {
+    display: inline-block;
+}
+
+div.hsl-display input {
+    display: inline-block;
+    width: 50px;
+    margin: 0 2px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+div.hex-display {
+    margin: 7px;
+}
+
+div.hex-display input {
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
