@@ -20,6 +20,8 @@
             this.picker_elem.append(close_btn);
             this.color = "#ffffff";
             this.color_swatches = [];
+            this.elem.val(this.color);
+            this.color_elem.css('background', this.color);
             this.picker = new iro.ColorPicker(picker_elem.get(0), {
                 color: this.color,
                 layout: [
@@ -35,15 +37,15 @@
                     },
                 ]
             });
-            this.elem.val(this.color);
-            this.color_elem.css('background', this.color);
             let add_color_btn = this.add_color_btn = $('<button class="add_color">+ Add</button>');
             let remove_color_btn = this.remove_color_btn = $('<button class="remove_color">- Remove</button>');
             let buttons = $('<div class="buttons"/>');
             this.picker_elem.append(buttons);
             buttons.append(add_color_btn).append(remove_color_btn);
-            this.add_color_btn.on('click', this.create_swatch.bind(this));
-            this.remove_color_btn.on('click', this.remove_swatch.bind(this));
+            this.create_swatch = this.create_swatch.bind(this);
+            this.remove_swatch = this.remove_swatch.bind(this);
+            this.add_color_btn.on('click', this.create_swatch);
+            this.remove_color_btn.on('click', this.remove_swatch);
             let swatches_container = this.swatches_container = $(`
             <div class="color-picker-recent"></div>
         `);
@@ -130,8 +132,10 @@
             let hsl = this.picker.color.hsl;
             let color = this.picker.color.hexString;
             for (let swatch of this.color_swatches) {
-                if (swatch.hex === color) {
-                    return
+                if (hsl.h === swatch.hsl.h &&
+                    hsl.s === swatch.hsl.s &&
+                    hsl.l === swatch.hsl.l) {
+                        return;
                 }
             }
             let current_color_swatch = $(`
@@ -142,6 +146,8 @@
                 $('div.color-swatch')[0].remove();
             }
             this.swatches_container.append(current_color_swatch);
+            $('div.color-swatch').removeClass('selected');
+            current_color_swatch.addClass('selected');
             let swatch = {
                 hex: color,
                 hsl: hsl

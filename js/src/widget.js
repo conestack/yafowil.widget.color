@@ -26,6 +26,9 @@ export class ColorWidget {
         // color related
         this.color = "#ffffff"; // color on init
         this.color_swatches = []; // saved colors
+        this.elem.val(this.color);
+        this.color_elem.css('background', this.color);
+
         this.picker = new iro.ColorPicker(picker_elem.get(0), {
             color: this.color,
             layout: [
@@ -41,16 +44,16 @@ export class ColorWidget {
                 },
             ]
         });
-        this.elem.val(this.color);
-        this.color_elem.css('background', this.color);
 
         let add_color_btn = this.add_color_btn = $('<button class="add_color">+ Add</button>');
         let remove_color_btn = this.remove_color_btn = $('<button class="remove_color">- Remove</button>');
         let buttons = $('<div class="buttons"/>');
         this.picker_elem.append(buttons);
         buttons.append(add_color_btn).append(remove_color_btn);
-        this.add_color_btn.on('click', this.create_swatch.bind(this));
-        this.remove_color_btn.on('click', this.remove_swatch.bind(this));
+        this.create_swatch = this.create_swatch.bind(this);
+        this.remove_swatch = this.remove_swatch.bind(this);
+        this.add_color_btn.on('click', this.create_swatch);
+        this.remove_color_btn.on('click', this.remove_swatch);
 
         let swatches_container = this.swatches_container = $(`
             <div class="color-picker-recent"></div>
@@ -156,8 +159,10 @@ export class ColorWidget {
         let color = this.picker.color.hexString;
 
         for (let swatch of this.color_swatches) {
-            if (swatch.hex === color) {
-                return
+            if (hsl.h === swatch.hsl.h &&
+                hsl.s === swatch.hsl.s &&
+                hsl.l === swatch.hsl.l) {
+                    return;
             }
         }
 
@@ -171,6 +176,9 @@ export class ColorWidget {
         }
 
         this.swatches_container.append(current_color_swatch);
+
+        $('div.color-swatch').removeClass('selected');
+        current_color_swatch.addClass('selected');
 
         let swatch = {
             hex: color,
