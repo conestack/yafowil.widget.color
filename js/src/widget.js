@@ -9,16 +9,21 @@ export class ColorWidget {
         });
     }
 
-    constructor(elem) {
+    constructor(elem, preview_elem) {
         this.picker = null;
         this.picker_elem = null;
         this.elem = elem;
         this.elem.attr('spellcheck', "false"); // disable spellcheck on input
-        let color_elem = this.color_elem = $('<span class="color-picker-color" />');
-        elem.after(color_elem);
+
+        if (preview_elem) {
+            this.preview_elem = preview_elem;
+        } else {
+            let preview_elem = this.preview_elem = $('<span class="color-picker-color" />');
+            elem.after(preview_elem);
+        }
 
         let picker_elem = this.picker_elem = $('<div class="color-picker-wrapper" />');
-        this.color_elem.after(picker_elem);
+        this.preview_elem.after(picker_elem);
 
         let close_btn = this.close_btn = $('<button class="close-button">✕</button>');
         this.picker_elem.append(close_btn);
@@ -27,7 +32,7 @@ export class ColorWidget {
         this.color = "#ffffff"; // color on init
         this.color_swatches = []; // saved colors
         this.elem.val(this.color);
-        this.color_elem.css('background', this.color);
+        this.preview_elem.css('background', this.color);
 
         this.picker = new iro.ColorPicker(picker_elem.get(0), {
             color: this.color,
@@ -62,7 +67,7 @@ export class ColorWidget {
 
         this.trigger_handle = this.trigger_handle.bind(this);
         elem.on('focus', this.trigger_handle);
-        color_elem.on('click', this.trigger_handle);
+        preview_elem.on('click', this.trigger_handle);
 
         this.update_color = this.update_color.bind(this);
         this.picker.on('color:change', this.update_color);
@@ -104,7 +109,7 @@ export class ColorWidget {
 
     update_color() {
         let current_color = this.picker.color.hexString;
-        this.color_elem.css('background', current_color);
+        this.preview_elem.css('background', current_color);
         this.elem.val(current_color);
     }
 
@@ -133,7 +138,7 @@ export class ColorWidget {
         let target = this.picker_elem;
         if(!target.is(e.target) &&
             target.has(e.target).length === 0 &&
-            !this.color_elem.is(e.target) &&
+            !this.preview_elem.is(e.target) &&
             target.css('display') === 'block') 
         {
             this.hide_elem();
