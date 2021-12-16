@@ -6,7 +6,7 @@ export class ColorWidget {
     static initialize(context) {
         $('input.color-picker', context).each(function() {
             let options = {
-                preview_elem: $('h1.title'), // add optional preview elem
+                // preview_elem: $('h1.title'), // add optional preview elem
                 hsl_display: true,
                 hex_display: true
             };
@@ -48,21 +48,41 @@ export class ColorWidget {
         this.elem.val(this.color);
         this.preview_elem.css('background', this.color);
 
-        this.picker = new iro.ColorPicker(picker_elem.get(0), {
-            color: this.color,
-            layout: [
-                {
-                    component: iro.ui.Box,
-                    options: {}
-                },
-                {
-                    component: iro.ui.Slider,
-                    options: {
-                        sliderType: 'hue'
-                    }
-                },
-            ]
-        });
+        if ($(window).width() <= 450) {
+            this.picker = new iro.ColorPicker(picker_elem.get(0), {
+                color: this.color,
+                layoutDirection: 'horizontal',
+                width: 150,
+                layout: [
+                    {
+                        component: iro.ui.Box,
+                        options: {}
+                    },
+                    {
+                        component: iro.ui.Slider,
+                        options: {
+                            sliderType: 'hue'
+                        }
+                    },
+                ]
+            });
+        } else {
+            this.picker = new iro.ColorPicker(picker_elem.get(0), {
+                color: this.color,
+                layout: [
+                    {
+                        component: iro.ui.Box,
+                        options: {}
+                    },
+                    {
+                        component: iro.ui.Slider,
+                        options: {
+                            sliderType: 'hue'
+                        }
+                    },
+                ]
+            });
+        }
 
         let add_color_btn = this.add_color_btn = $(`
             <button class="add_color">
@@ -89,6 +109,14 @@ export class ColorWidget {
 
         if (options) {
             this.init_options(options);
+        }
+
+        let elem_bottom_edge = this.elem.offset().top + this.elem.height();
+        if (
+            elem_bottom_edge + this.picker_elem.height()
+            > $(document).height() - 44
+        ){
+            this.picker_elem.css('transform', `translateY(calc(-100% - 28px)`);
         }
 
         this.trigger_handle = this.trigger_handle.bind(this);
@@ -242,7 +270,6 @@ export class ColorWidget {
     }
 
     trigger_handle(evt) {
-        evt.preventDefault();
         if (this.picker_elem.css('display') === "none") {
             this.picker_elem.show();
             $(window).on('keydown', this.handle_keypress);
