@@ -41,10 +41,11 @@
             this.elem.val(this.color);
             this.preview_elem.css('background', this.color);
             if ($(window).width() <= 450) {
+                let calc_width = this.picker_elem.outerWidth() / 2 - 40;
                 this.picker = new iro.ColorPicker(picker_elem.get(0), {
                     color: this.color,
                     layoutDirection: 'horizontal',
-                    width: 150,
+                    width: calc_width,
                     layout: [
                         {
                             component: iro.ui.Box,
