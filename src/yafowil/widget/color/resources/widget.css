@@ -30,7 +30,7 @@ div.color-picker-wrapper {
         width: 45%;
     }
     .color-picker-wrapper div.color-picker-recent {
-        width: 60%;
+        width: 50%;
     }
     .color-picker-wrapper div.hsl-display {
         flex-direction: column;
