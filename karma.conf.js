@@ -13,9 +13,8 @@ module.exports = function(config) {
             type: 'module',
             included: false
         }, {
-            pattern: '../node_modules/@jaames/iro/dist/iro.es.js',
-            type: 'module',
-            included: false
+            pattern: '../node_modules/@jaames/iro/dist/iro.js',
+            included: true
         },
         {
             pattern: '../js/src/*.js',
@@ -52,7 +51,8 @@ module.exports = function(config) {
             customResolver: null,
             ecmaVersion: 6,
             aliases: {
-                jquery: '../node_modules/jquery/src/jquery.js'
+                jquery: '../node_modules/jquery/src/jquery.js',
+                iro: '../node_modules/@jaames/iro/dist/iro.es.js'
             }
         }
     });

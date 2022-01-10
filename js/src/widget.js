@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import iro from '../../node_modules/@jaames/iro/dist/iro.es.js';
 
 export class ColorWidget {
 
@@ -18,23 +17,22 @@ export class ColorWidget {
         this.picker = null;
         this.picker_elem = null;
         this.elem = elem;
+        this.elem.data('color_widget', this);
         this.elem.attr('spellcheck', "false"); // disable spellcheck on input
         this.elem.attr('maxlength', 7);
         let picker_elem = this.picker_elem = $(`
             <div class="color-picker-wrapper" />
         `);
 
-        if (options) {
-            if (options.preview_elem) {
-                this.preview_elem = options.preview_elem;
-                this.elem.after(picker_elem);
-            } else {
-                let preview_elem = this.preview_elem = $(`
-                    <span class="color-picker-color" />
-                `);
-                this.elem.after(preview_elem);
-                this.preview_elem.after(picker_elem);
-            }
+        if (options && options.preview_elem) {
+            this.preview_elem = options.preview_elem;
+            this.elem.after(picker_elem);
+        } else {
+            let preview_elem = this.preview_elem = $(`
+                <span class="color-picker-color" />
+            `);
+            this.elem.after(preview_elem);
+            this.preview_elem.after(picker_elem);
         }
 
         let close_btn = this.close_btn = $(`
@@ -202,15 +200,16 @@ export class ColorWidget {
             this.color_swatches = JSON.parse(json_str);
 
             for (let swatch of this.color_swatches) {
+                let elem_id = swatch.hex.substr(1);
                 let current_color_swatch = $(`
                     <div class="color-swatch"
-                         id="${swatch.hex}"
+                         id="${elem_id}"
                          style="background:${swatch.hex}"/>
                 `);
                 this.swatches_container.append(current_color_swatch);
 
                 current_color_swatch.on('click', () => {
-                    this.color = swatch.color;
+                    this.color = swatch.hex;
                     this.picker.color.hsl = swatch.hsl;
 
                     if ($('div.color-swatch').length > 1) {
