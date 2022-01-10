@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import iro from 'iro';
+import iro from '../../node_modules/@jaames/iro/dist/iro.es.js';
 
 export class ColorWidget {
 
