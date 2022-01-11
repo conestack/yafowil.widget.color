@@ -11,18 +11,20 @@ QUnit.module('ColorWidget', hooks => {
     });
     hooks.afterEach(() => {
         $('#container').empty();
+        localStorage.removeItem('color-swatches');
     });
     hooks.after(() => {
         $('#container').empty().remove();
     });
 
-    QUnit.test.todo('initialize', assert => {
+    QUnit.test('initialize', assert => {
         ColorWidget.initialize();
         let widget = elem.data('color_widget');
         assert.ok(widget.elem.attr('spellcheck'), false);
+        assert.deepEqual(widget.elem, elem);
     });
 
-    QUnit.test.only('default constructor', assert => {
+    QUnit.test('default constructor', assert => {
         let widget = new ColorWidget(elem);
         assert.strictEqual(widget.elem.attr('spellcheck'), 'false');
         assert.strictEqual(widget.elem.attr('maxlength'), '7');
@@ -33,14 +35,16 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual(widget.color, '#ffffff');
         assert.strictEqual(widget.color_swatches.length, 0);
         assert.strictEqual(widget.elem.val(), '#ffffff');
-        // for some reason, hex white gets transformed to rgb value
-        assert.strictEqual(widget.preview_elem.css('background-color'), 'rgb(255, 255, 255)');
-
+        // hex white gets transformed to rgb value
+        assert.strictEqual(
+            widget.preview_elem.css('background-color'),
+            'rgb(255, 255, 255)'
+        );
         // iro picker exists
         assert.ok(widget.picker);
     });
 
-    QUnit.test.only('preview_elem', assert => {
+    QUnit.test('preview_elem', assert => {
         let prev_elem = $('<div id="preview" style="width:2px; height:2px" />');
         $('body').append(prev_elem);
         let options = {
@@ -52,7 +56,7 @@ QUnit.module('ColorWidget', hooks => {
         prev_elem.remove();
     });
 
-    QUnit.test.only('init_options: hsl_display', assert => {
+    QUnit.test('init_options: hsl_display', assert => {
         let options = {
             hsl_display: true
         }
@@ -61,14 +65,17 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual(widget.hsl_display.children('div').length, 3);
     });
 
-    QUnit.test.only('init_options: hex_display', assert => {
+    QUnit.test('init_options: hex_display', assert => {
         let widget = new ColorWidget(elem, {hex_display: true});
         assert.ok(widget.hex_display.hasClass('hex-display'));
         assert.strictEqual(widget.hex_display.children('input').length, 1);
-        assert.strictEqual(widget.hex_display.val(), widget.picker.color.hexString);
+        assert.strictEqual(
+            widget.hex_display.val(),
+            widget.picker.color.hexString
+        );
     });
 
-    QUnit.test.only('init_swatches', assert => {
+    QUnit.test('init_swatches', assert => {
         // set json string
         let swatch1 = {hex: '#e6f96c', hsl: {h: 68, s: 93, l: 70}};
         let swatch2 = {hex: '#00db7f', hsl: {h: 155, s: 100, l: 43}};
@@ -92,19 +99,25 @@ QUnit.module('ColorWidget', hooks => {
         $('#00db7f').trigger('click');
         assert.strictEqual(widget.color, '#00db7f');
         assert.ok($('#00db7f').hasClass('selected'));
-
-        // remove json string
-        localStorage.removeItem('color-swatches');
     });
 
-    QUnit.test.todo('update_color', assert => {
+    QUnit.test('update_hsl_value', assert => {
         // initialize
         let widget = new ColorWidget(elem, {hex_display: true, hsl_display: true});
+        // initial color
+        assert.deepEqual(widget.picker.color.hsl, {h:0, s:0, l:100});
 
-        assert.ok(true);
+        $('input.l', widget.hsl_display).val(10).trigger('input');
+        assert.deepEqual(widget.picker.color.hsl, {h:0, s:0, l:10});
+
+        $('input.h', widget.hsl_display).val(100).trigger('input');
+        assert.deepEqual(widget.picker.color.hsl, {h:100, s:0, l:10});
+
+        $('input.s', widget.hsl_display).val(10).trigger('input');
+        assert.deepEqual(widget.picker.color.hsl, {h:100, s:10, l:10});
     });
 
-    QUnit.test.only('update_hex_value', assert => {
+    QUnit.test('update_hex_value', assert => {
         // initialize
         let widget = new ColorWidget(elem, {hex_display: true});
 
@@ -128,7 +141,7 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual(widget.picker.color.hexString, '#cccccc');
     });
 
-    QUnit.test.only('trigger_handle', assert => {
+    QUnit.test('trigger_handle', assert => {
         // initialize
         let widget = new ColorWidget(elem);
         assert.strictEqual(widget.picker_elem.css('display'), 'none');
@@ -152,7 +165,7 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual(widget.picker_elem.css('display'), 'none');
     });
 
-    QUnit.test.only('handle_keypress', assert => {
+    QUnit.test('handle_keypress', assert => {
         // initialize
         let widget = new ColorWidget(elem);
         assert.strictEqual(widget.picker_elem.css('display'), 'none');
@@ -176,7 +189,7 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual(widget.picker_elem.css('display'), 'none');
     });
 
-    QUnit.test.only('hide_elem', assert => {
+    QUnit.test('hide_elem', assert => {
         // initialize
         let widget = new ColorWidget(elem);
         assert.strictEqual(widget.picker_elem.css('display'), 'none');
@@ -191,10 +204,111 @@ QUnit.module('ColorWidget', hooks => {
         assert.false(widget.elem.is(':focus'));
     });
 
-    QUnit.module('swatches', () => {
-        QUnit.test('create_swatch', assert => {
-            // initialize
-            let widget = new ColorWidget(elem);
-        });
+    QUnit.test('create_swatch, remove_swatch, set_swatches', assert => {
+        // initialize
+        let widget = new ColorWidget(elem);
+        assert.strictEqual(widget.swatches_container.css('display'), 'none');
+
+        // open menu by click
+        widget.preview_elem.trigger('click');
+        assert.strictEqual(widget.color_swatches.length, 0);
+
+        // click add color
+        widget.add_color_btn.trigger('click');
+        // assertions
+        assert.strictEqual(widget.swatches_container.css('display'), 'block');
+        assert.strictEqual(widget.color_swatches.length, 1);
+        assert.strictEqual(
+            widget.color_swatches[0].hex,
+            widget.picker.color.hexString
+        );
+        assert.deepEqual(
+            widget.color_swatches[0].hsl,
+            widget.picker.color.hsl
+        );
+
+        // add same color again
+        widget.add_color_btn.trigger('click');
+        assert.strictEqual(widget.color_swatches.length, 1);
+
+        // add second color
+        widget.picker.color.hexString = '#cccccc';
+        widget.add_color_btn.trigger('click');
+        assert.strictEqual(widget.color_swatches.length, 2);
+        assert.strictEqual(
+            widget.preview_elem.css('background-color'),
+            'rgb(204, 204, 204)'
+        );
+        assert.ok($('#cccccc').hasClass('selected'));
+
+        // click on first swatch
+        $('#ffffff').trigger('click');
+        assert.strictEqual(widget.color, '#ffffff');
+        assert.strictEqual(
+            widget.picker.color.hexString,
+            '#ffffff'
+        );
+        assert.strictEqual(
+            widget.preview_elem.css('background-color'),
+            'rgb(255, 255, 255)'
+        );
+        assert.false($('#cccccc').hasClass('selected'));
+        assert.ok($('#ffffff').hasClass('selected'));
+
+        // JSON localStorage
+        assert.strictEqual(
+            localStorage.getItem('color-swatches'),
+            JSON.stringify(widget.color_swatches)
+        );
+
+        // delete swatch with keypress
+        let delKey = $.Event('keydown', { key: 'Delete' });
+        $(window).trigger(delKey);
+        assert.strictEqual($('div.color-swatch').length, 1);
+        assert.strictEqual($('div#ffffff').length, 0);
+        assert.strictEqual(
+            widget.picker.color.hexString,
+            '#cccccc'
+        );
+
+        // delete swatch with button
+        widget.remove_color_btn.trigger('click');
+        assert.strictEqual($('div.color-swatch').length, 0);
+        assert.strictEqual($('div#cccccc').length, 0);
+        assert.notOk(localStorage.getItem('color-swatches'));
+
+        assert.strictEqual(widget.color, '#ffffff');
+        assert.strictEqual(widget.picker.color.hexString, '#ffffff');
+    });
+
+    QUnit.test('create over 12 swatches', assert => {
+        // initialize
+        let widget = new ColorWidget(elem);
+        assert.strictEqual(widget.swatches_container.css('display'), 'none');
+
+        // open menu by click
+        widget.preview_elem.trigger('click');
+        assert.strictEqual(widget.color_swatches.length, 0);
+
+        let colors = [
+            '#83ee01', '#05074b', '#ae47ed', '#eb6ef2', '#c2c9a1', '#8e84b4',
+            '#d8c576', '#add2b4', '#05013d', '#4edbb3', '#420c21', '#a23bf6',
+            '#fe9185'
+        ]
+        // add swatches
+        for (let i = 0; i < 13; i++) {
+            widget.picker.color.hexString = colors[i];
+            widget.add_color_btn.trigger('click');
+        }
+        assert.strictEqual(widget.color_swatches.length, 12);
+
+        // change array
+        colors.shift();
+        for (let i = 0; i < 12; i++) {
+            assert.strictEqual(
+                widget.color_swatches[i].hex,
+                colors[i]
+            );
+        }
     });
 });

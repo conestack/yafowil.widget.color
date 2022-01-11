@@ -328,7 +328,7 @@ export class ColorWidget {
         }
 
         let current_color_swatch = $(`
-            <div class="color-swatch" id="${color}" style="background:${color}"/>
+            <div class="color-swatch" id="${color.substr(1)}" style="background:${color}"/>
         `);
 
         if (this.color_swatches.length >= 12) {
@@ -364,7 +364,7 @@ export class ColorWidget {
         }
 
         let current_color_swatch = $('div.color-swatch.selected');
-        let color = current_color_swatch.attr('id');
+        let color = `#${current_color_swatch.attr('id')}`;
 
         let swatches = this.color_swatches;
 
@@ -375,6 +375,12 @@ export class ColorWidget {
         }
         current_color_swatch.remove();
         $('div.color-swatch').last().addClass('selected');
+        if (this.color_swatches.length === 0) {
+            this.picker.color.hsl = {h: 0, s: 0, l: 100};
+            this.color = '#ffffff';
+            localStorage.removeItem('color-swatches');
+            return;
+        }
         let last_color = this.color_swatches[this.color_swatches.length - 1];
         this.picker.color.hsl = last_color.hsl;
         this.set_swatches();
