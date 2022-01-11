@@ -312,21 +312,30 @@ QUnit.module('ColorWidget', hooks => {
     });
 
     QUnit.module('mobile and resize', hooks => {
-        hooks.before(() => {
-            let original_width = $(window).width();
-        });
-        hooks.beforeEach(() => {
-
-        });
+        let original_width = $(window).width();
         hooks.afterEach(() => {
-            
-        });
-        hooks.after(() => {
-            
+            viewport.set(original_width);
         });
 
-        QUnit.test.only('mobile initialization', assert => {
-            assert.ok(true);
-        })
+        QUnit.test('mobile initialization', assert => {
+            viewport.set(300);
+            // initialize
+            let widget = new ColorWidget(elem);
+            assert.ok(widget.picker_elem.hasClass('mobile'));
+        });
+
+        QUnit.test('resizing', assert => {
+            // initialize
+            let widget = new ColorWidget(elem);
+            assert.notOk(widget.picker_elem.hasClass('mobile'));
+
+            viewport.set(300);
+            $(window).trigger('resize');
+            assert.ok(widget.picker_elem.hasClass('mobile'));
+
+            viewport.set(1000);
+            $(window).trigger('resize');
+            assert.notOk(widget.picker_elem.hasClass('mobile'));
+        });
     })
 });
