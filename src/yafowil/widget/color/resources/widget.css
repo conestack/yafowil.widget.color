@@ -14,6 +14,7 @@ div.color-picker-wrapper {
     position: absolute;
     z-index: 10;
     width: fit-content;
+    max-width: fit-content;
     padding: 20px;
     border: 1px solid rgb(226, 226, 226);
     border-radius: 10px;
@@ -22,54 +23,68 @@ div.color-picker-wrapper {
     display: none;
 }
 
-@media (max-width:450px) {
-    div.color-picker-wrapper {
-        width: 90%!important;
-    }
-    .color-picker-wrapper div.buttons {
-        width: 45%;
-    }
-    .color-picker-wrapper div.color-picker-recent {
-        width: 50%;
-    }
-    .color-picker-wrapper div.hsl-display {
-        flex-direction: column;
-        position: absolute;
-        top: 0;
-        right: 0;
-        height: 60%;
-        width: 30%;
-        margin: 0;
-        margin-right: 20px;
-        padding-top: 20px;
-    }
-    .color-picker-wrapper div.hsl-display > div {
-        margin: 5px;
-    }
-
-    .color-picker-wrapper div.hex-display {
-        flex-direction: column;
-        position: absolute;
-        align-items: baseline;
-        bottom: 0;
-        right: 0;
-        width: 30%;
-        height: 40%;
-        margin: 0;
-        margin-right: 20px;
-        padding-top: 20px;
-    }
-
-    .color-picker-wrapper div.hex-display input {
-        padding: 0;
-        margin: 0;
-    }
-
-    .color-picker-wrapper button.close-button {
-        top: 0;
-        font-size: 30px;
-    }
+.color-picker-wrapper.mobile {
+    width: 90vw;
+    max-width: 90vw;
 }
+.color-picker-wrapper.mobile div.hsl-display {
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    margin-right: 30px;
+    padding-top: 20px;
+}
+.color-picker-wrapper.mobile div.hsl-display input {
+    width: auto;
+}
+.color-picker-wrapper.mobile div.hsl-display > div {
+    margin: 5px;
+}
+.color-picker-wrapper.mobile div.hex-display {
+    display: none;
+}
+.color-picker-wrapper.mobile div.hex-display input {
+    margin: 0;
+    width: auto;
+}
+.color-picker-wrapper.mobile .buttons.hsl-false {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    width: 30%;
+    height: fit-content;
+}
+.color-picker-wrapper.mobile .buttons.hsl-false button {
+    width: 100%;
+}
+.color-picker-wrapper.mobile .buttons {
+    height: 40px;
+}
+.color-picker-wrapper.mobile .buttons button {
+    width: 45%;
+    padding: 3px;
+    border: 1px solid #d8d8d8;
+    border-radius: 10px;
+    background: white;
+    margin: 10px 2%;
+    box-shadow: 1px 1px 3px #ccc;
+}
+.color-picker-wrapper.mobile button.close-button {
+    top: 0;
+    font-size: 30px;
+}
+.color-picker-wrapper.mobile div.color-swatch {
+    width: calc(100% / 6 - 8px);
+    margin: 4px;
+}
+.color-picker-wrapper.mobile .IroColorPicker {
+    margin-left: 6px;
+}
+
 
 button.close-button{
     float: right;

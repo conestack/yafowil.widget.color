@@ -1,4 +1,4 @@
-(function (exports, $, iro) {
+(function (exports, $) {
     'use strict';
 
     class ColorWidget {
@@ -12,102 +12,50 @@
             });
         }
         constructor(elem, options) {
-            this.picker = null;
-            this.picker_elem = null;
             this.elem = elem;
-            this.elem.data('color_widget', this);
-            this.elem.attr('spellcheck', "false");
-            this.elem.attr('maxlength', 7);
-            let picker_elem = this.picker_elem = $(`
+            this.elem.data('color_widget', this)
+                     .attr('spellcheck', "false")
+                     .attr('maxlength', 7);
+            this.picker_elem = $(`
             <div class="color-picker-wrapper" />
         `);
-            if (options && options.preview_elem) {
-                this.preview_elem = options.preview_elem;
-                this.elem.after(picker_elem);
-            } else {
-                let preview_elem = this.preview_elem = $(`
-                <span class="color-picker-color" />
-            `);
-                this.elem.after(preview_elem);
-                this.preview_elem.after(picker_elem);
-            }
-            let close_btn = this.close_btn = $(`
+            this.picker_container = $('<div class="color-picker-container" />');
+            this.close_btn = $(`
             <button class="close-button">✕</button>
         `);
-            this.picker_elem.append(close_btn);
-            this.color = "#ffffff";
-            this.color_swatches = [];
-            this.elem.val(this.color);
-            this.preview_elem.css('background', this.color);
-            if ($(window).width() <= 450) {
-                let calc_width = this.picker_elem.outerWidth() / 2 - 40;
-                this.picker = new iro.ColorPicker(picker_elem.get(0), {
-                    color: this.color,
-                    layoutDirection: 'horizontal',
-                    width: calc_width,
-                    layout: [
-                        {
-                            component: iro.ui.Box,
-                            options: {}
-                        },
-                        {
-                            component: iro.ui.Slider,
-                            options: {
-                                sliderType: 'hue'
-                            }
-                        },
-                    ]
-                });
-            } else {
-                this.picker = new iro.ColorPicker(picker_elem.get(0), {
-                    color: this.color,
-                    layout: [
-                        {
-                            component: iro.ui.Box,
-                            options: {}
-                        },
-                        {
-                            component: iro.ui.Slider,
-                            options: {
-                                sliderType: 'hue'
-                            }
-                        },
-                    ]
-                });
-            }
             let add_color_btn = this.add_color_btn = $(`
             <button class="add_color">
-              + Add
+            + Add
             </button>
         `);
             let remove_color_btn = this.remove_color_btn = $(`
             <button class="remove_color">
-              - Remove
+            - Remove
             </button>
         `);
-            let buttons = $('<div class="buttons"/>');
-            this.picker_elem.append(buttons);
-            buttons.append(add_color_btn).append(remove_color_btn);
+            this.buttons = $('<div class="buttons"/>').append(add_color_btn).append(remove_color_btn);
+            this.swatches_container = $(`<div class="color-picker-recent" />`);
+            this.picker_elem
+                .append(this.picker_container)
+                .append(this.close_btn)
+                .append(this.buttons)
+                .append(this.swatches_container);
+            this.resize_handle = this.resize_handle.bind(this);
+            this.resize_handle();
+            $(window).on('resize', this.resize_handle);
             this.create_swatch = this.create_swatch.bind(this);
-            this.remove_swatch = this.remove_swatch.bind(this);
             this.add_color_btn.on('click', this.create_swatch);
+            this.remove_swatch = this.remove_swatch.bind(this);
             this.remove_color_btn.on('click', this.remove_swatch);
-            let swatches_container = this.swatches_container = $(`
-            <div class="color-picker-recent"></div>
-        `);
-            this.picker_elem.append(swatches_container);
-            if (options) {
-                this.init_options(options);
-            }
-            let elem_bottom_edge = this.elem.offset().top + this.elem.height();
-            if (
-                elem_bottom_edge + this.picker_elem.height()
-                > $(document).height() - 44
-            ){
-                this.picker_elem.css('transform', `translateY(calc(-100% - 28px)`);
-            }
+            this.init_options(options);
+            this.init_swatches();
+            this.color = "#ffffff";
+            this.color_swatches = [];
+            this.elem.val(this.color);
+            this.preview_elem.css('background', this.color);
             this.trigger_handle = this.trigger_handle.bind(this);
             this.elem.on('focus', this.trigger_handle);
+            this.preview_elem.on('click', this.trigger_handle);
             this.elem.on('input', () => {
                 let hex = this.elem.val();
                 if (hex.length === 0) {
@@ -115,19 +63,27 @@
                 }
                 this.update_hex_value(hex);
             });
-            this.preview_elem.on('click', this.trigger_handle);
             this.update_color = this.update_color.bind(this);
             this.picker.on('color:change', this.update_color);
             this.hide_elem = this.hide_elem.bind(this);
             this.close_btn.on('click', this.hide_elem);
             this.handle_keypress = this.handle_keypress.bind(this);
             this.handle_click = this.handle_click.bind(this);
-            this.init_swatches();
         }
         init_options(options) {
-            if (options.hsl_display) {
+            if (options && options.preview_elem) {
+                this.preview_elem = options.preview_elem;
+                this.elem.after(this.picker_elem);
+            } else {
+                this.preview_elem = $(`
+                <span class="color-picker-color" />
+            `);
+                this.elem.after(this.preview_elem);
+                this.preview_elem.after(this.picker_elem);
+            }
+            if (options && options.hsl_display) {
                 let hsl = this.picker.color.hsl;
-                let hsl_display = this.hsl_display = $(`
+                this.hsl_display = $(`
                 <div class="hsl-display">
                   <div>
                     H:
@@ -146,11 +102,13 @@
                   </div>
                 </div>
             `);
-                this.picker_elem.append(hsl_display);
+                this.picker_elem.append(this.hsl_display);
                 $('input', this.hsl_display).on('input',
                     this.update_hsl_value.bind(this));
+            } else {
+                this.buttons.addClass('hsl-false');
             }
-            if (options.hex_display) {
+            if (options && options.hex_display) {
                 let hex_display = this.hex_display = $(`
                 <div class="hex-display">
                   HEX:
@@ -190,6 +148,56 @@
                             $('div.color-swatch').removeClass('selected');
                         }
                         current_color_swatch.addClass('selected');
+                    });
+                }
+            }
+        }
+        resize_handle(e) {
+            if ($(window).width() <= 450 && !this.picker_elem.hasClass('mobile')) {
+                this.picker = null;
+                $('div.IroColorPicker', this.picker_elem).remove();
+                this.picker_elem.addClass('mobile');
+                let calc_width = $(window).width() * 0.3;
+                this.picker = new iro.ColorPicker(this.picker_container.get(0), {
+                    color: this.color,
+                    layoutDirection: 'horizontal',
+                    width: calc_width,
+                    display: 'inline-block',
+                    layout: [
+                        {
+                            component: iro.ui.Box,
+                            options: {}
+                        },
+                        {
+                            component: iro.ui.Slider,
+                            options: {
+                                sliderType: 'hue'
+                            }
+                        },
+                    ]
+                });
+            }
+            else if ($(window).width() > 450) {
+                if (this.picker_elem.hasClass('mobile')) {
+                    this.picker = null;
+                    $('div.IroColorPicker', this.picker_elem).remove();
+                    this.picker_elem.removeClass('mobile');
+                }
+                if (!this.picker) {
+                    this.picker = new iro.ColorPicker(this.picker_container.get(0), {
+                        color: this.color,
+                        layout: [
+                            {
+                                component: iro.ui.Box,
+                                options: {}
+                            },
+                            {
+                                component: iro.ui.Slider,
+                                options: {
+                                    sliderType: 'hue'
+                                }
+                            },
+                        ]
                     });
                 }
             }
@@ -289,7 +297,7 @@
                 }
             }
             let current_color_swatch = $(`
-            <div class="color-swatch" id="${color}" style="background:${color}"/>
+            <div class="color-swatch" id="${color.substr(1)}" style="background:${color}"/>
         `);
             if (this.color_swatches.length >= 12) {
                 this.color_swatches.shift();
@@ -316,7 +324,7 @@
                 e.preventDefault();
             }
             let current_color_swatch = $('div.color-swatch.selected');
-            let color = current_color_swatch.attr('id');
+            let color = `#${current_color_swatch.attr('id')}`;
             let swatches = this.color_swatches;
             for (let index in swatches) {
                 if (color === swatches[index].hex) {
@@ -325,6 +333,12 @@
             }
             current_color_swatch.remove();
             $('div.color-swatch').last().addClass('selected');
+            if (this.color_swatches.length === 0) {
+                this.picker.color.hsl = {h: 0, s: 0, l: 100};
+                this.color = '#ffffff';
+                localStorage.removeItem('color-swatches');
+                return;
+            }
             let last_color = this.color_swatches[this.color_swatches.length - 1];
             this.picker.color.hsl = last_color.hsl;
             this.set_swatches();
@@ -356,5 +370,5 @@
 
     return exports;
 
-})({}, jQuery, iro);
+})({}, jQuery);
 //# sourceMappingURL=widget.js.map

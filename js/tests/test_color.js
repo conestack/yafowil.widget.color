@@ -83,8 +83,7 @@ QUnit.module('ColorWidget', hooks => {
         localStorage.setItem("color-swatches", json_str);
 
         // initialize
-        let widget = new ColorWidget(elem, {hex_display:true, hsl_display: true});
-
+        let widget = new ColorWidget(elem, {hex_display: true, hsl_display: true});
         // assertions
         assert.deepEqual(widget.color_swatches, [swatch1, swatch2]);
         assert.strictEqual(widget.swatches_container.css('display'), 'block');
@@ -311,4 +310,23 @@ QUnit.module('ColorWidget', hooks => {
             );
         }
     });
+
+    QUnit.module('mobile and resize', hooks => {
+        hooks.before(() => {
+            let original_width = $(window).width();
+        });
+        hooks.beforeEach(() => {
+
+        });
+        hooks.afterEach(() => {
+            
+        });
+        hooks.after(() => {
+            
+        });
+
+        QUnit.test.only('mobile initialization', assert => {
+            assert.ok(true);
+        })
+    })
 });

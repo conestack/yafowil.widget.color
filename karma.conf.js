@@ -6,7 +6,8 @@ module.exports = function(config) {
     config.set({
         basePath: 'karma',
         frameworks: [
-            'qunit'
+            'qunit',
+            'viewport'
         ],
         files: [{
             pattern: '../node_modules/jquery/src/**/*.js',
