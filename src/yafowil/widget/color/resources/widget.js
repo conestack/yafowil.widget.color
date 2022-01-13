@@ -5,7 +5,7 @@
         static initialize(context) {
             $('input.color-picker', context).each(function() {
                 let options = {
-                    hsl_display: true,
+                    hsl_display: false,
                     hex_display: true
                 };
                 new ColorWidget($(this), options);
@@ -20,9 +20,7 @@
             <div class="color-picker-wrapper" />
         `);
             this.picker_container = $('<div class="color-picker-container" />');
-            this.close_btn = $(`
-            <button class="close-button">✕</button>
-        `);
+            this.close_btn = $(`<button class="close-button">✕</button>`);
             let add_color_btn = this.add_color_btn = $(`
             <button class="add_color">
             + Add
@@ -33,7 +31,9 @@
             - Remove
             </button>
         `);
-            this.buttons = $('<div class="buttons"/>').append(add_color_btn).append(remove_color_btn);
+            this.buttons = $('<div class="buttons"/>')
+                .append(add_color_btn)
+                .append(remove_color_btn);
             this.swatches_container = $(`<div class="color-picker-recent" />`);
             this.picker_elem
                 .append(this.picker_container)
@@ -64,10 +64,23 @@
             this.remove_color_btn.on('click', this.remove_swatch);
             this.init_options(options);
             this.color_swatches = [];
-            this.init_swatches();
-            this.color = "#ffffff";
-            this.elem.val(this.color);
-            this.preview_elem.css('background', this.color);
+            let json_str = localStorage.getItem("color-swatches");
+            if (json_str) {
+                this.swatches_container.show();
+                let color_swatches = JSON.parse(json_str);
+                for (let swatch of color_swatches) {
+                    this.color_swatches.push(new ColorSwatch(this, swatch.hex, swatch.hsl));
+                }
+                this.active_swatch = this.color_swatches[this.color_swatches.length -1];
+                this.active_swatch.select();
+                this.hex = this.active_swatch.hex;
+                this.hsl = this.active_swatch.hsl;
+            } else {
+                this.hex = "#ffffff";
+                this.hsl = {h:0, s:0, l:100};
+            }
+            this.elem.val(this.hex);
+            this.preview_elem.css('background', this.hex);
             this.trigger_handle = this.trigger_handle.bind(this);
             this.elem.on('focus', this.trigger_handle);
             this.preview_elem.on('click', this.trigger_handle);
@@ -76,7 +89,7 @@
                 if (hex.length === 0) {
                     this.elem.val('#');
                 }
-                this.update_hex_value(hex);
+                this.hex = hex;
             });
             this.update_color = this.update_color.bind(this);
             this.picker.on('color:change', this.update_color);
@@ -86,7 +99,10 @@
             this.handle_click = this.handle_click.bind(this);
         }
         init_options(options) {
-            if (options && options.preview_elem) {
+            let preview_elem = options.preview_elem;
+            let hsl_display = options.hsl_display;
+            let hex_display = options.hex_display;
+            if (preview_elem) {
                 this.preview_elem = options.preview_elem;
                 this.elem.after(this.picker_elem);
             } else {
@@ -96,7 +112,7 @@
                 this.elem.after(this.preview_elem);
                 this.preview_elem.after(this.picker_elem);
             }
-            if (options && options.hsl_display) {
+            if (hsl_display) {
                 let hsl = this.picker.color.hsl;
                 this.hsl_display = $(`
                 <div class="hsl-display">
@@ -118,12 +134,12 @@
                 </div>
             `);
                 this.picker_elem.append(this.hsl_display);
-                $('input', this.hsl_display).on('input',
-                    this.update_hsl_value.bind(this));
+                this.handle_hsl_input = this.handle_hsl_input.bind(this);
+                $('input', this.hsl_display).on('input', this.handle_hsl_input);
             } else {
                 this.buttons.addClass('hsl-false');
             }
-            if (options && options.hex_display) {
+            if (hex_display) {
                 let hex_display = this.hex_display = $(`
                 <div class="hex-display">
                   HEX:
@@ -134,38 +150,38 @@
                 this.picker_elem.append(hex_display);
                 let hex = this.picker.color.hexString;
                 this.hex_display.val(hex);
-                $('input', this.hex_display).on('input', (e) => {
-                    let hex = $(e.currentTarget).val();
-                    if (hex.length === 0) {
-                        $(e.currentTarget).val('#');
-                    }
-                    this.update_hex_value(hex);
-                });
+                this.handle_hex_input = this.handle_hex_input.bind(this);
+                $('input', this.hex_display).on('input', this.handle_hex_input);
             }
         }
-        init_swatches() {
-            let json_str = localStorage.getItem("color-swatches");
-            if (json_str) {
-                this.swatches_container.show();
-                this.color_swatches = JSON.parse(json_str);
-                for (let swatch of this.color_swatches) {
-                    let elem_id = swatch.hex.substr(1);
-                    let current_color_swatch = $(`
-                    <div class="color-swatch"
-                         id="${elem_id}"
-                         style="background:${swatch.hex}"/>
-                `);
-                    this.swatches_container.append(current_color_swatch);
-                    current_color_swatch.on('click', () => {
-                        this.color = swatch.hex;
-                        this.picker.color.hsl = swatch.hsl;
-                        if ($('div.color-swatch').length > 1) {
-                            $('div.color-swatch').removeClass('selected');
-                        }
-                        current_color_swatch.addClass('selected');
-                    });
+        get hex() {
+            return this._hex;
+        }
+        set hex(hex) {
+            if (typeof hex === 'string'
+                && hex[0] === '#'
+                && hex.length === 7
+                && !isNaN(Number('0x' + hex.substring(1,7)))
+            ){
+                this._hex = hex;
+                this.picker.color.hexString = hex;
+                this.elem.val(hex);
+                if (this.hex_display) {
+                    $('input', this.hex_display).val(hex);
                 }
             }
+        }
+        get hsl() {
+            return this._hsl;
+        }
+        set hsl(hsl) {
+            if (this.hsl_display) {
+                $('input.h', this.hsl_display).val(hsl.h);
+                $('input.s', this.hsl_display).val(hsl.s);
+                $('input.l', this.hsl_display).val(hsl.l);
+            }
+            this.picker.color.hsl = hsl;
+            this._hsl = hsl;
         }
         resize_handle(e) {
             if ($(window).width() <= 450) {
@@ -184,28 +200,10 @@
                 }
             }
         }
-        update_color() {
-            let current_color = this.picker.color.hexString;
-            let current_hsl = this.picker.color.hsl;
-            this.preview_elem.css('background', current_color);
-            this.elem.val(current_color);
-            if (this.hsl_display) {
-                $('input.h', this.hsl_display).val(current_hsl.h);
-                $('input.s', this.hsl_display).val(current_hsl.s);
-                $('input.l', this.hsl_display).val(current_hsl.l);
-            }
-            if (this.hex_display) {
-                $('input', this.hex_display).val(current_color);
-            }
-        }
-        update_hsl_value(e) {
+        handle_hsl_input(e) {
             e.preventDefault();
             let target = $(e.target);
-            let hsl = {
-                h: this.picker.color.hsl.h,
-                s: this.picker.color.hsl.s,
-                l: this.picker.color.hsl.l
-            };
+            let hsl = this.picker.color.hsl;
             switch (target.attr('class')) {
                 case 'h':
                     hsl.h = target.val();
@@ -219,13 +217,18 @@
             }
             this.picker.color.hsl = hsl;
         }
-        update_hex_value(hex) {
-            if (typeof hex === 'string'
-                && hex[0] === '#'
-                && hex.length === 7
-                && !isNaN(Number('0x' + hex.substring(1,7)))) {
-                this.picker.color.hexString = hex;
+        handle_hex_input(e) {
+            let hex = $(e.currentTarget).val();
+            if (hex.length === 0) {
+                $(e.currentTarget).val('#');
             }
+            this.hex = hex;
+        }
+        update_color() {
+            this.hex = this.picker.color.hexString;
+            this.hsl = this.picker.color.hsl;
+            this.preview_elem.css('background', this.hex);
+            this.elem.val(this.hex);
         }
         trigger_handle(evt) {
             if (this.picker_elem.css('display') === "none") {
@@ -270,8 +273,7 @@
                 this.swatches_container.show();
             }
             let hsl = this.picker.color.hsl;
-            let color = this.picker.color.hexString;
-            console.log(this.color_swatches);
+            let hex = this.picker.color.hexString;
             for (let swatch of this.color_swatches) {
                 if (hsl.h === swatch.hsl.h &&
                     hsl.s === swatch.hsl.s &&
@@ -279,56 +281,71 @@
                         return;
                 }
             }
-            let current_color_swatch = $(`
-            <div class="color-swatch" id="${color.substr(1)}" style="background:${color}"/>
-        `);
-            if (this.color_swatches.length >= 12) {
+            let current_swatch = new ColorSwatch(this, hex, hsl);
+            this.color_swatches.push(current_swatch);
+            current_swatch.select();
+            if (this.color_swatches.length > 12) {
+                this.color_swatches[0].destroy();
                 this.color_swatches.shift();
-                $('div.color-swatch')[0].remove();
             }
-            this.swatches_container.append(current_color_swatch);
-            $('div.color-swatch').removeClass('selected');
-            current_color_swatch.addClass('selected');
-            let swatch = {
-                hex: color,
-                hsl: hsl
-            };
-            this.color_swatches.push(swatch);
-            current_color_swatch.on('click', () => {
-                this.color = color;
-                this.picker.color.hsl = hsl;
-                $('div.color-swatch').removeClass('selected');
-                current_color_swatch.addClass('selected');
-            });
             this.set_swatches();
         }
         remove_swatch(e) {
             if (e) {
                 e.preventDefault();
             }
-            let current_color_swatch = $('div.color-swatch.selected');
-            let color = `#${current_color_swatch.attr('id')}`;
-            let swatches = this.color_swatches;
-            for (let index in swatches) {
-                if (color === swatches[index].hex) {
-                    this.color_swatches.splice(index, 1);
-                }
-            }
-            current_color_swatch.remove();
-            $('div.color-swatch').last().addClass('selected');
+            this.active_swatch.destroy();
+            let index = this.color_swatches.indexOf(this.active_swatch);
+            this.color_swatches.splice(index, 1);
+            let last_color = this.color_swatches[this.color_swatches.length - 1];
             if (this.color_swatches.length === 0) {
                 this.picker.color.hsl = {h: 0, s: 0, l: 100};
                 this.color = '#ffffff';
                 localStorage.removeItem('color-swatches');
                 return;
             }
-            let last_color = this.color_swatches[this.color_swatches.length - 1];
+            last_color.select();
             this.picker.color.hsl = last_color.hsl;
+            this.color = last_color.hex;
             this.set_swatches();
         }
         set_swatches() {
-            let json_str = JSON.stringify(this.color_swatches);
-            localStorage.setItem("color-swatches", json_str);
+            let swatches = [];
+            for (let swatch of this.color_swatches) {
+                swatches.push({
+                    hex: swatch.hex,
+                    hsl: swatch.hsl
+                });
+            }
+            localStorage.setItem("color-swatches", JSON.stringify(swatches));
+        }
+    }
+    class ColorSwatch {
+        constructor(widget, hex, hsl) {
+            this.elem = $(`
+            <div class="color-swatch"
+                id="${hex.substr(1)}"
+                style="background:${hex}"
+            />
+        `);
+            this.widget = widget;
+            this.widget.swatches_container.append(this.elem);
+            this.hex = hex;
+            this.hsl = hsl;
+            this.destroy = this.destroy.bind(this);
+            this.select = this.select.bind(this);
+            this.elem.on('click', this.select);
+        }
+        destroy() {
+            this.elem.off('click', this.select);
+            this.elem.remove();
+        }
+        select(e) {
+            $('div.color-swatch').removeClass('selected');
+            this.elem.addClass('selected');
+            this.widget.active_swatch = this;
+            this.widget.hex = this.hex;
+            this.widget.hsl = this.hsl;
         }
     }
 
