@@ -44,6 +44,22 @@ export class ColorWidget {
             .append(this.buttons)
             .append(this.swatches_container);
 
+        this.picker = new iro.ColorPicker(this.picker_container.get(0), {
+            color: this.color,
+            layout: [
+                {
+                    component: iro.ui.Box,
+                    options: {}
+                },
+                {
+                    component: iro.ui.Slider,
+                    options: {
+                        sliderType: 'hue'
+                    }
+                }
+            ]
+        });
+
         this.resize_handle = this.resize_handle.bind(this);
         this.resize_handle();
         $(window).on('resize', this.resize_handle);
@@ -177,54 +193,19 @@ export class ColorWidget {
     }
 
     resize_handle(e) {
-        if ($(window).width() <= 450 && !this.picker_elem.hasClass('mobile')) {
-            this.picker = null;
-            $('div.IroColorPicker', this.picker_elem).remove();
-            this.picker_elem.addClass('mobile');
+        if ($(window).width() <= 450) {
+            if (!this.picker_elem.hasClass('mobile')) {
+                this.picker_elem.addClass('mobile');
+                this.picker.state.layoutDirection = 'horizontal';
+            }
             let calc_width = $(window).width() * 0.3;
-
-            this.picker = new iro.ColorPicker(this.picker_container.get(0), {
-                color: this.color,
-                layoutDirection: 'horizontal',
-                width: calc_width,
-                display: 'inline-block',
-                layout: [
-                    {
-                        component: iro.ui.Box,
-                        options: {}
-                    },
-                    {
-                        component: iro.ui.Slider,
-                        options: {
-                            sliderType: 'hue'
-                        }
-                    },
-                ]
-            });
+            this.picker.resize(calc_width);
         }
         else if ($(window).width() > 450) {
             if (this.picker_elem.hasClass('mobile')) {
-                this.picker = null;
-                $('div.IroColorPicker', this.picker_elem).remove();
                 this.picker_elem.removeClass('mobile');
-            }
-
-            if (!this.picker) {
-                this.picker = new iro.ColorPicker(this.picker_container.get(0), {
-                    color: this.color,
-                    layout: [
-                        {
-                            component: iro.ui.Box,
-                            options: {}
-                        },
-                        {
-                            component: iro.ui.Slider,
-                            options: {
-                                sliderType: 'hue'
-                            }
-                        },
-                    ]
-                });
+                this.picker.state.layoutDirection = 'vertical';
+                this.picker.resize(300);
             }
         }
     }

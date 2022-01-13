@@ -40,6 +40,21 @@
                 .append(this.close_btn)
                 .append(this.buttons)
                 .append(this.swatches_container);
+            this.picker = new iro.ColorPicker(this.picker_container.get(0), {
+                color: this.color,
+                layout: [
+                    {
+                        component: iro.ui.Box,
+                        options: {}
+                    },
+                    {
+                        component: iro.ui.Slider,
+                        options: {
+                            sliderType: 'hue'
+                        }
+                    }
+                ]
+            });
             this.resize_handle = this.resize_handle.bind(this);
             this.resize_handle();
             $(window).on('resize', this.resize_handle);
@@ -48,9 +63,9 @@
             this.remove_swatch = this.remove_swatch.bind(this);
             this.remove_color_btn.on('click', this.remove_swatch);
             this.init_options(options);
+            this.color_swatches = [];
             this.init_swatches();
             this.color = "#ffffff";
-            this.color_swatches = [];
             this.elem.val(this.color);
             this.preview_elem.css('background', this.color);
             this.trigger_handle = this.trigger_handle.bind(this);
@@ -153,52 +168,19 @@
             }
         }
         resize_handle(e) {
-            if ($(window).width() <= 450 && !this.picker_elem.hasClass('mobile')) {
-                this.picker = null;
-                $('div.IroColorPicker', this.picker_elem).remove();
-                this.picker_elem.addClass('mobile');
+            if ($(window).width() <= 450) {
+                if (!this.picker_elem.hasClass('mobile')) {
+                    this.picker_elem.addClass('mobile');
+                    this.picker.state.layoutDirection = 'horizontal';
+                }
                 let calc_width = $(window).width() * 0.3;
-                this.picker = new iro.ColorPicker(this.picker_container.get(0), {
-                    color: this.color,
-                    layoutDirection: 'horizontal',
-                    width: calc_width,
-                    display: 'inline-block',
-                    layout: [
-                        {
-                            component: iro.ui.Box,
-                            options: {}
-                        },
-                        {
-                            component: iro.ui.Slider,
-                            options: {
-                                sliderType: 'hue'
-                            }
-                        },
-                    ]
-                });
+                this.picker.resize(calc_width);
             }
             else if ($(window).width() > 450) {
                 if (this.picker_elem.hasClass('mobile')) {
-                    this.picker = null;
-                    $('div.IroColorPicker', this.picker_elem).remove();
                     this.picker_elem.removeClass('mobile');
-                }
-                if (!this.picker) {
-                    this.picker = new iro.ColorPicker(this.picker_container.get(0), {
-                        color: this.color,
-                        layout: [
-                            {
-                                component: iro.ui.Box,
-                                options: {}
-                            },
-                            {
-                                component: iro.ui.Slider,
-                                options: {
-                                    sliderType: 'hue'
-                                }
-                            },
-                        ]
-                    });
+                    this.picker.state.layoutDirection = 'vertical';
+                    this.picker.resize(300);
                 }
             }
         }
@@ -289,6 +271,7 @@
             }
             let hsl = this.picker.color.hsl;
             let color = this.picker.color.hexString;
+            console.log(this.color_swatches);
             for (let swatch of this.color_swatches) {
                 if (hsl.h === swatch.hsl.h &&
                     hsl.s === swatch.hsl.s &&
