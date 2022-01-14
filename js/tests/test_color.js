@@ -2,6 +2,7 @@ import {ColorWidget} from '../src/widget.js';
 
 QUnit.module('ColorWidget', hooks => {
     let elem = $('<input class="color-picker"/>');
+    let widget;
 
     hooks.before(() => {
         $('body').append('<div id="container" />');
@@ -12,27 +13,29 @@ QUnit.module('ColorWidget', hooks => {
     hooks.afterEach(() => {
         $('#container').empty();
         localStorage.removeItem('color-swatches');
+        widget = null;
     });
     hooks.after(() => {
         $('#container').empty().remove();
     });
 
-    QUnit.test('initialize', assert => {
+    QUnit.test.only('initialize', assert => {
         ColorWidget.initialize();
-        let widget = elem.data('color_widget');
+        widget = elem.data('color_widget');
         assert.ok(widget.elem.attr('spellcheck'), false);
         assert.deepEqual(widget.elem, elem);
     });
 
-    QUnit.test('default constructor', assert => {
-        let widget = new ColorWidget(elem);
+    QUnit.test.only('default constructor', assert => {
+        ColorWidget.initialize();
+        widget = elem.data('color_widget');
         assert.strictEqual(widget.elem.attr('spellcheck'), 'false');
         assert.strictEqual(widget.elem.attr('maxlength'), '7');
 
         // preview element
         assert.ok(widget.preview_elem.hasClass('color-picker-color'));
 
-        assert.strictEqual(widget.color, '#ffffff');
+        assert.strictEqual(widget.hex, '#ffffff');
         assert.strictEqual(widget.color_swatches.length, 0);
         assert.strictEqual(widget.elem.val(), '#ffffff');
         // hex white gets transformed to rgb value
@@ -44,7 +47,7 @@ QUnit.module('ColorWidget', hooks => {
         assert.ok(widget.picker);
     });
 
-    QUnit.test('preview_elem', assert => {
+    QUnit.test.only('preview_elem', assert => {
         let prev_elem = $('<div id="preview" style="width:2px; height:2px" />');
         $('body').append(prev_elem);
         let options = {
@@ -56,7 +59,7 @@ QUnit.module('ColorWidget', hooks => {
         prev_elem.remove();
     });
 
-    QUnit.test('init_options: hsl_display', assert => {
+    QUnit.test.skip('init_options: hsl_display', assert => {
         let options = {
             hsl_display: true
         }
@@ -65,7 +68,7 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual(widget.hsl_display.children('div').length, 3);
     });
 
-    QUnit.test('init_options: hex_display', assert => {
+    QUnit.skip('init_options: hex_display', assert => {
         let widget = new ColorWidget(elem, {hex_display: true});
         assert.ok(widget.hex_display.hasClass('hex-display'));
         assert.strictEqual(widget.hex_display.children('input').length, 1);
@@ -75,7 +78,7 @@ QUnit.module('ColorWidget', hooks => {
         );
     });
 
-    QUnit.test('init_swatches', assert => {
+    QUnit.test.skip('init_swatches', assert => {
         // set json string
         let swatch1 = {hex: '#e6f96c', hsl: {h: 68, s: 93, l: 70}};
         let swatch2 = {hex: '#00db7f', hsl: {h: 155, s: 100, l: 43}};
@@ -91,12 +94,12 @@ QUnit.module('ColorWidget', hooks => {
 
         // trigger click on swatch 1
         $('#e6f96c').trigger('click');
-        assert.strictEqual(widget.color, '#e6f96c');
+        assert.strictEqual(widget.hex, '#e6f96c');
         assert.ok($('#e6f96c').hasClass('selected'));
 
         // trigger click on swatch 2
         $('#00db7f').trigger('click');
-        assert.strictEqual(widget.color, '#00db7f');
+        assert.strictEqual(widget.hex, '#00db7f');
         assert.ok($('#00db7f').hasClass('selected'));
     });
 
@@ -140,66 +143,66 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual(widget.picker.color.hexString, '#cccccc');
     });
 
-    QUnit.test('trigger_handle', assert => {
+    QUnit.test.only('trigger_handle', assert => {
         // initialize
         let widget = new ColorWidget(elem);
-        assert.strictEqual(widget.picker_elem.css('display'), 'none');
+        assert.strictEqual(widget.dropdown_elem.css('display'), 'none');
 
         // trigger on input focus
         widget.elem.trigger('focus');
-        assert.strictEqual(widget.picker_elem.css('display'), 'block');
+        assert.strictEqual(widget.dropdown_elem.css('display'), 'block');
 
         // mousedown inside picker
-        widget.picker_elem.trigger('mousedown');
-        assert.strictEqual(widget.picker_elem.css('display'), 'block');
+        widget.dropdown_elem.trigger('mousedown');
+        assert.strictEqual(widget.dropdown_elem.css('display'), 'block');
 
         // mousedown outside picker
         $('body').trigger('mousedown');
-        assert.strictEqual(widget.picker_elem.css('display'), 'none');
+        assert.strictEqual(widget.dropdown_elem.css('display'), 'none');
 
         // click on preview elem
         widget.preview_elem.trigger('click');
-        assert.strictEqual(widget.picker_elem.css('display'), 'block');
+        assert.strictEqual(widget.dropdown_elem.css('display'), 'block');
         widget.preview_elem.trigger('click');
-        assert.strictEqual(widget.picker_elem.css('display'), 'none');
+        assert.strictEqual(widget.dropdown_elem.css('display'), 'none');
     });
 
     QUnit.test('handle_keypress', assert => {
         // initialize
         let widget = new ColorWidget(elem);
-        assert.strictEqual(widget.picker_elem.css('display'), 'none');
+        assert.strictEqual(widget.dropdown_elem.css('display'), 'none');
 
         // trigger input focus
         widget.elem.trigger('focus');
-        assert.strictEqual(widget.picker_elem.css('display'), 'block');
+        assert.strictEqual(widget.dropdown_elem.css('display'), 'block');
 
         // trigger Enter key
         let enter_key = $.Event('keydown', {key: 'Enter'});
         $(window).trigger(enter_key);
-        assert.strictEqual(widget.picker_elem.css('display'), 'none');
+        assert.strictEqual(widget.dropdown_elem.css('display'), 'none');
 
         // trigger input focus
         widget.elem.trigger('focus');
-        assert.strictEqual(widget.picker_elem.css('display'), 'block');
+        assert.strictEqual(widget.dropdown_elem.css('display'), 'block');
 
         // trigger Escape key
         let escape_key = $.Event('keydown', {key: 'Escape'});
         $(window).trigger(escape_key);
-        assert.strictEqual(widget.picker_elem.css('display'), 'none');
+        assert.strictEqual(widget.dropdown_elem.css('display'), 'none');
     });
 
     QUnit.test('hide_elem', assert => {
         // initialize
         let widget = new ColorWidget(elem);
-        assert.strictEqual(widget.picker_elem.css('display'), 'none');
+        assert.strictEqual(widget.dropdown_elem.css('display'), 'none');
 
         // trigger input focus
         widget.elem.trigger('focus');
-        assert.strictEqual(widget.picker_elem.css('display'), 'block');
+        assert.strictEqual(widget.dropdown_elem.css('display'), 'block');
 
         // click close btn
         widget.close_btn.trigger('click');
-        assert.strictEqual(widget.picker_elem.css('display'), 'none');
+        assert.strictEqual(widget.dropdown_elem.css('display'), 'none');
         assert.false(widget.elem.is(':focus'));
     });
 
@@ -242,7 +245,7 @@ QUnit.module('ColorWidget', hooks => {
 
         // click on first swatch
         $('#ffffff').trigger('click');
-        assert.strictEqual(widget.color, '#ffffff');
+        assert.strictEqual(widget.hex, '#ffffff');
         assert.strictEqual(
             widget.picker.color.hexString,
             '#ffffff'
@@ -276,7 +279,7 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual($('div#cccccc').length, 0);
         assert.notOk(localStorage.getItem('color-swatches'));
 
-        assert.strictEqual(widget.color, '#ffffff');
+        assert.strictEqual(widget.hex, '#ffffff');
         assert.strictEqual(widget.picker.color.hexString, '#ffffff');
     });
 
@@ -321,21 +324,21 @@ QUnit.module('ColorWidget', hooks => {
             viewport.set(300);
             // initialize
             let widget = new ColorWidget(elem);
-            assert.ok(widget.picker_elem.hasClass('mobile'));
+            assert.ok(widget.dropdown_elem.hasClass('mobile'));
         });
 
         QUnit.test('resizing', assert => {
             // initialize
             let widget = new ColorWidget(elem);
-            assert.notOk(widget.picker_elem.hasClass('mobile'));
+            assert.notOk(widget.dropdown_elem.hasClass('mobile'));
 
             viewport.set(300);
             $(window).trigger('resize');
-            assert.ok(widget.picker_elem.hasClass('mobile'));
+            assert.ok(widget.dropdown_elem.hasClass('mobile'));
 
             viewport.set(1000);
             $(window).trigger('resize');
-            assert.notOk(widget.picker_elem.hasClass('mobile'));
+            assert.notOk(widget.dropdown_elem.hasClass('mobile'));
         });
     })
 });
