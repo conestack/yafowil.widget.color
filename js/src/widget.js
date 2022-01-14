@@ -18,7 +18,7 @@ export class ColorWidget {
         this.elem.data('color_widget', this)
                  .attr('spellcheck', "false")
                  .attr('maxlength', 7);
-        this.picker_elem = $(`
+        this.dropdown_elem = $(`
             <div class="color-picker-wrapper" />
         `);
         this.picker_container = $('<div class="color-picker-container" />');
@@ -38,7 +38,7 @@ export class ColorWidget {
             .append(remove_color_btn);
         this.swatches_container = $(`<div class="color-picker-recent" />`);
 
-        this.picker_elem
+        this.dropdown_elem
             .append(this.picker_container)
             .append(this.close_btn)
             .append(this.buttons)
@@ -116,67 +116,6 @@ export class ColorWidget {
         this.handle_click = this.handle_click.bind(this);
     }
 
-    init_options(options) {
-        let preview_elem = options.preview_elem;
-        let hsl_display = options.hsl_display;
-        let hex_display = options.hex_display;
-
-        if (preview_elem) {
-            this.preview_elem = options.preview_elem;
-            this.elem.after(this.picker_elem);
-        } else {
-            this.preview_elem = $(`
-                <span class="color-picker-color" />
-            `);
-            this.elem.after(this.preview_elem);
-            this.preview_elem.after(this.picker_elem);
-        }
-
-        if (hsl_display) {
-            let hsl = this.picker.color.hsl;
-            this.hsl_display = $(`
-                <div class="hsl-display">
-                  <div>
-                    H:
-                    <input class="h" type="number" value="${hsl.h}"
-                        min="0", max="360" />
-                  </div>
-                  <div>
-                    S:
-                    <input class="s" type="number" value="${hsl.s}"
-                        min="0", max="100" />
-                  </div>
-                  <div>
-                    L:
-                    <input class="l" type="number" value="${hsl.l}"
-                        min="0", max="100" />
-                  </div>
-                </div>
-            `);
-            this.picker_elem.append(this.hsl_display);
-            this.handle_hsl_input = this.handle_hsl_input.bind(this);
-            $('input', this.hsl_display).on('input', this.handle_hsl_input);
-        } else {
-            this.buttons.addClass('hsl-false');
-        }
-
-        if (hex_display) {
-            let hex_display = this.hex_display = $(`
-                <div class="hex-display">
-                  HEX:
-                  <input value="${this.picker.color.hexString}"
-                    spellcheck="false" maxlength="7" />
-                </div>
-            `);
-            this.picker_elem.append(hex_display);
-            let hex = this.picker.color.hexString;
-            this.hex_display.val(hex);
-
-            this.handle_hex_input = this.handle_hex_input.bind(this);
-            $('input', this.hex_display).on('input', this.handle_hex_input);
-        }
-    }
-
     get hex() {
         return this._hex;
     }
@@ -210,21 +149,81 @@ export class ColorWidget {
         this._hsl = hsl;
     }
 
+    init_options(options) {
+        let preview_elem = options.preview_elem;
+        let hsl_display = options.hsl_display;
+        let hex_display = options.hex_display;
+
+        if (preview_elem) {
+            this.preview_elem = options.preview_elem;
+            this.elem.after(this.dropdown_elem);
+        } else {
+            this.preview_elem = $(`
+                <span class="color-picker-color" />
+            `);
+            this.elem.after(this.preview_elem);
+            this.preview_elem.after(this.dropdown_elem);
+        }
+
+        if (hsl_display) {
+            let hsl = this.picker.color.hsl;
+
+            this.hsl_display = $(`
+                <div class="hsl-display">
+                  <div>
+                    H:
+                    <input class="h" type="number" value="${hsl.h}"
+                        min="0", max="360" />
+                  </div>
+                  <div>
+                    S:
+                    <input class="s" type="number" value="${hsl.s}"
+                        min="0", max="100" />
+                  </div>
+                  <div>
+                    L:
+                    <input class="l" type="number" value="${hsl.l}"
+                        min="0", max="100" />
+                  </div>
+                </div>
+            `);
+            this.dropdown_elem.append(this.hsl_display);
+            this.handle_hsl_input = this.handle_hsl_input.bind(this);
+            $('input', this.hsl_display).on('input', this.handle_hsl_input);
+        } else {
+            this.buttons.addClass('hsl-false');
+        }
+
+        if (hex_display) {
+            let hex_display = this.hex_display = $(`
+                <div class="hex-display">
+                  HEX:
+                  <input value="${this.picker.color.hexString}"
+                    spellcheck="false" maxlength="7" />
+                </div>
+            `);
+            this.dropdown_elem.append(hex_display);
+            let hex = this.picker.color.hexString;
+            this.hex_display.val(hex);
+
+            this.handle_hex_input = this.handle_hex_input.bind(this);
+            $('input', this.hex_display).on('input', this.handle_hex_input);
+        }
+    }
+
     resize_handle(e) {
         if ($(window).width() <= 450) {
-            if (!this.picker_elem.hasClass('mobile')) {
-                this.picker_elem.addClass('mobile');
+            if (!this.dropdown_elem.hasClass('mobile')) {
+                this.dropdown_elem.addClass('mobile');
                 this.picker.state.layoutDirection = 'horizontal';
             }
             let calc_width = $(window).width() * 0.3;
             this.picker.resize(calc_width);
-        }
-        else if ($(window).width() > 450) {
-            if (this.picker_elem.hasClass('mobile')) {
-                this.picker_elem.removeClass('mobile');
-                this.picker.state.layoutDirection = 'vertical';
-                this.picker.resize(300);
-            }
+        } else
+        if ($(window).width() > 450 && this.dropdown_elem.hasClass('mobile')) {
+            this.dropdown_elem.removeClass('mobile');
+            this.picker.state.layoutDirection = 'vertical';
+            this.picker.resize(300);
         }
     }
 
@@ -263,8 +262,8 @@ export class ColorWidget {
     }
 
     trigger_handle(evt) {
-        if (this.picker_elem.css('display') === "none") {
-            this.picker_elem.show();
+        if (this.dropdown_elem.css('display') === "none") {
+            this.dropdown_elem.show();
             $(window).on('keydown', this.handle_keypress);
             $(window).on('mousedown', this.handle_click);
         } else {
@@ -283,7 +282,7 @@ export class ColorWidget {
     }
 
     handle_click(e) {
-        let target = this.picker_elem;
+        let target = this.dropdown_elem;
         if (!target.is(e.target) &&
             target.has(e.target).length === 0 &&
             !this.preview_elem.is(e.target) &&
@@ -297,7 +296,7 @@ export class ColorWidget {
         if (e) {
             e.preventDefault();
         }
-        this.picker_elem.hide();
+        this.dropdown_elem.hide();
         this.elem.blur();
         $(window).off('keydown', this.handle_keypress);
         $(window).off('mousedown', this.handle_click);
@@ -337,22 +336,20 @@ export class ColorWidget {
         }
 
         this.active_swatch.destroy();
-
         let index = this.color_swatches.indexOf(this.active_swatch);
         this.color_swatches.splice(index, 1);
-
         let last_color = this.color_swatches[this.color_swatches.length - 1];
 
         if (this.color_swatches.length === 0) {
             this.picker.color.hsl = {h: 0, s: 0, l: 100};
-            this.color = '#ffffff';
+            this.hex = '#ffffff';
             localStorage.removeItem('color-swatches');
             return;
         }
 
         last_color.select();
         this.picker.color.hsl = last_color.hsl;
-        this.color = last_color.hex;
+        this.hex = last_color.hex;
         this.set_swatches();
     }
 

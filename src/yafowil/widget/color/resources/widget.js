@@ -5,7 +5,7 @@
         static initialize(context) {
             $('input.color-picker', context).each(function() {
                 let options = {
-                    hsl_display: false,
+                    hsl_display: true,
                     hex_display: true
                 };
                 new ColorWidget($(this), options);
@@ -16,7 +16,7 @@
             this.elem.data('color_widget', this)
                      .attr('spellcheck', "false")
                      .attr('maxlength', 7);
-            this.picker_elem = $(`
+            this.dropdown_elem = $(`
             <div class="color-picker-wrapper" />
         `);
             this.picker_container = $('<div class="color-picker-container" />');
@@ -35,7 +35,7 @@
                 .append(add_color_btn)
                 .append(remove_color_btn);
             this.swatches_container = $(`<div class="color-picker-recent" />`);
-            this.picker_elem
+            this.dropdown_elem
                 .append(this.picker_container)
                 .append(this.close_btn)
                 .append(this.buttons)
@@ -104,13 +104,13 @@
             let hex_display = options.hex_display;
             if (preview_elem) {
                 this.preview_elem = options.preview_elem;
-                this.elem.after(this.picker_elem);
+                this.elem.after(this.dropdown_elem);
             } else {
                 this.preview_elem = $(`
                 <span class="color-picker-color" />
             `);
                 this.elem.after(this.preview_elem);
-                this.preview_elem.after(this.picker_elem);
+                this.preview_elem.after(this.dropdown_elem);
             }
             if (hsl_display) {
                 let hsl = this.picker.color.hsl;
@@ -133,7 +133,7 @@
                   </div>
                 </div>
             `);
-                this.picker_elem.append(this.hsl_display);
+                this.dropdown_elem.append(this.hsl_display);
                 this.handle_hsl_input = this.handle_hsl_input.bind(this);
                 $('input', this.hsl_display).on('input', this.handle_hsl_input);
             } else {
@@ -147,7 +147,7 @@
                     spellcheck="false" maxlength="7" />
                 </div>
             `);
-                this.picker_elem.append(hex_display);
+                this.dropdown_elem.append(hex_display);
                 let hex = this.picker.color.hexString;
                 this.hex_display.val(hex);
                 this.handle_hex_input = this.handle_hex_input.bind(this);
@@ -185,16 +185,16 @@
         }
         resize_handle(e) {
             if ($(window).width() <= 450) {
-                if (!this.picker_elem.hasClass('mobile')) {
-                    this.picker_elem.addClass('mobile');
+                if (!this.dropdown_elem.hasClass('mobile')) {
+                    this.dropdown_elem.addClass('mobile');
                     this.picker.state.layoutDirection = 'horizontal';
                 }
                 let calc_width = $(window).width() * 0.3;
                 this.picker.resize(calc_width);
             }
             else if ($(window).width() > 450) {
-                if (this.picker_elem.hasClass('mobile')) {
-                    this.picker_elem.removeClass('mobile');
+                if (this.dropdown_elem.hasClass('mobile')) {
+                    this.dropdown_elem.removeClass('mobile');
                     this.picker.state.layoutDirection = 'vertical';
                     this.picker.resize(300);
                 }
@@ -231,8 +231,8 @@
             this.elem.val(this.hex);
         }
         trigger_handle(evt) {
-            if (this.picker_elem.css('display') === "none") {
-                this.picker_elem.show();
+            if (this.dropdown_elem.css('display') === "none") {
+                this.dropdown_elem.show();
                 $(window).on('keydown', this.handle_keypress);
                 $(window).on('mousedown', this.handle_click);
             } else {
@@ -249,7 +249,7 @@
             }
         }
         handle_click(e) {
-            let target = this.picker_elem;
+            let target = this.dropdown_elem;
             if (!target.is(e.target) &&
                 target.has(e.target).length === 0 &&
                 !this.preview_elem.is(e.target) &&
@@ -262,7 +262,7 @@
             if (e) {
                 e.preventDefault();
             }
-            this.picker_elem.hide();
+            this.dropdown_elem.hide();
             this.elem.blur();
             $(window).off('keydown', this.handle_keypress);
             $(window).off('mousedown', this.handle_click);
