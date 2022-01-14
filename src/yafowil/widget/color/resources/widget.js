@@ -205,24 +205,20 @@
             this._hsl = hsl;
         }
         init_options(options) {
-            let preview_elem = options.preview_elem;
-            console.log(preview_elem);
-            let hsl_display = options.hsl_display;
-            let hex_display = options.hex_display;
-            if (preview_elem) {
-                this.preview_elem = preview_elem;
+            if (options && options.preview_elem) {
+                this.preview_elem = options.preview_elem;
                 this.elem.after(this.dropdown_elem);
             } else {
                 this.preview_elem = $(`<span />`).addClass('color-picker-color');
                 this.elem.after(this.preview_elem);
                 this.preview_elem.after(this.dropdown_elem);
             }
-            if (hsl_display) {
+            if (options && options.hsl_display) {
                 this.hsl_display = new ColorHSLInput(this, this.picker.color.hsl);
             } else {
                 this.buttons.addClass('hsl-false');
             }
-            if (hex_display) {
+            if (options && options.hex_display) {
                 this.hex_display = new ColorHexInput(this, this.picker.color.hexString);
             }
         }
