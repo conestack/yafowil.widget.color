@@ -18,24 +18,14 @@ export class ColorWidget {
         this.elem.data('color_widget', this)
                  .attr('spellcheck', "false")
                  .attr('maxlength', 7);
-        this.dropdown_elem = $(`
-            <div class="color-picker-wrapper" />
-        `);
+        this.dropdown_elem = $(`<div class="color-picker-wrapper" />`);
         this.picker_container = $('<div class="color-picker-container" />');
-        this.close_btn = $(`<button class="close-button">✕</button>`);
-        let add_color_btn = this.add_color_btn = $(`
-            <button class="add_color">
-            + Add
-            </button>
-        `);
-        let remove_color_btn = this.remove_color_btn = $(`
-            <button class="remove_color">
-            - Remove
-            </button>
-        `);
+        this.close_btn = $(`<button class="close-button" />`).text('✕');
+        this.add_color_btn = $(`<button class="add_color" />`).text('+ Add');
+        this.remove_color_btn = $(`<button class="remove_color" />`).text('- Remove');
         this.buttons = $('<div class="buttons"/>')
-            .append(add_color_btn)
-            .append(remove_color_btn);
+            .append(this.add_color_btn)
+            .append(this.remove_color_btn);
         this.swatches_container = $(`<div class="color-picker-recent" />`);
 
         this.dropdown_elem
