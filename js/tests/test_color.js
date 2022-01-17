@@ -178,7 +178,7 @@ QUnit.module('ColorWidget', hooks => {
         assert.false(widget.elem.is(':focus'));
     });
 
-    QUnit.test.skip('create_swatch, remove_swatch, set_swatches', assert => {
+    QUnit.test('create_swatch, remove_swatch, set_swatches', assert => {
         // initialize
         let widget = new ColorWidget(elem);
         assert.strictEqual(widget.swatches_container.css('display'), 'none');
@@ -193,7 +193,7 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual(widget.swatches_container.css('display'), 'block');
         assert.strictEqual(widget.color_swatches.length, 1);
         assert.deepEqual(
-            widget.color_swatches[0].color,
+            widget.color_swatches[0].color.hsl,
             widget.picker.color.hsl
         );
 
@@ -209,11 +209,11 @@ QUnit.module('ColorWidget', hooks => {
             widget.preview_elem.css('background-color'),
             'rgb(204, 204, 204)'
         );
-        assert.ok($('#cccccc').hasClass('selected'));
+        assert.ok(widget.color_swatches[1].elem.hasClass('selected'));
 
         // click on first swatch
-        $('#ffffff').trigger('click');
-        assert.strictEqual(widget.hex, '#ffffff');
+        widget.color_swatches[0].elem.trigger('click');
+        assert.strictEqual(widget.color.hexString, '#ffffff');
         assert.strictEqual(
             widget.picker.color.hexString,
             '#ffffff'
@@ -222,13 +222,13 @@ QUnit.module('ColorWidget', hooks => {
             widget.preview_elem.css('background-color'),
             'rgb(255, 255, 255)'
         );
-        assert.false($('#cccccc').hasClass('selected'));
-        assert.ok($('#ffffff').hasClass('selected'));
+        assert.false(widget.color_swatches[1].elem.hasClass('selected'));
+        assert.ok(widget.color_swatches[0].elem.hasClass('selected'));
 
         // JSON localStorage
         let swatches = [];
         for (let swatch of widget.color_swatches) {
-            swatches.push(swatch.color);
+            swatches.push(swatch.color.hsl);
         }
         assert.strictEqual(
             localStorage.getItem('color-swatches'),
@@ -239,7 +239,6 @@ QUnit.module('ColorWidget', hooks => {
         let delKey = $.Event('keydown', { key: 'Delete' });
         $(window).trigger(delKey);
         assert.strictEqual($('div.color-swatch').length, 1);
-        assert.strictEqual($('div#ffffff').length, 0);
         assert.strictEqual(
             widget.picker.color.hexString,
             '#cccccc'
@@ -248,10 +247,9 @@ QUnit.module('ColorWidget', hooks => {
         // delete swatch with button
         widget.remove_color_btn.trigger('click');
         assert.strictEqual($('div.color-swatch').length, 0);
-        assert.strictEqual($('div#cccccc').length, 0);
         assert.notOk(localStorage.getItem('color-swatches'));
 
-        assert.strictEqual(widget.hex, '#ffffff');
+        assert.strictEqual(widget.color.hexString, '#ffffff');
         assert.strictEqual(widget.picker.color.hexString, '#ffffff');
     });
 
@@ -271,7 +269,7 @@ QUnit.module('ColorWidget', hooks => {
         ]
         // add swatches
         for (let i = 0; i < 13; i++) {
-            widget.picker.color.hexString = colors[i];
+            widget.picker.color.set(colors[i]);
             widget.add_color_btn.trigger('click');
         }
         assert.strictEqual(widget.color_swatches.length, 12);
@@ -316,7 +314,7 @@ QUnit.module('ColorWidget', hooks => {
             assert.deepEqual(widget.color_swatches[0].color.hsl, widget.picker.color.hsl);
         });
 
-        QUnit.test.skip('find_match', assert => {
+        QUnit.test('color_equals', assert => {
             let color = { h: 100, s: 100, l: 75 };
             let colors = [
                 { h: 100, s: 100, l: 50 },

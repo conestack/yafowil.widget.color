@@ -15,16 +15,6 @@ class ColorSwatch {
         this.elem.on('click', this.select);
     }
 
-    find_match(color) {
-        // if (hsv.h === this.color.h &&
-        //     hsv.s === this.color.s &&
-        //     hsv.v === this.color.v) {
-        //     return true;
-        // } else {
-        //     return false;
-        // }
-    }
-
     destroy() {
         this.elem.off('click', this.select);
         this.elem.remove();
@@ -128,7 +118,7 @@ class ColorHexInput {
     update() {
         if (this.value.length === 0) {
             this.input.val('#');
-        } else if (this.widget.parse_hex(this.input.val())) {
+        } else {
             this.widget.picker.color.set(this.value);
         }
     }
@@ -229,7 +219,7 @@ export class ColorWidget {
             let hex = this.elem.val();
             if (hex.length === 0) {
                 this.elem.val('#');
-            } else if (this.parse_hex(hex)) {
+            } else {
                 this.picker.color.set(hex);
             }
         });
@@ -278,18 +268,6 @@ export class ColorWidget {
             this.dropdown_elem.removeClass('mobile');
             this.picker.state.layoutDirection = 'vertical';
             this.picker.resize(300);
-        }
-    }
-
-    parse_hex(hex) {
-        if (typeof hex === 'string'
-            && hex[0] === '#'
-            && hex.length === 7
-            && !isNaN(Number('0x' + hex.substring(1,7))))
-        {
-            return true;
-        } else {
-            return false;
         }
     }
 
@@ -349,15 +327,26 @@ export class ColorWidget {
         $(window).off('mousedown', this.handle_click);
     }
 
+    color_equals(color) {
+        if (color instanceof iro.Color &&
+            color.hsl.h === this.color.hsl.h &&
+            color.hsl.s === this.color.hsl.s &&
+            color.hsl.l === this.color.hsl.l) {
+            return true;
+        }
+    }
+
     create_swatch(e) {
         if (e) {
             e.preventDefault();
             this.swatches_container.show();
         }
 
-        // for (let swatch of this.color_swatches) {
-        //     if (swatch.find_match(hsv)) {return};
-        // }
+        for (let swatch of this.color_swatches) {
+            if (this.color_equals(swatch.color)) {
+                return;
+            }
+        }
 
         let swatch = new ColorSwatch(this, this.picker.color.clone());
         this.color_swatches.push(swatch);
