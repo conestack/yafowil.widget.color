@@ -173,7 +173,7 @@
             this.elem.val(this.color.hexString);
             this.preview_elem.css(
                 'background-color',
-                `hsl(${this.color.h}, ${this.color.s}%, ${this.color.l}%)`
+                `hsl(${this.color.hsl.h}, ${this.color.hsl.s}%, ${this.color.hsl.l}%)`
             );
             this.resize_handle = this.resize_handle.bind(this);
             this.resize_handle();
