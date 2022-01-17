@@ -1,8 +1,9 @@
 import {ColorWidget} from '../src/widget.js';
 
+let elem = $('<input class="color-picker"/>');
+let widget;
+
 QUnit.module('ColorWidget', hooks => {
-    let elem = $('<input class="color-picker"/>');
-    let widget;
 
     hooks.before(() => {
         $('body').append('<div id="container" />');
@@ -48,15 +49,18 @@ QUnit.module('ColorWidget', hooks => {
     });
 
     QUnit.test('parse json in constructor', assert => {
+        // mock json file
         let swatches = [
             {hex: "#cccccc", hsl: {h: 0, s: 0, l: 80}},
             {hex: "#ff0000", hsl: {h: 0, s: 100, l: 50}}
         ];
         localStorage.setItem("color-swatches", JSON.stringify(swatches));
 
+        // initialize
         ColorWidget.initialize();
         widget = elem.data('color_widget');
 
+        // assertions
         assert.strictEqual(widget.swatches_container.css('display'), 'block');
         assert.strictEqual(widget.color_swatches.length, 2);
         assert.deepEqual(widget.active_swatch, widget.color_swatches[1]);
@@ -66,6 +70,7 @@ QUnit.module('ColorWidget', hooks => {
     });
 
     QUnit.test('preview_elem', assert => {
+        // create preview elem
         let prev_elem = $('<div id="preview" style="width:2px; height:2px" />');
         $('body').append(prev_elem);
         let options = {
@@ -307,205 +312,179 @@ QUnit.module('ColorWidget', hooks => {
             assert.notOk(widget.dropdown_elem.hasClass('mobile'));
         });
     });
-});
 
-QUnit.module('ColorSwatch', hooks => {
-    let elem = $('<input class="color-picker"/>');
-    let widget;
+    QUnit.module('ColorSwatch', hooks => {
+        hooks.beforeEach(() => {
+            ColorWidget.initialize();
+            widget = elem.data('color_widget');
+        });
 
-    hooks.before(() => {
-        $('body').append('<div id="container" />');
-    });
-    hooks.beforeEach(() => {
-        $('#container').append(elem);
-        ColorWidget.initialize();
-        widget = elem.data('color_widget');
-    });
-    hooks.afterEach(() => {
-        $('#container').empty();
-        localStorage.removeItem('color-swatches');
-        widget = null;
-    });
-    hooks.after(() => {
-        $('#container').empty().remove();
-    });
+        QUnit.test('constructor', assert => {
+            let hex = widget.picker.color.hexString;
+            let hsl = widget.picker.color.hsl;
 
-    QUnit.test('constructor', assert => {
-        let hex = widget.picker.color.hexString;
-        let hsl = widget.picker.color.hsl;
+            widget.create_swatch();
+            assert.strictEqual(widget.color_swatches[0].color.hex, hex);
+            assert.deepEqual(widget.color_swatches[0].color.hsl, hsl);
+            assert.strictEqual(widget.color_swatches[0].elem.attr('id'), hex.substr(1));
+        });
 
-        widget.create_swatch();
-        assert.strictEqual(widget.color_swatches[0].color.hex, hex);
-        assert.deepEqual(widget.color_swatches[0].color.hsl, hsl);
-        assert.strictEqual(widget.color_swatches[0].elem.attr('id'), hex.substr(1));
-    });
+        QUnit.test('find_match', assert => {
+            let color = { h: 100, s: 100, l: 75 };
+            let colors = [
+                { h: 100, s: 100, l: 50 },
+                { h: 100, s: 100, l: 20 },
+                { h: 100, s: 50, l: 50 }
+            ];
 
-    QUnit.test('find_match', assert => {
-        let color = {h:100, s:100, l:75};
-        let colors = [{h:100, s:100, l:50}, {h:100, s:100, l:20}, {h:100, s:50, l:50}];
-
-        // create first swatch
-        widget.picker.color.hsl = color;
-        widget.create_swatch();
-
-        // create other swatches
-        for (let color of colors) {
+            // create first swatch
             widget.picker.color.hsl = color;
             widget.create_swatch();
-        }
-        assert.strictEqual(widget.color_swatches.length, 4);
 
-        // attempt to create same swatches again
-        for (let color of colors) {
-            widget.picker.color.hsl = color;
+            // create other swatches
+            for (let color of colors) {
+                widget.picker.color.hsl = color;
+                widget.create_swatch();
+            }
+            assert.strictEqual(widget.color_swatches.length, 4);
+
+            // attempt to create same swatches again
+            for (let color of colors) {
+                widget.picker.color.hsl = color;
+                widget.create_swatch();
+            }
+            assert.strictEqual(widget.color_swatches.length, 4);
+        });
+
+        QUnit.test('destroy swatch', assert => {
+            let color1 = { h: 100, s: 100, l: 75 };
+            let color2 = { h: 200, s: 100, l: 75 };
+
+            // create swatch
+            widget.picker.color.hsl = color1;
             widget.create_swatch();
-        }
-        assert.strictEqual(widget.color_swatches.length, 4);
-    });
+            assert.strictEqual(widget.color_swatches.length, 1);
 
-    QUnit.test('destroy swatch', assert => {
-        let color1 = {h:100, s:100, l:75};
-        let color2 = {h:200, s:100, l:75};
-
-        // create swatch
-        widget.picker.color.hsl = color1;
-        widget.create_swatch();
-        assert.strictEqual(widget.color_swatches.length, 1);
-
-        // create second swatch
-        widget.picker.color.hsl = color2;
-        widget.create_swatch();
-        assert.strictEqual(widget.color_swatches.length, 2);
-
-        // delete swatch
-        widget.remove_swatch();
-        assert.strictEqual(widget.color_swatches.length, 1);
-
-        // delete second swatch
-        widget.remove_swatch();
-        assert.strictEqual(widget.color_swatches.length, 0);
-
-        assert.strictEqual(widget.picker.color.hexString, '#ffffff');
-    });
-
-    QUnit.test('select swatch', assert => {
-        let colors = [{h:100, s:100, l:50}, {h:100, s:100, l:20}, {h:100, s:50, l:50}];
-        for (let color of colors) {
-            widget.picker.color.hsl = color;
+            // create second swatch
+            widget.picker.color.hsl = color2;
             widget.create_swatch();
-        }
+            assert.strictEqual(widget.color_swatches.length, 2);
 
-        // newest created element is active
-        assert.deepEqual(widget.active_swatch, widget.color_swatches[2]);
-        assert.strictEqual(widget.hex, widget.color_swatches[2].color.hex);
-        assert.deepEqual(widget.hsl, widget.color_swatches[2].color.hsl);
+            // delete swatch
+            widget.remove_swatch();
+            assert.strictEqual(widget.color_swatches.length, 1);
 
-        // click on first swatch
-        widget.color_swatches[0].elem.trigger('click');
-        assert.deepEqual(widget.active_swatch, widget.color_swatches[0]);
-        assert.strictEqual(widget.hex, widget.color_swatches[0].color.hex);
-        assert.deepEqual(widget.hsl, widget.color_swatches[0].color.hsl);
-    });
-});
+            // delete second swatch
+            widget.remove_swatch();
+            assert.strictEqual(widget.color_swatches.length, 0);
 
-QUnit.module('ColorHSLInput', hooks => {
-    let elem = $('<input class="color-picker"/>');
-    let widget;
+            assert.strictEqual(widget.picker.color.hexString, '#ffffff');
+        });
 
-    hooks.before(() => {
-        $('body').append('<div id="container" />');
-    });
-    hooks.beforeEach(() => {
-        $('#container').append(elem);
-        ColorWidget.initialize();
-        widget = elem.data('color_widget');
-    });
-    hooks.afterEach(() => {
-        $('#container').empty();
-        localStorage.removeItem('color-swatches');
-        widget = null;
-    });
-    hooks.after(() => {
-        $('#container').empty().remove();
-    });
+        QUnit.test('select swatch', assert => {
+            let colors = [
+                {h: 100, s: 100, l: 50},
+                {h: 100, s: 100, l: 20},
+                {h: 100, s: 50, l: 50}
+            ];
+            for (let color of colors) {
+                widget.picker.color.hsl = color;
+                widget.create_swatch();
+            }
 
-    QUnit.test('constructor', assert => {
-        assert.ok(widget.hsl_display.elem.is('div.hsl-display'));
-        assert.ok(widget.hsl_display.hue_input.is('input.h[type="number"][min="0"][max="360"]'));
-        assert.ok(widget.hsl_display.saturation_input.is('input.s[type="number"][min="0"][max="100"]'));
-        assert.ok(widget.hsl_display.lightness_input.is('input.l[type="number"][min="0"][max="100"]'));
+            // newest created element is active
+            assert.deepEqual(widget.active_swatch, widget.color_swatches[2]);
+            assert.strictEqual(widget.hex, widget.color_swatches[2].color.hex);
+            assert.deepEqual(widget.hsl, widget.color_swatches[2].color.hsl);
+
+            // click on first swatch
+            widget.color_swatches[0].elem.trigger('click');
+            assert.deepEqual(widget.active_swatch, widget.color_swatches[0]);
+            assert.strictEqual(widget.hex, widget.color_swatches[0].color.hex);
+            assert.deepEqual(widget.hsl, widget.color_swatches[0].color.hsl);
+        });
     });
 
-    QUnit.test('get/set hsl', assert => {
-        // hsl on init
-        assert.deepEqual(widget.hsl_display.hsl, widget.hsl);
+    QUnit.module('ColorHSLInput', hooks => {
+        hooks.beforeEach(() => {
+            ColorWidget.initialize();
+            widget = elem.data('color_widget');
+        });
 
-        // set hsl
-        widget.hsl = {h: 100, s:100, l:20};
-        assert.strictEqual(widget.hsl_display.hue_input.val(), "100");
-        assert.strictEqual(widget.hsl_display.saturation_input.val(), "100");
-        assert.strictEqual(widget.hsl_display.lightness_input.val(), "20");
+        QUnit.test('constructor', assert => {
+            assert.ok(widget.hsl_display.elem.is('div.hsl-display'));
+            assert.ok(widget.hsl_display.hue_input
+                .is('input.h[type="number"][min="0"][max="360"]')
+            );
+            assert.ok(widget.hsl_display.saturation_input
+                .is('input.s[type="number"][min="0"][max="100"]')
+            );
+            assert.ok(widget.hsl_display.lightness_input
+                .is('input.l[type="number"][min="0"][max="100"]')
+            );
+        });
 
-        // input h
-        widget.hsl_display.hue_input.val(200);
-        widget.hsl_display.hue_input.trigger('input');
-        assert.deepEqual(widget.hsl, widget.hsl_display.hsl);
+        QUnit.test('get/set hsl', assert => {
+            // hsl on init
+            assert.deepEqual(widget.hsl_display.hsl, widget.hsl);
 
-        // input s
-        widget.hsl_display.saturation_input.val(80);
-        widget.hsl_display.saturation_input.trigger('input');
-        assert.deepEqual(widget.hsl, widget.hsl_display.hsl);
+            // set hsl
+            widget.hsl = { h: 100, s: 100, l: 20 };
+            assert.strictEqual(widget.hsl_display.hue_input.val(), "100");
+            assert.strictEqual(widget.hsl_display.saturation_input.val(), "100");
+            assert.strictEqual(widget.hsl_display.lightness_input.val(), "20");
 
-        // input h
-        widget.hsl_display.lightness_input.val(50);
-        widget.hsl_display.lightness_input.trigger('input');
-        assert.deepEqual(widget.hsl, widget.hsl_display.hsl);
-    });
-});
+            // input h
+            widget.hsl_display.hue_input.val(200);
+            widget.hsl_display.hue_input.trigger('input');
+            assert.deepEqual(widget.hsl, widget.hsl_display.hsl);
 
-QUnit.module('ColorHexInput', hooks => {
-    let elem = $('<input class="color-picker"/>');
-    let widget;
+            // input s
+            widget.hsl_display.saturation_input.val(80);
+            widget.hsl_display.saturation_input.trigger('input');
+            assert.deepEqual(widget.hsl, widget.hsl_display.hsl);
 
-    hooks.before(() => {
-        $('body').append('<div id="container" />');
-    });
-    hooks.beforeEach(() => {
-        $('#container').append(elem);
-        ColorWidget.initialize();
-        widget = elem.data('color_widget');
-    });
-    hooks.afterEach(() => {
-        $('#container').empty();
-        localStorage.removeItem('color-swatches');
-        widget = null;
-    });
-    hooks.after(() => {
-        $('#container').empty().remove();
+            // input h
+            widget.hsl_display.lightness_input.val(50);
+            widget.hsl_display.lightness_input.trigger('input');
+            assert.deepEqual(widget.hsl, widget.hsl_display.hsl);
+        });
     });
 
-    QUnit.test('constructor', assert => {
-        assert.ok(true);
-        assert.ok(widget.hex_display.elem.is('div.hex-display'));
-        assert.ok(widget.hex_display.hex_input.is('input[spellcheck="false"][maxlength="7"]'));
-    });
+    QUnit.module('ColorHexInput', hooks => {
+        hooks.beforeEach(() => {
+            ColorWidget.initialize();
+            widget = elem.data('color_widget');
+        });
 
-    QUnit.test('get/set hex', assert => {
-        // hex on init
-        assert.strictEqual(widget.hex, widget.hex_display.hex);
+        QUnit.test('constructor', assert => {
+            assert.ok(true);
+            assert.ok(widget.hex_display.elem.is('div.hex-display'));
+            assert.ok(widget.hex_display.hex_input
+                .is('input[spellcheck="false"][maxlength="7"]')
+            );
+        });
 
-        // set hex
-        widget.hex_display.hex = "#cccccc";
-        assert.strictEqual(widget.hex_display.hex_input.val(), widget.hex_display.hex);
+        QUnit.test('get/set hex', assert => {
+            // hex on init
+            assert.strictEqual(widget.hex, widget.hex_display.hex);
 
-        // trigger input
-        widget.hex_display.hex_input.val("#ffffff");
-        widget.hex_display.hex_input.trigger('input');
-        assert.strictEqual(widget.hex, "#ffffff");
+            // set hex
+            widget.hex_display.hex = "#cccccc";
+            assert.strictEqual(
+                widget.hex_display.hex_input.val(),
+                widget.hex_display.hex
+            );
 
-        // empty input
-        widget.hex_display.hex_input.val("");
-        widget.hex_display.hex_input.trigger('input');
-        assert.strictEqual(widget.hex_display.hex_input.val(), "#");
+            // trigger input
+            widget.hex_display.hex_input.val("#ffffff");
+            widget.hex_display.hex_input.trigger('input');
+            assert.strictEqual(widget.hex, "#ffffff");
+
+            // empty input
+            widget.hex_display.hex_input.val("");
+            widget.hex_display.hex_input.trigger('input');
+            assert.strictEqual(widget.hex_display.hex_input.val(), "#");
+        });
     });
 });
