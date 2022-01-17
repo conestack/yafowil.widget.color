@@ -4,8 +4,11 @@ class ColorSwatch {
 
     constructor(widget, hex, hsl) {
         this.widget = widget;
-        this.elem = $('<div />').addClass('color-swatch').attr('id', hex.substr(1))
-            .css('background', hex).appendTo(this.widget.swatches_container);
+        this.elem = $('<div />')
+            .addClass('color-swatch')
+            .attr('id', hex.substr(1))
+            .css('background', hex)
+            .appendTo(this.widget.swatches_container);
 
         this.color = {
             hex: hex,
@@ -46,26 +49,43 @@ class ColorHSLInput {
 
     constructor(widget, hsl) {
         this.widget = widget;
-        this.elem = $(`<div />`).addClass('hsl-display').appendTo(widget.dropdown_elem);
-        let hue_elem = $('<div />').addClass('hue').text('H:').appendTo(this.elem);
-        let saturation_elem = $('<div />').addClass('saturation').text('S:')
+
+        this.elem = $(`<div />`)
+            .addClass('hsl-display')
+            .appendTo(widget.dropdown_elem);
+        let hue_elem = $('<div />')
+            .addClass('hue').text('H:')
             .appendTo(this.elem);
-        let lightness_elem = $('<div />').addClass('lightness').text('L:')
+        let saturation_elem = $('<div />')
+            .addClass('saturation')
+            .text('S:')
+            .appendTo(this.elem);
+        let lightness_elem = $('<div />')
+            .addClass('lightness')
+            .text('L:')
             .appendTo(this.elem);
 
-        this.hue_input = $('<input />').addClass('h')
-                        .attr({type: 'number', min: 0, max:360}).val(hsl.h)
-                        .appendTo(hue_elem);
-        this.saturation_input = $('<input />').addClass('s')
-                        .attr({type: 'number', min: 0, max:100}).val(hsl.s)
-                        .appendTo(saturation_elem);
-        this.lightness_input = $('<input />').addClass('l')
-                        .attr({type: 'number', min: 0, max:100}).val(hsl.l)
-                        .appendTo(lightness_elem);
+        this.hue_input = $('<input />')
+            .addClass('h')
+            .attr({type: 'number', min: 0, max:360})
+            .val(hsl.h)
+            .appendTo(hue_elem);
+        this.saturation_input = $('<input />')
+            .addClass('s')
+            .attr({type: 'number', min: 0, max:100})
+            .val(hsl.s)
+            .appendTo(saturation_elem);
+        this.lightness_input = $('<input />')
+            .addClass('l')
+            .attr({type: 'number', min: 0, max:100})
+            .val(hsl.l)
+            .appendTo(lightness_elem);
 
         this.update = this.update.bind(this);
-        this.hue_input.add(this.saturation_input).add(this.lightness_input)
-                      .on('input', this.update);
+        this.hue_input
+            .add(this.saturation_input)
+            .add(this.lightness_input)
+            .on('input', this.update);
     }
 
     get hsl() {
@@ -91,10 +111,14 @@ class ColorHexInput {
 
     constructor(widget, hex) {
         this.widget = widget;
-        this.elem = $('<div />').addClass('hex-display').text('HEX:')
+        this.elem = $('<div />')
+            .addClass('hex-display')
+            .text('HEX:')
             .appendTo(widget.dropdown_elem);
-        this.hex_input = $('<input />').val(hex)
-            .attr({spellcheck: false, maxlength: 7}).appendTo(this.elem);
+        this.hex_input = $('<input />')
+            .val(hex)
+            .attr({spellcheck: false, maxlength: 7})
+            .appendTo(this.elem);
 
         this.update = this.update.bind(this);
         this.hex_input.on('input', this.update);
@@ -132,22 +156,33 @@ export class ColorWidget {
 
     constructor(elem, options) {
         this.elem = elem;
-        this.elem.data('color_widget', this)
-                 .attr('spellcheck', "false")
-                 .attr('maxlength', 7);
+        this.elem
+            .data('color_widget', this)
+            .attr('spellcheck', "false")
+            .attr('maxlength', 7);
 
-        this.dropdown_elem = $(`<div />`).addClass('color-picker-wrapper');
-        this.picker_container = $('<div />').addClass('color-picker-container')
+        this.dropdown_elem = $(`<div />`)
+            .addClass('color-picker-wrapper');
+        this.picker_container = $('<div />')
+            .addClass('color-picker-container')
             .appendTo(this.dropdown_elem);
-        this.close_btn = $(`<button />`).addClass('close-button').text('✕')
+        this.close_btn = $(`<button />`)
+            .addClass('close-button')
+            .text('✕')
             .appendTo(this.dropdown_elem);;
-        this.add_color_btn = $(`<button />`).addClass('add_color').text('+ Add');
-        this.remove_color_btn = $(`<button />`).addClass('remove_color').text('- Remove');
-        this.buttons = $('<div />').addClass('buttons')
+        this.add_color_btn = $(`<button />`)
+            .addClass('add_color')
+            .text('+ Add');
+        this.remove_color_btn = $(`<button />`)
+            .addClass('remove_color')
+            .text('- Remove');
+        this.buttons = $('<div />')
+            .addClass('buttons')
             .append(this.add_color_btn)
             .append(this.remove_color_btn)
             .appendTo(this.dropdown_elem);;
-        this.swatches_container = $(`<div />`).addClass('color-picker-recent')
+        this.swatches_container = $(`<div />`)
+            .addClass('color-picker-recent')
             .appendTo(this.dropdown_elem);;
 
         this.picker = new iro.ColorPicker(this.picker_container.get(0), {
