@@ -2,13 +2,13 @@
     'use strict';
 
     class ColorSwatch {
-        constructor(widget, hsl) {
+        constructor(widget, color) {
             this.widget = widget;
+            this.color = color;
             this.elem = $('<div />')
                 .addClass('color-swatch')
-                .css('background-color', `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`)
+                .css('background-color', this.color.hexString)
                 .appendTo(this.widget.swatches_container);
-            this.color = hsl;
             this.destroy = this.destroy.bind(this);
             this.select = this.select.bind(this);
             this.elem.on('click', this.select);
@@ -23,7 +23,7 @@
             $('div.color-swatch').removeClass('selected');
             this.elem.addClass('selected');
             this.widget.active_swatch = this;
-            this.widget.picker.color.hsl = this.color;
+            this.widget.picker.color.set(this.color);
         }
     }
     class ColorHSLInput {
@@ -77,7 +77,7 @@
             this.lightness_input.val(hsl.l);
         }
         update(e) {
-            this.widget.picker.color.hsl = this.value;
+            this.widget.picker.color.set(this.value);
         }
     }
     class ColorHexInput {
@@ -104,7 +104,7 @@
             if (this.value.length === 0) {
                 this.input.val('#');
             } else if (this.widget.parse_hex(this.input.val())) {
-                this.widget.picker.color.hexString = this.value;
+                this.widget.picker.color.set(this.value);
             }
         }
     }
@@ -162,7 +162,7 @@
                 let colors = JSON.parse(json_str);
                 this.swatches_container.show();
                 for (let color of colors) {
-                    this.color_swatches.push(new ColorSwatch(this, color));
+                    this.color_swatches.push(new ColorSwatch(this, new iro.Color(color)));
                 }
                 let active_swatch = this.color_swatches[this.color_swatches.length -1];
                 active_swatch.select();
@@ -170,10 +170,7 @@
             this.init_options(options);
             this.color = this.picker.color.clone();
             this.elem.val(this.color.hexString);
-            this.preview_elem.css(
-                'background-color',
-                `hsl(${this.color.hsl.h}, ${this.color.hsl.s}%, ${this.color.hsl.l}%)`
-            );
+            this.preview_elem.css('background-color', this.color.hexString);
             this.resize_handle = this.resize_handle.bind(this);
             this.resize_handle();
             $(window).on('resize', this.resize_handle);
@@ -189,7 +186,7 @@
                 if (hex.length === 0) {
                     this.elem.val('#');
                 } else if (this.parse_hex(hex)) {
-                    this.picker.color.hexString = hex;
+                    this.picker.color.set(hex);
                 }
             });
             this.update_color = this.update_color.bind(this);
@@ -245,10 +242,7 @@
         }
         update_color() {
             this.color = this.picker.color.clone();
-            this.preview_elem.css(
-                'background-color',
-                `hsl(${this.color.hsl.h}, ${this.color.hsl.s}%, ${this.color.hsl.l}%)`
-            );
+            this.preview_elem.css('background-color', this.color.hexString);
             this.elem.val(this.color.hexString);
             if (this.hsl_display) {
                 this.hsl_display.value = this.color.hsl;
@@ -300,7 +294,7 @@
                 e.preventDefault();
                 this.swatches_container.show();
             }
-            let swatch = new ColorSwatch(this, this.picker.color.hsl);
+            let swatch = new ColorSwatch(this, this.picker.color.clone());
             this.color_swatches.push(swatch);
             swatch.select();
             if (this.color_swatches.length > 12) {
@@ -322,14 +316,14 @@
             } else {
                 this.active_swatch = this.color_swatches[this.color_swatches.length - 1];
                 this.active_swatch.select();
-                this.picker.color.hsl = this.active_swatch.color;
+                this.picker.color.set(this.active_swatch.color);
                 this.set_swatches();
             }
         }
         set_swatches() {
             let swatches = [];
             for (let swatch of this.color_swatches) {
-                swatches.push(swatch.color);
+                swatches.push(swatch.color.hsl);
             }
             localStorage.setItem("color-swatches", JSON.stringify(swatches));
         }

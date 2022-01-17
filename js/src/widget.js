@@ -2,14 +2,13 @@ import $ from 'jquery';
 
 class ColorSwatch {
 
-    constructor(widget, hsl) {
+    constructor(widget, color) {
         this.widget = widget;
+        this.color = color;
         this.elem = $('<div />')
             .addClass('color-swatch')
-            .css('background-color', `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`)
+            .css('background-color', this.color.hexString)
             .appendTo(this.widget.swatches_container);
-
-        this.color = hsl;
 
         this.destroy = this.destroy.bind(this);
         this.select = this.select.bind(this);
@@ -35,7 +34,7 @@ class ColorSwatch {
         $('div.color-swatch').removeClass('selected');
         this.elem.addClass('selected');
         this.widget.active_swatch = this;
-        this.widget.picker.color.hsl = this.color;
+        this.widget.picker.color.set(this.color);
     }
 }
 
@@ -97,7 +96,7 @@ class ColorHSLInput {
     }
 
     update(e) {
-        this.widget.picker.color.hsl = this.value;
+        this.widget.picker.color.set(this.value);
     }
 }
 
@@ -130,7 +129,7 @@ class ColorHexInput {
         if (this.value.length === 0) {
             this.input.val('#');
         } else if (this.widget.parse_hex(this.input.val())) {
-            this.widget.picker.color.hexString = this.value;
+            this.widget.picker.color.set(this.value);
         }
     }
 }
@@ -198,7 +197,7 @@ export class ColorWidget {
             let colors = JSON.parse(json_str);
             this.swatches_container.show();
             for (let color of colors) {
-                this.color_swatches.push(new ColorSwatch(this, color));
+                this.color_swatches.push(new ColorSwatch(this, new iro.Color(color)));
             }
             let active_swatch = this.color_swatches[this.color_swatches.length -1];
             active_swatch.select();
@@ -209,10 +208,7 @@ export class ColorWidget {
         // color related
         this.color = this.picker.color.clone();
         this.elem.val(this.color.hexString);
-        this.preview_elem.css(
-            'background-color',
-            `hsl(${this.color.hsl.h}, ${this.color.hsl.s}%, ${this.color.hsl.l}%)`
-        );
+        this.preview_elem.css('background-color', this.color.hexString);
 
         // events
         this.resize_handle = this.resize_handle.bind(this);
@@ -234,7 +230,7 @@ export class ColorWidget {
             if (hex.length === 0) {
                 this.elem.val('#');
             } else if (this.parse_hex(hex)) {
-                this.picker.color.hexString = hex;
+                this.picker.color.set(hex);
             }
         });
 
@@ -299,10 +295,7 @@ export class ColorWidget {
 
     update_color() {
         this.color = this.picker.color.clone();
-        this.preview_elem.css(
-            'background-color',
-            `hsl(${this.color.hsl.h}, ${this.color.hsl.s}%, ${this.color.hsl.l}%)`
-        );
+        this.preview_elem.css('background-color', this.color.hexString);
         this.elem.val(this.color.hexString);
 
         if (this.hsl_display) {
@@ -366,7 +359,7 @@ export class ColorWidget {
         //     if (swatch.find_match(hsv)) {return};
         // }
 
-        let swatch = new ColorSwatch(this, this.picker.color.hsl);
+        let swatch = new ColorSwatch(this, this.picker.color.clone());
         this.color_swatches.push(swatch);
         swatch.select();
 
@@ -393,7 +386,7 @@ export class ColorWidget {
         } else {
             this.active_swatch = this.color_swatches[this.color_swatches.length - 1];
             this.active_swatch.select();
-            this.picker.color.hsl = this.active_swatch.color;
+            this.picker.color.set(this.active_swatch.color);
             this.set_swatches();
         }
     }
@@ -401,7 +394,7 @@ export class ColorWidget {
     set_swatches() {
         let swatches = [];
         for (let swatch of this.color_swatches) {
-            swatches.push(swatch.color);
+            swatches.push(swatch.color.hsl);
         }
         localStorage.setItem("color-swatches", JSON.stringify(swatches));
     }
