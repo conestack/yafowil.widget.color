@@ -59,7 +59,6 @@ QUnit.module('ColorWidget', hooks => {
         widget = elem.data('color_widget');
 
         // assertions
-        assert.strictEqual(widget.swatches_container.css('display'), 'block');
         assert.strictEqual(widget.color_swatches.length, 2);
         assert.deepEqual(widget.active_swatch, widget.color_swatches[1]);
         assert.ok(widget.color_swatches[1].elem.hasClass('selected'));

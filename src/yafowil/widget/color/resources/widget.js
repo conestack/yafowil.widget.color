@@ -11,7 +11,6 @@
             this.color = hsl;
             this.destroy = this.destroy.bind(this);
             this.select = this.select.bind(this);
-            this.select();
             this.elem.on('click', this.select);
         }
         find_match(color) {
@@ -158,7 +157,6 @@
                 }]
             });
             this.color_swatches = [];
-            this.init_options(options);
             let json_str = localStorage.getItem("color-swatches");
             if (json_str) {
                 let colors = JSON.parse(json_str);
@@ -169,6 +167,7 @@
                 let active_swatch = this.color_swatches[this.color_swatches.length -1];
                 active_swatch.select();
             }
+            this.init_options(options);
             this.color = this.picker.color.clone();
             this.elem.val(this.color.hexString);
             this.preview_elem.css(
@@ -246,7 +245,10 @@
         }
         update_color() {
             this.color = this.picker.color.clone();
-            this.preview_elem.css('background', this.color.hexString);
+            this.preview_elem.css(
+                'background-color',
+                `hsl(${this.color.hsl.h}, ${this.color.hsl.s}%, ${this.color.hsl.l}%)`
+            );
             this.elem.val(this.color.hexString);
             if (this.hsl_display) {
                 this.hsl_display.value = this.color.hsl;
@@ -298,7 +300,9 @@
                 e.preventDefault();
                 this.swatches_container.show();
             }
-            this.color_swatches.push(new ColorSwatch(this, this.picker.color.hsl));
+            let swatch = new ColorSwatch(this, this.picker.color.hsl);
+            this.color_swatches.push(swatch);
+            swatch.select();
             if (this.color_swatches.length > 12) {
                 this.color_swatches[0].destroy();
                 this.color_swatches.shift();

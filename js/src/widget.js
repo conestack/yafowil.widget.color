@@ -13,7 +13,6 @@ class ColorSwatch {
 
         this.destroy = this.destroy.bind(this);
         this.select = this.select.bind(this);
-        this.select();
         this.elem.on('click', this.select);
     }
 
@@ -194,8 +193,6 @@ export class ColorWidget {
         });
 
         this.color_swatches = []; // saved colors
-        this.init_options(options);
-
         let json_str = localStorage.getItem("color-swatches");
         if (json_str) {
             let colors = JSON.parse(json_str);
@@ -206,6 +203,8 @@ export class ColorWidget {
             let active_swatch = this.color_swatches[this.color_swatches.length -1];
             active_swatch.select();
         }
+
+        this.init_options(options);
 
         // color related
         this.color = this.picker.color.clone();
@@ -300,7 +299,10 @@ export class ColorWidget {
 
     update_color() {
         this.color = this.picker.color.clone();
-        this.preview_elem.css('background', this.color.hexString);
+        this.preview_elem.css(
+            'background-color',
+            `hsl(${this.color.hsl.h}, ${this.color.hsl.s}%, ${this.color.hsl.l}%)`
+        );
         this.elem.val(this.color.hexString);
 
         if (this.hsl_display) {
@@ -364,7 +366,9 @@ export class ColorWidget {
         //     if (swatch.find_match(hsv)) {return};
         // }
 
-        this.color_swatches.push(new ColorSwatch(this, this.picker.color.hsl));
+        let swatch = new ColorSwatch(this, this.picker.color.hsl);
+        this.color_swatches.push(swatch);
+        swatch.select();
 
         if (this.color_swatches.length > 12) {
             this.color_swatches[0].destroy();
