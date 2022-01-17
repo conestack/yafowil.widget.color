@@ -181,15 +181,15 @@ export class ColorWidget {
             }]
         });
 
-        this.color_swatches = []; // saved colors
+        this.swatches = []; // saved colors
         let json_str = localStorage.getItem("color-swatches");
         if (json_str) {
             let colors = JSON.parse(json_str);
             this.swatches_container.show();
             for (let color of colors) {
-                this.color_swatches.push(new ColorSwatch(this, new iro.Color(color)));
+                this.swatches.push(new ColorSwatch(this, new iro.Color(color)));
             }
-            let active_swatch = this.color_swatches[this.color_swatches.length -1];
+            let active_swatch = this.swatches[this.swatches.length -1];
             active_swatch.select();
         }
 
@@ -342,19 +342,19 @@ export class ColorWidget {
             this.swatches_container.show();
         }
 
-        for (let swatch of this.color_swatches) {
+        for (let swatch of this.swatches) {
             if (this.color_equals(swatch.color)) {
                 return;
             }
         }
 
         let swatch = new ColorSwatch(this, this.picker.color.clone());
-        this.color_swatches.push(swatch);
+        this.swatches.push(swatch);
         swatch.select();
 
-        if (this.color_swatches.length > 12) {
-            this.color_swatches[0].destroy();
-            this.color_swatches.shift();
+        if (this.swatches.length > 12) {
+            this.swatches[0].destroy();
+            this.swatches.shift();
         }
 
         this.set_swatches();
@@ -366,14 +366,14 @@ export class ColorWidget {
         }
 
         this.active_swatch.destroy();
-        let index = this.color_swatches.indexOf(this.active_swatch);
-        this.color_swatches.splice(index, 1);
+        let index = this.swatches.indexOf(this.active_swatch);
+        this.swatches.splice(index, 1);
 
-        if (this.color_swatches.length === 0) {
+        if (this.swatches.length === 0) {
             this.picker.color.reset();
             localStorage.removeItem('color-swatches');
         } else {
-            this.active_swatch = this.color_swatches[this.color_swatches.length - 1];
+            this.active_swatch = this.swatches[this.swatches.length - 1];
             this.active_swatch.select();
             this.picker.color.set(this.active_swatch.color);
             this.set_swatches();
@@ -382,7 +382,7 @@ export class ColorWidget {
 
     set_swatches() {
         let swatches = [];
-        for (let swatch of this.color_swatches) {
+        for (let swatch of this.swatches) {
             swatches.push(swatch.color.hsl);
         }
         localStorage.setItem("color-swatches", JSON.stringify(swatches));
