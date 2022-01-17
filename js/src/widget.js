@@ -70,9 +70,9 @@ class ColorHSLInput {
 
     get hsl() {
         return {
-            h: this.hue_input.val(),
-            s: this.saturation_input.val(),
-            l: this.lightness_input.val()
+            h: parseInt(this.hue_input.val()),
+            s: parseInt(this.saturation_input.val()),
+            l: parseInt(this.lightness_input.val())
         }
     }
 
@@ -82,7 +82,7 @@ class ColorHSLInput {
         this.lightness_input.val(hsl.l);
     }
 
-    update(e){
+    update(e) {
         this.widget.hsl = this.hsl;
     }
 }
@@ -111,8 +111,9 @@ class ColorHexInput {
     update() {
         if (this.hex.length === 0) {
             this.hex_input.val('#');
+        } else if (this.widget.parse_hex(this.hex_input.val())) {
+            this.widget.hex = this.hex;
         }
-        this.widget.hex = this.hex;
     }
 }
 
@@ -172,8 +173,8 @@ export class ColorWidget {
             for (let swatch of color_swatches) {
                 this.color_swatches.push(new ColorSwatch(this, swatch.hex, swatch.hsl));
             }
-            this.active_swatch = this.color_swatches[this.color_swatches.length -1];
-            this.active_swatch.select();
+            let active_swatch = this.color_swatches[this.color_swatches.length -1];
+            active_swatch.select();
             this.hex = this.active_swatch.color.hex;
             this.hsl = this.active_swatch.color.hsl;
         } else {
@@ -204,8 +205,9 @@ export class ColorWidget {
             let hex = this.elem.val();
             if (hex.length === 0) {
                 this.elem.val('#');
+            } else if (this.parse_hex(hex)) {
+                this.hex = hex;
             }
-            this.hex = hex;
         });
 
         this.update_color = this.update_color.bind(this);
@@ -223,11 +225,7 @@ export class ColorWidget {
     }
 
     set hex(hex) {
-        if (typeof hex === 'string'
-            && hex[0] === '#'
-            && hex.length === 7
-            && !isNaN(Number('0x' + hex.substring(1,7)))
-        ){
+        if (this.parse_hex(hex)) {
             this._hex = hex;
             this.picker.color.hexString = hex;
             this.elem.val(hex);
@@ -283,6 +281,18 @@ export class ColorWidget {
             this.dropdown_elem.removeClass('mobile');
             this.picker.state.layoutDirection = 'vertical';
             this.picker.resize(300);
+        }
+    }
+
+    parse_hex(hex) {
+        if (typeof hex === 'string'
+            && hex[0] === '#'
+            && hex.length === 7
+            && !isNaN(Number('0x' + hex.substring(1,7))))
+        {
+            return true;
+        } else {
+            return false;
         }
     }
 
