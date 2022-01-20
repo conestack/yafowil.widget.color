@@ -56,11 +56,11 @@
                 .attr({type: 'number', min: 0, max:100})
                 .val(hsl.l)
                 .appendTo(lightness_elem);
-            this.update = this.update.bind(this);
+            this.on_input = this.on_input.bind(this);
             this.hue_input
                 .add(this.saturation_input)
                 .add(this.lightness_input)
-                .on('input', this.update);
+                .on('input', this.on_input);
         }
         get value() {
             return {
@@ -74,7 +74,7 @@
             this.saturation_input.val(hsl.s);
             this.lightness_input.val(hsl.l);
         }
-        update(e) {
+        on_input(e) {
             this.widget.picker.color.set(this.value);
         }
     }
@@ -89,8 +89,8 @@
                 .val(hex)
                 .attr({spellcheck: false, maxlength: 7})
                 .appendTo(this.elem);
-            this.update = this.update.bind(this);
-            this.input.on('input', this.update);
+            this.on_input = this.on_input.bind(this);
+            this.input.on('input', this.on_input);
         }
         get value() {
             return this.input.val();
@@ -98,7 +98,7 @@
         set value(hex) {
             this.input.val(hex);
         }
-        update() {
+        on_input() {
             if (this.value.length === 0) {
                 this.input.val('#');
             } else {
@@ -169,16 +169,16 @@
             this.color = this.picker.color.clone();
             this.elem.val(this.color.hexString);
             this.preview_elem.css('background-color', this.color.hexString);
-            this.resize_handle = this.resize_handle.bind(this);
-            this.resize_handle();
-            $(window).on('resize', this.resize_handle);
+            this.on_resize = this.on_resize.bind(this);
+            this.on_resize();
+            $(window).on('resize', this.on_resize);
             this.create_swatch = this.create_swatch.bind(this);
             this.add_color_btn.on('click', this.create_swatch);
             this.remove_swatch = this.remove_swatch.bind(this);
             this.remove_color_btn.on('click', this.remove_swatch);
-            this.trigger_handle = this.trigger_handle.bind(this);
-            this.elem.on('focus', this.trigger_handle);
-            this.preview_elem.on('click', this.trigger_handle);
+            this.open = this.open.bind(this);
+            this.elem.on('focus', this.open);
+            this.preview_elem.on('click', this.open);
             this.elem.on('input', () => {
                 let hex = this.elem.val();
                 if (hex.length === 0) {
@@ -191,8 +191,8 @@
             this.picker.on('color:change', this.update_color);
             this.close = this.close.bind(this);
             this.close_btn.on('click', this.close);
-            this.handle_keypress = this.handle_keypress.bind(this);
-            this.handle_click = this.handle_click.bind(this);
+            this.on_keydown = this.on_keydown.bind(this);
+            this.on_click = this.on_click.bind(this);
         }
         init_options(options) {
             if (options && options.preview_elem) {
@@ -212,7 +212,7 @@
                 this.hex_display = new ColorHexInput(this, this.picker.color.hexString);
             }
         }
-        resize_handle(e) {
+        on_resize(e) {
             if ($(window).width() <= 450) {
                 if (!this.dropdown_elem.hasClass('mobile')) {
                     this.dropdown_elem.addClass('mobile');
@@ -239,16 +239,16 @@
                 this.hex_display.value = this.color.hexString;
             }
         }
-        trigger_handle(evt) {
+        open(evt) {
             if (this.dropdown_elem.css('display') === "none") {
                 this.dropdown_elem.show();
-                $(window).on('keydown', this.handle_keypress);
-                $(window).on('mousedown', this.handle_click);
+                $(window).on('keydown', this.on_keydown);
+                $(window).on('mousedown', this.on_click);
             } else {
                 this.close();
             }
         }
-        handle_keypress(e) {
+        on_keydown(e) {
             if (e.key === "Enter" || e.key === "Escape") {
                 e.preventDefault();
                 this.close();
@@ -257,7 +257,7 @@
                 this.remove_swatch();
             }
         }
-        handle_click(e) {
+        on_click(e) {
             let target = this.dropdown_elem;
             if (!target.is(e.target) &&
                 target.has(e.target).length === 0 &&
@@ -273,8 +273,8 @@
             }
             this.dropdown_elem.hide();
             this.elem.blur();
-            $(window).off('keydown', this.handle_keypress);
-            $(window).off('mousedown', this.handle_click);
+            $(window).off('keydown', this.on_keydown);
+            $(window).off('mousedown', this.on_click);
         }
         color_equals(color) {
             if (color instanceof iro.Color &&
