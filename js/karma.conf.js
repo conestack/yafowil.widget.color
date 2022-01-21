@@ -10,23 +10,23 @@ module.exports = function(config) {
             'viewport'
         ],
         files: [{
-            pattern: '../node_modules/jquery/src/**/*.js',
+            pattern: '../../node_modules/jquery/src/**/*.js',
             type: 'module',
             included: false
         }, {
-            pattern: '../node_modules/@jaames/iro/dist/iro.js',
+            pattern: '../../node_modules/@jaames/iro/dist/iro.js',
             included: true
         },
         {
-            pattern: '../js/src/*.js',
+            pattern: '../src/*.js',
             type: 'module',
             included: false
         }, {
-            pattern: '../js/tests/test_*.js',
+            pattern: '../tests/test_*.js',
             type: 'module'
         },
         {
-            pattern: '../src/yafowil/widget/color/resources/widget.css',
+            pattern: '../../src/yafowil/widget/color/resources/widget.css',
             included: true
         }],
         browsers: [
@@ -38,11 +38,11 @@ module.exports = function(config) {
             'coverage'
         ],
         preprocessors: {
-            '../js/src/*.js': [
+            '../src/*.js': [
                 'coverage',
                 'module-resolver'
             ],
-            '../js/tests/*.js': [
+            '../tests/*.js': [
                 'coverage',
                 'module-resolver'
             ]
@@ -52,8 +52,8 @@ module.exports = function(config) {
             customResolver: null,
             ecmaVersion: 6,
             aliases: {
-                jquery: '../node_modules/jquery/src/jquery.js',
-                iro: '../node_modules/@jaames/iro/dist/iro.es.js'
+                jquery: '../../node_modules/jquery/src/jquery.js',
+                iro: '../../node_modules/@jaames/iro/dist/iro.es.js'
             }
         }
     });
