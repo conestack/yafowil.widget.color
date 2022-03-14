@@ -12,3 +12,5 @@ Contributors
 ============
 
 - Robert Niederrreiter
+
+- Lena Daxenbichler

@@ -1,4 +1,4 @@
-(function (exports, $) {
+var yafowil_color = (function (exports, $) {
     'use strict';
 
     class ColorSwatch {
@@ -351,4 +351,3 @@
     return exports;
 
 })({}, jQuery);
-//# sourceMappingURL=widget.js.map
