@@ -5,17 +5,28 @@ from yafowil.tsf import TSF
 from yafowil.utils import as_data_attrs
 from yafowil.utils import cssclasses
 from yafowil.utils import cssid
+from yafowil.utils import data_attrs_helper
 from yafowil.utils import managedprops
 
 
 _ = TSF('yafowil.widget.color')
 
 
-@managedprops('emptyvalue')
+color_options = [
+    'preview_elem',
+    'hsl_display',
+    'hex_display',
+    'box_width',
+    'box_height',
+    'color'
+]
+
+
 def color_extractor(widget, data):
     pass
 
 
+@managedprops(*color_options)
 def color_edit_renderer(widget, data):
     input_attrs = {
         'class_': cssclasses(widget, data),
@@ -23,8 +34,11 @@ def color_edit_renderer(widget, data):
         'name_': widget.dottedpath,
         'type': 'text'
     }
+    custom_attrs = data_attrs_helper(widget, data, color_options)
     # XXX: widget options
-    input_attrs.update(as_data_attrs({}))
+    for key in custom_attrs:
+        input_attrs[key] = custom_attrs[key]
+
     return data.tag('input', **input_attrs)
 
 
@@ -58,4 +72,43 @@ CSS classes for color widget wrapper DOM element.
 
 factory.doc['props']['color.emptyvalue'] = """\
 If color value empty, return as extracted value.
+"""
+
+# Additional Options
+
+factory.defaults['color.preview_elem'] = None
+factory.doc['props']['color.preview_elem'] = """\
+Add an optional preview elem.
+Values: [True|False|None (default)].
+"""
+
+factory.defaults['color.hsl_display'] = None
+factory.doc['props']['color.hsl_display'] = """\
+Add option to display and edit hsl color values.
+Values: [True|False|None].
+"""
+
+factory.defaults['color.hex_display'] = None
+factory.doc['props']['color.hex_display'] = """\
+Add option to display and edit hex color values.
+Values: [True|False|None].
+"""
+
+factory.defaults['color.box_width'] = 250
+factory.doc['props']['color.box_width'] = """\
+Set the initial width of the color box (in pixels).
+Values: [px].
+"""
+
+factory.defaults['color.box_height'] = None
+factory.doc['props']['color.box_height'] = """\
+Set the initial height of the color box (in pixels).
+Values: [px].
+"""
+
+factory.defaults['color.color'] = '#ffffff'
+factory.doc['props']['color.color'] = """\
+Set the inital picker color if no swatches are specified.
+The color can be passed as hex or hsl value.
+Values: [String(hex), Obj(hsl)].
 """

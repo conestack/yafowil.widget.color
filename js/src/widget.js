@@ -127,17 +127,21 @@ class ColorHexInput {
 export class ColorWidget {
 
     static initialize(context) {
-        $('input.color-picker', context).each(function() {
+        $('input.color-picker', context).each(function(index) {
+            let elem = $(this);
             let options = {
-                // preview_elem: $('h1.title'), // add optional preview elem
-                hsl_display: true,
-                hex_display: true
+                preview_elem: elem.data('preview_elem'),
+                hsl_display: elem.data('hsl_display'),
+                hex_display: elem.data('hex_display'),
+                box_width: elem.data('box_width'),
+                box_height: elem.data('box_height'),
+                color: elem.data('color')
             };
-            new ColorWidget($(this), options);
+            new ColorWidget(elem, options, index);
         });
     }
 
-    constructor(elem, options) {
+    constructor(elem, options, index) {
         this.elem = elem;
         this.elem
             .data('color_widget', this)
@@ -145,7 +149,8 @@ export class ColorWidget {
             .attr('maxlength', 7);
 
         this.dropdown_elem = $(`<div />`)
-            .addClass('color-picker-wrapper');
+            .addClass('color-picker-wrapper')
+            .css('top', this.elem.outerHeight());
         this.picker_container = $('<div />')
             .addClass('color-picker-container')
             .appendTo(this.dropdown_elem);
@@ -167,9 +172,11 @@ export class ColorWidget {
         this.swatches_container = $(`<div />`)
             .addClass('color-picker-recent')
             .appendTo(this.dropdown_elem);;
+        this.index = index;
 
-        this.picker = new iro.ColorPicker(this.picker_container.get(0), {
-            color: '#ffffff',
+        let iro_opts = {
+            color: options.color,
+            width: options.box_width,
             layout: [{
                 component: iro.ui.Box,
                 options: {}
@@ -179,10 +186,16 @@ export class ColorWidget {
                     sliderType: 'hue'
                 }
             }]
-        });
+        }
+
+        if (options.box_height) {
+            iro_opts.boxHeight = options.box_height;
+        }
+
+        this.picker = new iro.ColorPicker(this.picker_container.get(0), iro_opts);
 
         this.swatches = []; // saved colors
-        let json_str = localStorage.getItem("color-swatches");
+        let json_str = localStorage.getItem(`color-swatches-${index}`);
         if (json_str) {
             let colors = JSON.parse(json_str);
             this.swatches_container.show();
@@ -236,8 +249,9 @@ export class ColorWidget {
 
     init_options(options) {
         if (options && options.preview_elem) {
-            this.preview_elem = options.preview_elem;
-            this.elem.after(this.dropdown_elem);
+            this.preview_elem = $(options.preview_elem);
+            this.elem.after(this.preview_elem);
+            this.preview_elem.after(this.dropdown_elem);
         } else {
             this.preview_elem = $(`<span />`).addClass('color-picker-color');
             this.elem.after(this.preview_elem);
@@ -253,6 +267,15 @@ export class ColorWidget {
         if (options && options.hex_display) {
             this.hex_display = new ColorHexInput(this, this.picker.color.hexString);
         }
+
+        let dimensions = {};
+        if (options && options.box_width) {
+            dimensions.width = options.box_width;
+        }
+        if (options && options.box_height) {
+            dimensions.height = options.box_height;
+        }
+        this.box_dimensions = dimensions;
     }
 
     on_resize(e) {
@@ -261,13 +284,19 @@ export class ColorWidget {
                 this.dropdown_elem.addClass('mobile');
                 this.picker.state.layoutDirection = 'horizontal';
             }
+            if (this.box_dimensions.height) {
+                this.picker.state.boxHeight = null;
+            }
             let calc_width = $(window).width() * 0.3;
             this.picker.resize(calc_width);
         } else
         if ($(window).width() > 450 && this.dropdown_elem.hasClass('mobile')) {
             this.dropdown_elem.removeClass('mobile');
             this.picker.state.layoutDirection = 'vertical';
-            this.picker.resize(300);
+            if (this.box_dimensions.height) {
+                this.picker.state.boxHeight = this.box_dimensions.height;
+            }
+            this.picker.resize(this.box_dimensions.width);
         }
     }
 
@@ -371,7 +400,7 @@ export class ColorWidget {
 
         if (this.swatches.length === 0) {
             this.picker.color.reset();
-            localStorage.removeItem('color-swatches');
+            localStorage.removeItem(`color-swatches-${this.index}`);
         } else {
             this.active_swatch = this.swatches[this.swatches.length - 1];
             this.active_swatch.select();
@@ -385,6 +414,6 @@ export class ColorWidget {
         for (let swatch of this.swatches) {
             swatches.push(swatch.color.hsl);
         }
-        localStorage.setItem("color-swatches", JSON.stringify(swatches));
+        localStorage.setItem(`color-swatches-${this.index}`, JSON.stringify(swatches));
     }
 }
