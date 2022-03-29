@@ -14,11 +14,12 @@ _ = TSF('yafowil.widget.color')
 
 color_options = [
     'preview_elem',
-    'hsl_display',
-    'hex_display',
+    'format',
     'box_width',
     'box_height',
-    'color'
+    'slider_size',
+    'color',
+    'swatches'
 ]
 
 
@@ -82,16 +83,10 @@ Add an optional preview elem.
 Values: [True|False|None (default)].
 """
 
-factory.defaults['color.hsl_display'] = None
-factory.doc['props']['color.hsl_display'] = """\
+factory.defaults['color.format'] = ['hex']
+factory.doc['props']['color.format'] = """\
 Add option to display and edit hsl color values.
-Values: [True|False|None].
-"""
-
-factory.defaults['color.hex_display'] = None
-factory.doc['props']['color.hex_display'] = """\
-Add option to display and edit hex color values.
-Values: [True|False|None].
+Values: [List('hex') (default)|None].
 """
 
 factory.defaults['color.box_width'] = 250
@@ -106,9 +101,22 @@ Set the initial height of the color box (in pixels).
 Values: [px].
 """
 
+factory.defaults['color.slider_size'] = 10
+factory.doc['props']['color.slider_size'] = """\
+Set the height of slider elements (in pixels).
+Values: [px].
+"""
+
 factory.defaults['color.color'] = '#ffffff'
 factory.doc['props']['color.color'] = """\
 Set the inital picker color if no swatches are specified.
 The color can be passed as hex or hsl value.
 Values: [String(hex), Obj(hsl)].
+"""
+
+factory.defaults['color.swatches'] = None
+factory.doc['props']['color.swatches'] = """\
+Set swatches to be initialized.
+Given swatches can't be deleted in the widget.
+Values: [Array(Dict)].
 """
