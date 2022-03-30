@@ -3,6 +3,7 @@ import {
     ColorHexInput,
     ColorHSLInput,
     ColorRGBInput,
+    ColorKelvinInput,
     ColorSwatch
 } from './components';
 
@@ -72,6 +73,15 @@ export class ColorWidget {
             }]
         }
 
+        if (options.format.includes('kelvin')) {
+            iro_opts.layout.push({
+                component: iro.ui.Slider,
+                options: {
+                    sliderType: 'kelvin',
+                    sliderSize: options.slider_size
+                }
+            });
+        }
         if (options.format.includes('rgba')) {
             iro_opts.layout.push({
                 component: iro.ui.Slider,
@@ -170,7 +180,9 @@ export class ColorWidget {
         if (options.format.includes('hex')) {
             this.hex_display = new ColorHexInput(this, this.picker.color.hexString);
         }
-
+        if (options.format.includes('kelvin')) {
+            this.kelvin_display = new ColorKelvinInput(this, this.picker.color.kelvin)
+        }
         if (options.format.includes('rgba')) {
             this.rgb_display = new ColorRGBInput(this, this.picker.color.rgba, true);
         } else if (options.format.includes('rgb')) {
@@ -224,6 +236,9 @@ export class ColorWidget {
                 this.rgb_display.rgb = this.color.rgb;
             }
         }
+        if (this.kelvin_display) {
+            this.kelvin_display.value = this.color.kelvin;
+        }
 
         this.elem.val(this.color.hexString);
         if (this.hex_display) {
@@ -274,9 +289,10 @@ export class ColorWidget {
 
     color_equals(color) {
         if (color instanceof iro.Color &&
-            color.hsl.h === this.color.hsl.h &&
-            color.hsl.s === this.color.hsl.s &&
-            color.hsl.l === this.color.hsl.l) {
+            color.hsla.h === this.color.hsla.h &&
+            color.hsla.s === this.color.hsla.s &&
+            color.hsla.l === this.color.hsla.l &&
+            color.hsla.a === this.color.hsla.a) {
             return true;
         }
     }
@@ -313,6 +329,11 @@ export class ColorWidget {
             this.swatches_container.show();
         }
 
+        for (let swatch of this.fixed_swatches) {
+            if (this.color_equals(swatch.color)) {
+                return;
+            }
+        }
         for (let swatch of this.swatches) {
             if (this.color_equals(swatch.color)) {
                 return;
@@ -363,7 +384,7 @@ export class ColorWidget {
     set_swatches() {
         let swatches = [];
         for (let swatch of this.swatches) {
-            swatches.push(swatch.color.hsl);
+            swatches.push(swatch.color.hsla);
         }
         localStorage.setItem(`color-swatches-${this.index}`, JSON.stringify(swatches));
     }

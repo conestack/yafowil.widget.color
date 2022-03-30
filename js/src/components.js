@@ -223,3 +223,33 @@ export class ColorHexInput {
         }
     }
 }
+
+export class ColorKelvinInput {
+
+    constructor(widget, kelvin) {
+        this.widget = widget;
+        this.elem = $('<div />')
+            .addClass('kelvin-display')
+            .text('K:')
+            .appendTo(widget.dropdown_elem);
+        this.input = $('<input readonly />')
+            .val(kelvin)
+            .attr({type: 'number'})
+            .appendTo(this.elem);
+
+        this.on_input = this.on_input.bind(this);
+        this.input.on('input', this.on_input);
+    }
+
+    get value() {
+        return this.input.val();
+    }
+
+    set value(kelvin) {
+        this.input.val(parseFloat(kelvin).toFixed(2));
+    }
+
+    on_input() {
+        this.widget.picker.color.set(this.value);
+    }
+}

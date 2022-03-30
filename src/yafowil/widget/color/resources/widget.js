@@ -195,6 +195,30 @@ var yafowil_color = (function (exports, $$1) {
             }
         }
     }
+    class ColorKelvinInput {
+        constructor(widget, kelvin) {
+            this.widget = widget;
+            this.elem = $('<div />')
+                .addClass('kelvin-display')
+                .text('K:')
+                .appendTo(widget.dropdown_elem);
+            this.input = $('<input readonly />')
+                .val(kelvin)
+                .attr({type: 'number'})
+                .appendTo(this.elem);
+            this.on_input = this.on_input.bind(this);
+            this.input.on('input', this.on_input);
+        }
+        get value() {
+            return this.input.val();
+        }
+        set value(kelvin) {
+            this.input.val(parseFloat(kelvin).toFixed(2));
+        }
+        on_input() {
+            this.widget.picker.color.set(this.value);
+        }
+    }
 
     class ColorWidget {
         static initialize(context) {
@@ -254,6 +278,15 @@ var yafowil_color = (function (exports, $$1) {
                     }
                 }]
             };
+            if (options.format.includes('kelvin')) {
+                iro_opts.layout.push({
+                    component: iro.ui.Slider,
+                    options: {
+                        sliderType: 'kelvin',
+                        sliderSize: options.slider_size
+                    }
+                });
+            }
             if (options.format.includes('rgba')) {
                 iro_opts.layout.push({
                     component: iro.ui.Slider,
@@ -338,6 +371,9 @@ var yafowil_color = (function (exports, $$1) {
             if (options.format.includes('hex')) {
                 this.hex_display = new ColorHexInput(this, this.picker.color.hexString);
             }
+            if (options.format.includes('kelvin')) {
+                this.kelvin_display = new ColorKelvinInput(this, this.picker.color.kelvin);
+            }
             if (options.format.includes('rgba')) {
                 this.rgb_display = new ColorRGBInput(this, this.picker.color.rgba, true);
             } else if (options.format.includes('rgb')) {
@@ -387,6 +423,9 @@ var yafowil_color = (function (exports, $$1) {
                     this.rgb_display.rgb = this.color.rgb;
                 }
             }
+            if (this.kelvin_display) {
+                this.kelvin_display.value = this.color.kelvin;
+            }
             this.elem.val(this.color.hexString);
             if (this.hex_display) {
                 this.hex_display.value = this.color.hexString;
@@ -431,9 +470,10 @@ var yafowil_color = (function (exports, $$1) {
         }
         color_equals(color) {
             if (color instanceof iro.Color &&
-                color.hsl.h === this.color.hsl.h &&
-                color.hsl.s === this.color.hsl.s &&
-                color.hsl.l === this.color.hsl.l) {
+                color.hsla.h === this.color.hsla.h &&
+                color.hsla.s === this.color.hsla.s &&
+                color.hsla.l === this.color.hsla.l &&
+                color.hsla.a === this.color.hsla.a) {
                 return true;
             }
         }
@@ -465,6 +505,11 @@ var yafowil_color = (function (exports, $$1) {
             if (e) {
                 e.preventDefault();
                 this.swatches_container.show();
+            }
+            for (let swatch of this.fixed_swatches) {
+                if (this.color_equals(swatch.color)) {
+                    return;
+                }
             }
             for (let swatch of this.swatches) {
                 if (this.color_equals(swatch.color)) {
@@ -509,7 +554,7 @@ var yafowil_color = (function (exports, $$1) {
         set_swatches() {
             let swatches = [];
             for (let swatch of this.swatches) {
-                swatches.push(swatch.color.hsl);
+                swatches.push(swatch.color.hsla);
             }
             localStorage.setItem(`color-swatches-${this.index}`, JSON.stringify(swatches));
         }

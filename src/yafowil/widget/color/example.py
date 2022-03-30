@@ -111,6 +111,9 @@ Color Widget with RGB/RGBA option
 
 Add an option to edit and view RGB/RGBA values of the currently selected color.
 
+RGB does not include alpha channel, while RGBA adds an opacity slider and allows
+RGBA values.
+
 
 .. code-block:: python
 
@@ -137,6 +140,44 @@ def rgb_example():
         'widget': part,
         'doc': DOC_RGB,
         'title': 'Color with RGB option',
+    }
+
+
+
+DOC_KELVIN = """
+Color Widget with Kelvin option
+-------------------------------
+
+Add an option to edit and view Kelvin values of the currently selected color.
+
+Adds a Kelvin temperature slider.
+
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='colorwidget',
+        props={
+            'label': 'Color Widget with Kelvin option',
+            'format': ['kelvin']
+        }
+    )
+"""
+
+
+def kelvin_example():
+    part = factory(u'fieldset', name='yafowil.widget.color')
+    part['color'] = factory(
+        '#field:color',
+        props={
+            'label': 'Color Widget with Kelvin option',
+            'format': ['kelvin']
+        })
+    return {
+        'widget': part,
+        'doc': DOC_KELVIN,
+        'title': 'Color with Kelvin option',
     }
 
 
@@ -252,6 +293,7 @@ def get_example():
         default_example(),
         hsl_example(),
         rgb_example(),
+        kelvin_example(),
         preview_example(),
         dim_example(),
         swatches_example()

@@ -86,7 +86,14 @@ Values: [True|False|None (default)].
 factory.defaults['color.format'] = ['hex']
 factory.doc['props']['color.format'] = """\
 Add option to display and edit hsl color values.
-Values: [List('hex') (default)|None].
+Values: [List(Str)|None].
+
+Available options:
+- 'hex'
+- 'hsl'
+- 'rgb'
+- 'rgba'
+- 'kelvin'
 """
 
 factory.defaults['color.box_width'] = 250
