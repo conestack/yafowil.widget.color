@@ -287,14 +287,37 @@ def swatches_example():
     }
 
 
+DOC_TEST = """
+TEST
+----
+"""
+
+def TEST():
+    part = factory(u'fieldset', name='yafowil.widget.color')
+    part['color'] = factory(
+        '#field:color',
+        props={
+            'label': 'Color Widget dimensions',
+            'format': ['rgba', 'kelvin', 'hsl', 'hex'],
+            'preview_elem': '<div id="test-prev" style="border-radius: 50%; width:800px; height:300px; margin:20px; border: 1px solid gray;" />',
+            'color': '#4287f5'
+        })
+    return {
+        'widget': part,
+        'doc': DOC_TEST,
+        'title': 'Color Widget dimensions',
+    }
+
+
 
 def get_example():
     return [
-        default_example(),
-        hsl_example(),
-        rgb_example(),
-        kelvin_example(),
-        preview_example(),
-        dim_example(),
-        swatches_example()
+        # default_example(),
+        # hsl_example(),
+        # rgb_example(),
+        # kelvin_example(),
+        # preview_example(),
+        # dim_example(),
+        # swatches_example(),
+        TEST()
     ]

@@ -92,100 +92,84 @@ export class ColorHSLInput {
     on_input(e) {
         this.widget.picker.color.set(this.value);
     }
+
+    update(color) {
+        this.value = color.hsl;
+    }
 }
 
 export class ColorRGBInput {
 
-    constructor(widget, rgb, alpha = false) {
+    constructor(widget, color) {
         this.widget = widget;
 
         this.elem = $(`<div />`)
             .addClass('rgb-display')
             .appendTo(widget.dropdown_elem);
-        let r_elem = $('<div />')
-            .addClass('r').text('R:')
-            .appendTo(this.elem);
-        let g_elem = $('<div />')
-            .addClass('g')
-            .text('G:')
-            .appendTo(this.elem);
-        let b_elem = $('<div />')
-            .addClass('b')
-            .text('B:')
-            .appendTo(this.elem);
-        let a_elem = $('<div />')
-            .addClass('a')
-            .text('A:')
-            .appendTo(this.elem);
 
-        this.r_input = $('<input />')
-            .addClass('r')
-            .attr({type: 'number', min: 0, max:255})
-            .val(rgb.r)
-            .appendTo(r_elem);
-        this.g_input = $('<input />')
-            .addClass('g')
-            .attr({type: 'number', min: 0, max:255})
-            .val(rgb.g)
-            .appendTo(g_elem);
-        this.b_input = $('<input />')
-            .addClass('b')
-            .attr({type: 'number', min: 0, max:255})
-            .val(rgb.b)
-            .appendTo(b_elem);
-        this.a_input = $('<input />')
-            .addClass('r')
-            .attr({type: 'number', min: 0, max:1})
-            .val(rgb.a || 1)
-            .appendTo(a_elem);
-
-        if (!alpha) {
-            a_elem.hide();
+        this.inputs = {};
+        this.color = color;
+        ['r', 'g', 'b'].forEach(name => {
+            this.create_input(name);
+        });
+        if (color.a) {
+            this.create_input('a');
         }
 
         this.on_input = this.on_input.bind(this);
-        this.r_input
-            .add(this.g_input)
-            .add(this.b_input)
-            .add(this.a_input)
-            .on('input', this.on_input);
-    }
-
-    get rgb() {
-        return {
-            r: parseInt(this.r_input.val()),
-            g: parseInt(this.g_input.val()),
-            b: parseInt(this.b_input.val())
+        for (let input in this.inputs) {
+            this.inputs[input].on('input', this.on_input);
         }
     }
 
-    get rgba() {
-        return {
-            r: parseInt(this.r_input.val()),
-            g: parseInt(this.g_input.val()),
-            b: parseInt(this.b_input.val()),
-            a: parseFloat(this.a_input.val()),
+    get value() {
+        let color = {
+            r: parseInt(this.inputs.r.val()),
+            g: parseInt(this.inputs.g.val()),
+            b: parseInt(this.inputs.b.val())
+        }
+        if (this.inputs.a) {
+            color.a = parseFloat(this.inputs.a.val());
+        }
+        return color;
+    }
+
+    set value(color) {
+        this.inputs.r.val(color.r);
+        this.inputs.g.val(color.g);
+        this.inputs.b.val(color.b);
+        if (color.a) {
+            this.inputs.a.val(color.a);
         }
     }
 
-    set rgb(rgb) {
-        this.r_input.val(rgb.r);
-        this.g_input.val(rgb.g);
-        this.b_input.val(rgb.b);
-    }
+    create_input(name) {
+        let elem = $('<div />')
+            .addClass(name)
+            .text(name.toUpperCase() + ':')
+            .appendTo(this.elem);
 
-    set rgba(rgba) {
-        this.r_input.val(rgba.r);
-        this.g_input.val(rgba.g);
-        this.b_input.val(rgba.b);
-        this.a_input.val(rgba.a);
+        this.inputs[name] = $('<input />')
+            .addClass(name)
+            .val(this.color[name])
+            .appendTo(elem);
+
+        if (name === 'a') {
+            this.inputs[name].attr({type: 'number', step: 0.1, min: 0, max:1});
+        } else {
+            this.inputs[name].attr({type: 'number', min: 0, max:255})
+        }
     }
 
     on_input(e) {
-        if (this.a_input) {
-            this.widget.picker.color.set(this.rgba);
+        this.widget.picker.color.set(this.value);
+    }
+
+    update(color) {
+        if (this.inputs.a) {
+            this.value = color.rgba;
         } else {
-            this.widget.picker.color.set(this.rgb);
+            this.value = color.rgb;
         }
     }
 }
@@ -222,6 +206,10 @@ export class ColorHexInput {
             this.widget.picker.color.set(this.value);
         }
     }
+
+    update(color) {
+        this.value = color.hexString;
+    }
 }
 
 export class ColorKelvinInput {
@@ -251,5 +239,38 @@ export class ColorKelvinInput {
 
     on_input() {
         this.widget.picker.color.set(this.value);
+    }
+
+    update(color) {
+        this.value = color.kelvin;
+    }
+}
+
+export class PreviewElement {
+
+    constructor(widget, elem) {
+        this.widget = widget;
+        this.layer = $('<div />')
+            .addClass('preview-color-layer');
+        this.elem = elem
+            .addClass('transparent')
+            .append(this.layer)
+            .insertAfter(this.widget.elem);
+
+        this.on_click = this.on_click.bind(this);
+        this.elem.on('click', this.on_click);
+    }
+
+    get color() {
+        return this._color;
+    }
+
+    set color(color) {
+        this.layer.css('background-color', color);
+        this._color = color;
+    }
+
+    on_click() {
+        this.widget.open();
     }
 }

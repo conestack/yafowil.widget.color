@@ -81,89 +81,71 @@ var yafowil_color = (function (exports, $$1) {
         on_input(e) {
             this.widget.picker.color.set(this.value);
         }
+        update(color) {
+            this.value = color.hsl;
+        }
     }
     class ColorRGBInput {
-        constructor(widget, rgb, alpha = false) {
+        constructor(widget, color) {
             this.widget = widget;
             this.elem = $(`<div />`)
                 .addClass('rgb-display')
                 .appendTo(widget.dropdown_elem);
-            let r_elem = $('<div />')
-                .addClass('r').text('R:')
-                .appendTo(this.elem);
-            let g_elem = $('<div />')
-                .addClass('g')
-                .text('G:')
-                .appendTo(this.elem);
-            let b_elem = $('<div />')
-                .addClass('b')
-                .text('B:')
-                .appendTo(this.elem);
-            let a_elem = $('<div />')
-                .addClass('a')
-                .text('A:')
-                .appendTo(this.elem);
-            this.r_input = $('<input />')
-                .addClass('r')
-                .attr({type: 'number', min: 0, max:255})
-                .val(rgb.r)
-                .appendTo(r_elem);
-            this.g_input = $('<input />')
-                .addClass('g')
-                .attr({type: 'number', min: 0, max:255})
-                .val(rgb.g)
-                .appendTo(g_elem);
-            this.b_input = $('<input />')
-                .addClass('b')
-                .attr({type: 'number', min: 0, max:255})
-                .val(rgb.b)
-                .appendTo(b_elem);
-            this.a_input = $('<input />')
-                .addClass('r')
-                .attr({type: 'number', min: 0, max:1})
-                .val(rgb.a || 1)
-                .appendTo(a_elem);
-            if (!alpha) {
-                a_elem.hide();
+            this.inputs = {};
+            this.color = color;
+            ['r', 'g', 'b'].forEach(name => {
+                this.create_input(name);
+            });
+            if (color.a) {
+                this.create_input('a');
             }
             this.on_input = this.on_input.bind(this);
-            this.r_input
-                .add(this.g_input)
-                .add(this.b_input)
-                .add(this.a_input)
-                .on('input', this.on_input);
-        }
-        get rgb() {
-            return {
-                r: parseInt(this.r_input.val()),
-                g: parseInt(this.g_input.val()),
-                b: parseInt(this.b_input.val())
+            for (let input in this.inputs) {
+                this.inputs[input].on('input', this.on_input);
             }
         }
-        get rgba() {
-            return {
-                r: parseInt(this.r_input.val()),
-                g: parseInt(this.g_input.val()),
-                b: parseInt(this.b_input.val()),
-                a: parseFloat(this.a_input.val()),
+        get value() {
+            let color = {
+                r: parseInt(this.inputs.r.val()),
+                g: parseInt(this.inputs.g.val()),
+                b: parseInt(this.inputs.b.val())
+            };
+            if (this.inputs.a) {
+                color.a = parseFloat(this.inputs.a.val());
+            }
+            return color;
+        }
+        set value(color) {
+            this.inputs.r.val(color.r);
+            this.inputs.g.val(color.g);
+            this.inputs.b.val(color.b);
+            if (color.a) {
+                this.inputs.a.val(color.a);
             }
         }
-        set rgb(rgb) {
-            this.r_input.val(rgb.r);
-            this.g_input.val(rgb.g);
-            this.b_input.val(rgb.b);
-        }
-        set rgba(rgba) {
-            this.r_input.val(rgba.r);
-            this.g_input.val(rgba.g);
-            this.b_input.val(rgba.b);
-            this.a_input.val(rgba.a);
+        create_input(name) {
+            let elem = $('<div />')
+                .addClass(name)
+                .text(name.toUpperCase() + ':')
+                .appendTo(this.elem);
+            this.inputs[name] = $('<input />')
+                .addClass(name)
+                .val(this.color[name])
+                .appendTo(elem);
+            if (name === 'a') {
+                this.inputs[name].attr({type: 'number', step: 0.1, min: 0, max:1});
+            } else {
+                this.inputs[name].attr({type: 'number', min: 0, max:255});
+            }
         }
         on_input(e) {
-            if (this.a_input) {
-                this.widget.picker.color.set(this.rgba);
+            this.widget.picker.color.set(this.value);
+        }
+        update(color) {
+            if (this.inputs.a) {
+                this.value = color.rgba;
             } else {
-                this.widget.picker.color.set(this.rgb);
+                this.value = color.rgb;
             }
         }
     }
@@ -194,6 +176,9 @@ var yafowil_color = (function (exports, $$1) {
                 this.widget.picker.color.set(this.value);
             }
         }
+        update(color) {
+            this.value = color.hexString;
+        }
     }
     class ColorKelvinInput {
         constructor(widget, kelvin) {
@@ -217,6 +202,32 @@ var yafowil_color = (function (exports, $$1) {
         }
         on_input() {
             this.widget.picker.color.set(this.value);
+        }
+        update(color) {
+            this.value = color.kelvin;
+        }
+    }
+    class PreviewElement {
+        constructor(widget, elem) {
+            this.widget = widget;
+            this.layer = $('<div />')
+                .addClass('preview-color-layer');
+            this.elem = elem
+                .addClass('transparent')
+                .append(this.layer)
+                .insertAfter(this.widget.elem);
+            this.on_click = this.on_click.bind(this);
+            this.elem.on('click', this.on_click);
+        }
+        get color() {
+            return this._color;
+        }
+        set color(color) {
+            this.layer.css('background-color', color);
+            this._color = color;
+        }
+        on_click() {
+            this.widget.open();
         }
     }
 
@@ -244,7 +255,8 @@ var yafowil_color = (function (exports, $$1) {
                 .attr('maxlength', 7);
             this.dropdown_elem = $$1(`<div />`)
                 .addClass('color-picker-wrapper')
-                .css('top', this.elem.outerHeight());
+                .css('top', this.elem.outerHeight())
+                .insertAfter(this.elem);
             this.picker_container = $$1('<div />')
                 .addClass('color-picker-container')
                 .appendTo(this.dropdown_elem);
@@ -263,38 +275,23 @@ var yafowil_color = (function (exports, $$1) {
                 .append(this.remove_color_btn)
                 .appendTo(this.dropdown_elem);        this.swatches_container = $$1(`<div />`)
                 .addClass('color-picker-recent')
-                .appendTo(this.dropdown_elem);        this.index = index;
+                .appendTo(this.dropdown_elem);
+            this.index = index;
+            this.slider_size = options.slider_size;
             let iro_opts = {
                 color: options.color,
                 width: options.box_width,
                 layout: [{
                     component: iro.ui.Box,
                     options: {}
-                }, {
-                    component: iro.ui.Slider,
-                    options: {
-                        sliderType: 'hue',
-                        sliderSize: options.slider_size
-                    }
                 }]
             };
+            iro_opts.layout.push(this.create_slider('hue'));
             if (options.format.includes('kelvin')) {
-                iro_opts.layout.push({
-                    component: iro.ui.Slider,
-                    options: {
-                        sliderType: 'kelvin',
-                        sliderSize: options.slider_size
-                    }
-                });
+                iro_opts.layout.push(this.create_slider('kelvin'));
             }
             if (options.format.includes('rgba')) {
-                iro_opts.layout.push({
-                    component: iro.ui.Slider,
-                    options: {
-                        sliderType: 'alpha',
-                        sliderSize: options.slider_size
-                    }
-                });
+                iro_opts.layout.push(this.create_slider('alpha'));
             }
             if (options.box_height) {
                 iro_opts.boxHeight = options.box_height;
@@ -307,7 +304,15 @@ var yafowil_color = (function (exports, $$1) {
             this.init_options(options);
             this.color = this.picker.color.clone();
             this.elem.val(this.color.hexString);
-            this.preview_elem.css('background-color', this.color.rgbaString);
+            this.preview.color = this.color.rgbaString;
+            this.elem.on('input', () => {
+                let hex = this.elem.val();
+                if (hex.length === 0) {
+                    this.elem.val('#');
+                } else {
+                    this.picker.color.set(hex);
+                }
+            });
             this.on_resize = this.on_resize.bind(this);
             this.on_resize();
             $$1(window).on('resize', this.on_resize);
@@ -317,15 +322,6 @@ var yafowil_color = (function (exports, $$1) {
             this.remove_color_btn.on('click', this.remove_swatch);
             this.open = this.open.bind(this);
             this.elem.on('focus', this.open);
-            this.preview_elem.on('click', this.open);
-            this.elem.on('input', () => {
-                let hex = this.elem.val();
-                if (hex.length === 0) {
-                    this.elem.val('#');
-                } else {
-                    this.picker.color.set(hex);
-                }
-            });
             this.update_color = this.update_color.bind(this);
             this.picker.on('color:change', this.update_color);
             this.close = this.close.bind(this);
@@ -346,47 +342,40 @@ var yafowil_color = (function (exports, $$1) {
             }
         }
         init_options(options) {
-            if (options && options.preview_elem) {
-                let transparency_elem = $$1(options.preview_elem);
-                this.elem.after(transparency_elem);
-                transparency_elem
-                    .addClass('transparent')
-                    .after(this.dropdown_elem);
-                this.preview_elem = $$1('<div />')
-                    .appendTo(transparency_elem)
-                    .addClass('preview-color-layer');
-            } else {
-                let preview_background = $$1(`<span />`).addClass('color-picker-color');
-                this.preview_elem = $$1(`<div />`)
-                    .addClass('color-layer')
-                    .appendTo(preview_background);
-                this.elem.after(preview_background);
-                preview_background.after(this.dropdown_elem);
-            }
+            let prev_elem = options.preview_elem ? $$1(options.preview_elem) :
+                $$1(`<span />`).addClass('color-picker-color');
+            this.preview = new PreviewElement(this, prev_elem);
+            this.box_dimensions = {
+                width: options.box_width || null,
+                height: options.box_height || null
+            };
+            let clr = this.picker.color;
+            this.displays = {};
             if (options.format.includes('hsl')) {
-                this.hsl_display = new ColorHSLInput(this, this.picker.color.hsl);
+                this.displays.hsl = new ColorHSLInput(this, clr.hsl);
             } else {
                 this.buttons.addClass('hsl-false');
             }
+            if (options.format.includes('rgba')) {
+                this.displays.rgb = new ColorRGBInput(this, clr.rgba);
+            } else if (options.format.includes('rgb')) {
+                this.displays.rgb = new ColorRGBInput(this, clr.rgb);
+            }
             if (options.format.includes('hex')) {
-                this.hex_display = new ColorHexInput(this, this.picker.color.hexString);
+                this.displays.hex = new ColorHexInput(this, clr.hexString);
             }
             if (options.format.includes('kelvin')) {
-                this.kelvin_display = new ColorKelvinInput(this, this.picker.color.kelvin);
+                this.displays.kelvin = new ColorKelvinInput(this, clr.kelvin);
             }
-            if (options.format.includes('rgba')) {
-                this.rgb_display = new ColorRGBInput(this, this.picker.color.rgba, true);
-            } else if (options.format.includes('rgb')) {
-                this.rgb_display = new ColorRGBInput(this, this.picker.color.rgb);
+        }
+        create_slider(type) {
+            return {
+                component: iro.ui.Slider,
+                options: {
+                    sliderType: type,
+                    sliderSize: this.slider_size
+                }
             }
-            let dimensions = {};
-            if (options && options.box_width) {
-                dimensions.width = options.box_width;
-            }
-            if (options && options.box_height) {
-                dimensions.height = options.box_height;
-            }
-            this.box_dimensions = dimensions;
         }
         on_resize(e) {
             if ($$1(window).width() <= 450) {
@@ -411,24 +400,10 @@ var yafowil_color = (function (exports, $$1) {
         }
         update_color() {
             this.color = this.picker.color.clone();
-            this.preview_elem.css('background-color', this.color.rgbaString);
+            this.preview.color = this.color.rgbaString;
             this.elem.val(this.color.hexString);
-            if (this.hsl_display) {
-                this.hsl_display.value = this.color.hsl;
-            }
-            if (this.rgb_display) {
-                if (this.rgb_display.a_input) {
-                    this.rgb_display.rgba = this.color.rgba;
-                } else {
-                    this.rgb_display.rgb = this.color.rgb;
-                }
-            }
-            if (this.kelvin_display) {
-                this.kelvin_display.value = this.color.kelvin;
-            }
-            this.elem.val(this.color.hexString);
-            if (this.hex_display) {
-                this.hex_display.value = this.color.hexString;
+            for (let opt in this.displays) {
+                this.displays[opt].update(this.color);
             }
         }
         open(evt) {
@@ -453,7 +428,7 @@ var yafowil_color = (function (exports, $$1) {
             let target = this.dropdown_elem;
             if (!target.is(e.target) &&
                 target.has(e.target).length === 0 &&
-                !this.preview_elem.is(e.target) &&
+                !this.preview.elem.is(e.target) &&
                 target.css('display') === 'block')
             {
                 this.close();
