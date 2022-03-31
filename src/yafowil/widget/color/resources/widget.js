@@ -47,17 +47,17 @@ var yafowil_color = (function (exports, $$1) {
                 .appendTo(this.elem);
             this.hue_input = $('<input />')
                 .addClass('h')
-                .attr({type: 'number', min: 0, max:360})
+                .attr({type: 'numeric', min: 0, max:360})
                 .val(hsl.h)
                 .appendTo(hue_elem);
             this.saturation_input = $('<input />')
                 .addClass('s')
-                .attr({type: 'number', min: 0, max:100})
+                .attr({type: 'numeric', min: 0, max:100})
                 .val(hsl.s)
                 .appendTo(saturation_elem);
             this.lightness_input = $('<input />')
                 .addClass('l')
-                .attr({type: 'number', min: 0, max:100})
+                .attr({type: 'numeric', min: 0, max:100})
                 .val(hsl.l)
                 .appendTo(lightness_elem);
             this.on_input = this.on_input.bind(this);
@@ -133,9 +133,9 @@ var yafowil_color = (function (exports, $$1) {
                 .val(this.color[name])
                 .appendTo(elem);
             if (name === 'a') {
-                this.inputs[name].attr({type: 'number', step: 0.1, min: 0, max:1});
+                this.inputs[name].attr({type: 'numeric', step: 0.1, min: 0, max:1});
             } else {
-                this.inputs[name].attr({type: 'number', min: 0, max:255});
+                this.inputs[name].attr({type: 'numeric', min: 0, max:255});
             }
         }
         on_input(e) {
@@ -189,7 +189,7 @@ var yafowil_color = (function (exports, $$1) {
                 .appendTo(widget.dropdown_elem);
             this.input = $('<input readonly />')
                 .val(kelvin)
-                .attr({type: 'number'})
+                .attr({type: 'numeric'})
                 .appendTo(this.elem);
             this.on_input = this.on_input.bind(this);
             this.input.on('input', this.on_input);
@@ -237,7 +237,7 @@ var yafowil_color = (function (exports, $$1) {
                 let elem = $$1(this);
                 let options = {
                     preview_elem: elem.data('preview_elem'),
-                    format: elem.data('format'),
+                    elements: elem.data('elements'),
                     box_width: elem.data('box_width'),
                     box_height: elem.data('box_height'),
                     slider_size: elem.data('slider_size'),
@@ -281,16 +281,31 @@ var yafowil_color = (function (exports, $$1) {
             let iro_opts = {
                 color: options.color,
                 width: options.box_width,
-                layout: [{
+                layout: []
+            };
+            if (options.elements.includes('box')) {
+                iro_opts.layout.push({
                     component: iro.ui.Box,
                     options: {}
-                }]
-            };
-            iro_opts.layout.push(this.create_slider('hue'));
-            if (options.format.includes('kelvin')) {
+                });
+            }
+            if (options.elements.includes('hex')) {
+                iro_opts.layout.push(this.create_slider('hue'));
+            }
+            if (options.elements.includes('kelvin')) {
                 iro_opts.layout.push(this.create_slider('kelvin'));
             }
-            if (options.format.includes('rgba')) {
+            if (options.elements.includes('hsl')) {
+                iro_opts.layout.push(this.create_slider('hue'));
+                iro_opts.layout.push(this.create_slider('saturation'));
+                iro_opts.layout.push(this.create_slider('value'));
+            }
+            if (options.elements.includes('rgb') || options.elements.includes('rgba')) {
+                iro_opts.layout.push(this.create_slider('red'));
+                iro_opts.layout.push(this.create_slider('green'));
+                iro_opts.layout.push(this.create_slider('blue'));
+            }
+            if (options.elements.includes('rgba')) {
                 iro_opts.layout.push(this.create_slider('alpha'));
             }
             if (options.box_height) {
@@ -351,20 +366,20 @@ var yafowil_color = (function (exports, $$1) {
             };
             let clr = this.picker.color;
             this.displays = {};
-            if (options.format.includes('hsl')) {
+            if (options.elements.includes('hsl')) {
                 this.displays.hsl = new ColorHSLInput(this, clr.hsl);
             } else {
                 this.buttons.addClass('hsl-false');
             }
-            if (options.format.includes('rgba')) {
+            if (options.elements.includes('rgba')) {
                 this.displays.rgb = new ColorRGBInput(this, clr.rgba);
-            } else if (options.format.includes('rgb')) {
+            } else if (options.elements.includes('rgb')) {
                 this.displays.rgb = new ColorRGBInput(this, clr.rgb);
             }
-            if (options.format.includes('hex')) {
+            if (options.elements.includes('hex')) {
                 this.displays.hex = new ColorHexInput(this, clr.hexString);
             }
-            if (options.format.includes('kelvin')) {
+            if (options.elements.includes('kelvin')) {
                 this.displays.kelvin = new ColorKelvinInput(this, clr.kelvin);
             }
         }

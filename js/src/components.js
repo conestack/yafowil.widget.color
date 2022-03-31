@@ -54,17 +54,17 @@ export class ColorHSLInput {
 
         this.hue_input = $('<input />')
             .addClass('h')
-            .attr({type: 'number', min: 0, max:360})
+            .attr({type: 'numeric', min: 0, max:360})
             .val(hsl.h)
             .appendTo(hue_elem);
         this.saturation_input = $('<input />')
             .addClass('s')
-            .attr({type: 'number', min: 0, max:100})
+            .attr({type: 'numeric', min: 0, max:100})
             .val(hsl.s)
             .appendTo(saturation_elem);
         this.lightness_input = $('<input />')
             .addClass('l')
-            .attr({type: 'number', min: 0, max:100})
+            .attr({type: 'numeric', min: 0, max:100})
             .val(hsl.l)
             .appendTo(lightness_elem);
 
@@ -155,9 +155,9 @@ export class ColorRGBInput {
             .appendTo(elem);
 
         if (name === 'a') {
-            this.inputs[name].attr({type: 'number', step: 0.1, min: 0, max:1});
+            this.inputs[name].attr({type: 'numeric', step: 0.1, min: 0, max:1});
         } else {
-            this.inputs[name].attr({type: 'number', min: 0, max:255})
+            this.inputs[name].attr({type: 'numeric', min: 0, max:255})
         }
     }
 
@@ -222,7 +222,7 @@ export class ColorKelvinInput {
             .appendTo(widget.dropdown_elem);
         this.input = $('<input readonly />')
             .val(kelvin)
-            .attr({type: 'number'})
+            .attr({type: 'numeric'})
             .appendTo(this.elem);
 
         this.on_input = this.on_input.bind(this);

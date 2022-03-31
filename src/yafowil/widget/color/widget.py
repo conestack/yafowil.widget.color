@@ -14,7 +14,7 @@ _ = TSF('yafowil.widget.color')
 
 color_options = [
     'preview_elem',
-    'format',
+    'elements',
     'box_width',
     'box_height',
     'slider_size',
@@ -83,12 +83,13 @@ Add an optional preview elem.
 Values: [True|False|None (default)].
 """
 
-factory.defaults['color.format'] = ['hex']
-factory.doc['props']['color.format'] = """\
+factory.defaults['color.elements'] = ['box', 'hex']
+factory.doc['props']['color.elements'] = """\
 Add option to display and edit hsl color values.
 Values: [List(Str)|None].
 
 Available options:
+- 'box'
 - 'hex'
 - 'hsl'
 - 'rgb'

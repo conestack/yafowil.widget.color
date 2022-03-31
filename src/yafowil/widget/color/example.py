@@ -57,7 +57,7 @@ def preview_example():
         '#field:color',
         props={
             'label': 'Color Widget with preview element',
-            'format': ['rgba'],
+            'elements': ['rgba'],
             'preview_elem': '<div id="my-preview" style="border-radius: 50%; width:100px; height:100px; margin:20px; border: 1px solid gray;" />',
             'color': '#4287f5'
         })
@@ -83,7 +83,7 @@ Add an option to edit and view HSL values of the currently selected color.
         name='colorwidget',
         props={
             'label': 'Color Widget with hsl option',
-            'format': ['hsl']
+            'elements': ['hsl']
         }
     )
 """
@@ -95,7 +95,7 @@ def hsl_example():
         '#field:color',
         props={
             'label': 'Color Widget with hsl option',
-            'format': ['hsl']
+            'elements': ['hsl']
         })
     return {
         'widget': part,
@@ -122,7 +122,7 @@ RGBA values.
         name='colorwidget',
         props={
             'label': 'Color Widget with rgb option',
-            'format': ['rgb', 'rgba']
+            'elements': ['rgb', 'rgba']
         }
     )
 """
@@ -134,7 +134,7 @@ def rgb_example():
         '#field:color',
         props={
             'label': 'Color Widget with rgb option',
-            'format': ['rgba']
+            'elements': ['rgba']
         })
     return {
         'widget': part,
@@ -160,7 +160,8 @@ Adds a Kelvin temperature slider.
         name='colorwidget',
         props={
             'label': 'Color Widget with Kelvin option',
-            'format': ['kelvin']
+            'elements': ['kelvin'],
+            'slider_size': 30
         }
     )
 """
@@ -172,7 +173,8 @@ def kelvin_example():
         '#field:color',
         props={
             'label': 'Color Widget with Kelvin option',
-            'format': ['kelvin']
+            'elements': ['kelvin'],
+            'slider_size': 30
         })
     return {
         'widget': part,
@@ -261,7 +263,7 @@ def swatches_example():
         '#field:color',
         props={
             'label': 'Color Widget swatches',
-            'format': ['rgba'],
+            'elements': ['box', 'rgba'],
             'swatches': [
                 [60, 100, 50],          # default interpretation as rgb
                 [60, 100, 50, 0.5],     # default interpretation as rgba
@@ -298,7 +300,7 @@ def TEST():
         '#field:color',
         props={
             'label': 'Color Widget dimensions',
-            'format': ['rgba', 'kelvin', 'hsl', 'hex'],
+            'elements': ['rgba', 'kelvin', 'hsl', 'hex'],
             'preview_elem': '<div id="test-prev" style="border-radius: 50%; width:800px; height:300px; margin:20px; border: 1px solid gray;" />',
             'color': '#4287f5'
         })
@@ -312,12 +314,12 @@ def TEST():
 
 def get_example():
     return [
-        # default_example(),
-        # hsl_example(),
-        # rgb_example(),
-        # kelvin_example(),
-        # preview_example(),
-        # dim_example(),
-        # swatches_example(),
-        TEST()
+        default_example(),
+        hsl_example(),
+        rgb_example(),
+        kelvin_example(),
+        preview_example(),
+        dim_example(),
+        swatches_example(),
+        # TEST()
     ]
