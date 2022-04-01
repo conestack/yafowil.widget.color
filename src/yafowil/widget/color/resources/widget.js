@@ -52,7 +52,7 @@ var yafowil_color = (function (exports, $$1) {
         }
     }
 
-    class Slider {
+    class SliderInput {
         static component(type, size) {
             return {
                 component: iro.ui.Slider,
@@ -76,7 +76,7 @@ var yafowil_color = (function (exports, $$1) {
                 .appendTo(this.control_elem);
         }
     }
-    class HueSlider extends Slider {
+    class HueSliderInput extends SliderInput {
         constructor(widget, color, type, i) {
             super(widget, type, i);
             this.input_elem.attr({type: 'numeric', min: 0, max:360, maxlength:3});
@@ -103,7 +103,7 @@ var yafowil_color = (function (exports, $$1) {
             this.value = color.hsl.h;
         }
     }
-    class SaturationSlider extends Slider {
+    class SaturationSliderInput extends SliderInput {
         constructor(widget, color, type, i) {
             super(widget, type, i);
             this.input_elem.attr({type: 'numeric', min: 0, max:100, maxlength:3});
@@ -130,7 +130,7 @@ var yafowil_color = (function (exports, $$1) {
             this.value = color.hsl.s;
         }
     }
-    class ValueSlider extends Slider {
+    class ValueSliderInput extends SliderInput {
         constructor(widget, color, type, i) {
             super(widget, type, i);
             this.input_elem.attr({type: 'numeric', min: 0, max:100, maxlength:3});
@@ -157,7 +157,7 @@ var yafowil_color = (function (exports, $$1) {
             this.value = color.hsl.l;
         }
     }
-    class AlphaSlider extends Slider {
+    class AlphaSliderInput extends SliderInput {
         constructor(widget, color, type, i) {
             super(widget, type, i);
             this.input_elem.attr({type:'number', step:0.1, min:0, max:1});
@@ -184,7 +184,7 @@ var yafowil_color = (function (exports, $$1) {
             this.value = color.hsla.a;
         }
     }
-    class KelvinSlider extends Slider {
+    class KelvinSliderInput extends SliderInput {
         constructor(widget, color, type, i) {
             super(widget, type, i);
             this.input_elem.attr({type: 'numeric'});
@@ -206,7 +206,7 @@ var yafowil_color = (function (exports, $$1) {
             this.value = color.kelvin;
         }
     }
-    class RedSlider extends Slider {
+    class RedSliderInput extends SliderInput {
         constructor(widget, color, type, i) {
             super(widget, type, i);
             this.input_elem.attr({type: 'numeric'});
@@ -235,7 +235,7 @@ var yafowil_color = (function (exports, $$1) {
             this.value = color.rgb.r;
         }
     }
-    class GreenSlider extends Slider {
+    class GreenSliderInput extends SliderInput {
         constructor(widget, color, type, i) {
             super(widget, type, i);
             this.input_elem.attr({type: 'numeric'});
@@ -264,7 +264,7 @@ var yafowil_color = (function (exports, $$1) {
             this.value = color.rgb.g;
         }
     }
-    class BlueSlider extends Slider {
+    class BlueSliderInput extends SliderInput {
         constructor(widget, color, type, i) {
             super(widget, type, i);
             this.input_elem.attr({type: 'numeric'});
@@ -294,14 +294,14 @@ var yafowil_color = (function (exports, $$1) {
         }
     }
     let factories = {
-        hue: HueSlider,
-        saturation: SaturationSlider,
-        value: ValueSlider,
-        alpha: AlphaSlider,
-        kelvin: KelvinSlider,
-        red: RedSlider,
-        green: GreenSlider,
-        blue: BlueSlider
+        hue: HueSliderInput,
+        saturation: SaturationSliderInput,
+        value: ValueSliderInput,
+        alpha: AlphaSliderInput,
+        kelvin: KelvinSliderInput,
+        red: RedSliderInput,
+        green: GreenSliderInput,
+        blue: BlueSliderInput
     };
 
     class ColorWidget {
@@ -426,7 +426,7 @@ var yafowil_color = (function (exports, $$1) {
             let clr = new iro.Color(opts.color);
             this.sliders = {};
             opts.sliders.forEach((type, i) => {
-                iro_opts.layout.push(Slider.component(type, opts.slider_size));
+                iro_opts.layout.push(SliderInput.component(type, opts.slider_size));
                 let factory = factories[type];
                 let target = this.input_container;
                 if (type === 'hue' || type === 'saturation' || type === 'value') {

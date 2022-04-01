@@ -9,7 +9,7 @@ let targets = {
     blue: 'rgb'
 }
 
-export class Slider {
+export class SliderInput {
 
     static component(type, size) {
         return {
@@ -37,7 +37,7 @@ export class Slider {
     }
 }
 
-export class HueSlider extends Slider {
+export class HueSliderInput extends SliderInput {
 
     constructor(widget, color, type, i) {
         super(widget, type, i);
@@ -71,7 +71,7 @@ export class HueSlider extends Slider {
     }
 }
 
-export class SaturationSlider extends Slider {
+export class SaturationSliderInput extends SliderInput {
 
     constructor(widget, color, type, i) {
         super(widget, type, i);
@@ -105,7 +105,7 @@ export class SaturationSlider extends Slider {
     }
 }
 
-export class ValueSlider extends Slider {
+export class ValueSliderInput extends SliderInput {
 
     constructor(widget, color, type, i) {
         super(widget, type, i);
@@ -139,7 +139,7 @@ export class ValueSlider extends Slider {
     }
 }
 
-export class AlphaSlider extends Slider {
+export class AlphaSliderInput extends SliderInput {
 
     constructor(widget, color, type, i) {
         super(widget, type, i);
@@ -174,7 +174,7 @@ export class AlphaSlider extends Slider {
     }
 }
 
-export class KelvinSlider extends Slider {
+export class KelvinSliderInput extends SliderInput {
 
     constructor(widget, color, type, i) {
         super(widget, type, i);
@@ -203,7 +203,7 @@ export class KelvinSlider extends Slider {
     }
 }
 
-export class RedSlider extends Slider {
+export class RedSliderInput extends SliderInput {
 
     constructor(widget, color, type, i) {
         super(widget, type, i);
@@ -239,7 +239,7 @@ export class RedSlider extends Slider {
     }
 }
 
-export class GreenSlider extends Slider {
+export class GreenSliderInput extends SliderInput {
 
     constructor(widget, color, type, i) {
         super(widget, type, i);
@@ -275,7 +275,7 @@ export class GreenSlider extends Slider {
     }
 }
 
-export class BlueSlider extends Slider {
+export class BlueSliderInput extends SliderInput {
 
     constructor(widget, color, type, i) {
         super(widget, type, i);
@@ -312,12 +312,12 @@ export class BlueSlider extends Slider {
 }
 
 export let factories = {
-    hue: HueSlider,
-    saturation: SaturationSlider,
-    value: ValueSlider,
-    alpha: AlphaSlider,
-    kelvin: KelvinSlider,
-    red: RedSlider,
-    green: GreenSlider,
-    blue: BlueSlider
+    hue: HueSliderInput,
+    saturation: SaturationSliderInput,
+    value: ValueSliderInput,
+    alpha: AlphaSliderInput,
+    kelvin: KelvinSliderInput,
+    red: RedSliderInput,
+    green: GreenSliderInput,
+    blue: BlueSliderInput
 }

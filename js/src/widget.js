@@ -3,7 +3,7 @@ import {
     PreviewElement,
 } from './components';
 
-import {Slider, factories} from './sliders.js';
+import {SliderInput, factories} from './inputs.js';
 
 export class ColorWidget {
 
@@ -145,7 +145,7 @@ export class ColorWidget {
         let clr = new iro.Color(opts.color);
         this.sliders = {};
         opts.sliders.forEach((type, i) => {
-            iro_opts.layout.push(Slider.component(type, opts.slider_size));
+            iro_opts.layout.push(SliderInput.component(type, opts.slider_size));
             let factory = factories[type];
             let target = this.input_container;
             if (type === 'hue' || type === 'saturation' || type === 'value') {
