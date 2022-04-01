@@ -28,185 +28,6 @@ var yafowil_color = (function (exports, $$1) {
             this.widget.picker.color.set(this.color);
         }
     }
-    class ColorHSLInput {
-        constructor(widget, hsl) {
-            this.widget = widget;
-            this.elem = $(`<div />`)
-                .addClass('hsl-display')
-                .appendTo(widget.dropdown_elem);
-            let hue_elem = $('<div />')
-                .addClass('hue').text('H:')
-                .appendTo(this.elem);
-            let saturation_elem = $('<div />')
-                .addClass('saturation')
-                .text('S:')
-                .appendTo(this.elem);
-            let lightness_elem = $('<div />')
-                .addClass('lightness')
-                .text('L:')
-                .appendTo(this.elem);
-            this.hue_input = $('<input />')
-                .addClass('h')
-                .attr({type: 'numeric', min: 0, max:360})
-                .val(hsl.h)
-                .appendTo(hue_elem);
-            this.saturation_input = $('<input />')
-                .addClass('s')
-                .attr({type: 'numeric', min: 0, max:100})
-                .val(hsl.s)
-                .appendTo(saturation_elem);
-            this.lightness_input = $('<input />')
-                .addClass('l')
-                .attr({type: 'numeric', min: 0, max:100})
-                .val(hsl.l)
-                .appendTo(lightness_elem);
-            this.on_input = this.on_input.bind(this);
-            this.hue_input
-                .add(this.saturation_input)
-                .add(this.lightness_input)
-                .on('input', this.on_input);
-        }
-        get value() {
-            return {
-                h: parseInt(this.hue_input.val()),
-                s: parseInt(this.saturation_input.val()),
-                l: parseInt(this.lightness_input.val())
-            }
-        }
-        set value(hsl) {
-            this.hue_input.val(hsl.h);
-            this.saturation_input.val(hsl.s);
-            this.lightness_input.val(hsl.l);
-        }
-        on_input(e) {
-            this.widget.picker.color.set(this.value);
-        }
-        update(color) {
-            this.value = color.hsl;
-        }
-    }
-    class ColorRGBInput {
-        constructor(widget, color) {
-            this.widget = widget;
-            this.elem = $(`<div />`)
-                .addClass('rgb-display')
-                .appendTo(widget.dropdown_elem);
-            this.inputs = {};
-            this.color = color;
-            ['r', 'g', 'b'].forEach(name => {
-                this.create_input(name);
-            });
-            if (color.a) {
-                this.create_input('a');
-            }
-            this.on_input = this.on_input.bind(this);
-            for (let input in this.inputs) {
-                this.inputs[input].on('input', this.on_input);
-            }
-        }
-        get value() {
-            let color = {
-                r: parseInt(this.inputs.r.val()),
-                g: parseInt(this.inputs.g.val()),
-                b: parseInt(this.inputs.b.val())
-            };
-            if (this.inputs.a) {
-                color.a = parseFloat(this.inputs.a.val());
-            }
-            return color;
-        }
-        set value(color) {
-            this.inputs.r.val(color.r);
-            this.inputs.g.val(color.g);
-            this.inputs.b.val(color.b);
-            if (color.a) {
-                this.inputs.a.val(color.a);
-            }
-        }
-        create_input(name) {
-            let elem = $('<div />')
-                .addClass(name)
-                .text(name.toUpperCase() + ':')
-                .appendTo(this.elem);
-            this.inputs[name] = $('<input />')
-                .addClass(name)
-                .val(this.color[name])
-                .appendTo(elem);
-            if (name === 'a') {
-                this.inputs[name].attr({type: 'numeric', step: 0.1, min: 0, max:1});
-            } else {
-                this.inputs[name].attr({type: 'numeric', min: 0, max:255});
-            }
-        }
-        on_input(e) {
-            this.widget.picker.color.set(this.value);
-        }
-        update(color) {
-            if (this.inputs.a) {
-                this.value = color.rgba;
-            } else {
-                this.value = color.rgb;
-            }
-        }
-    }
-    class ColorHexInput {
-        constructor(widget, hex) {
-            this.widget = widget;
-            this.elem = $('<div />')
-                .addClass('hex-display')
-                .text('HEX:')
-                .appendTo(widget.dropdown_elem);
-            this.input = $('<input />')
-                .val(hex)
-                .attr({spellcheck: false, maxlength: 7})
-                .appendTo(this.elem);
-            this.on_input = this.on_input.bind(this);
-            this.input.on('input', this.on_input);
-        }
-        get value() {
-            return this.input.val();
-        }
-        set value(hex) {
-            this.input.val(hex);
-        }
-        on_input() {
-            if (this.value.length === 0) {
-                this.input.val('#');
-            } else {
-                this.widget.picker.color.set(this.value);
-            }
-        }
-        update(color) {
-            this.value = color.hexString;
-        }
-    }
-    class ColorKelvinInput {
-        constructor(widget, kelvin) {
-            this.widget = widget;
-            this.elem = $('<div />')
-                .addClass('kelvin-display')
-                .text('K:')
-                .appendTo(widget.dropdown_elem);
-            this.input = $('<input readonly />')
-                .val(kelvin)
-                .attr({type: 'numeric'})
-                .appendTo(this.elem);
-            this.on_input = this.on_input.bind(this);
-            this.input.on('input', this.on_input);
-        }
-        get value() {
-            return this.input.val();
-        }
-        set value(kelvin) {
-            this.input.val(parseFloat(kelvin).toFixed(2));
-        }
-        on_input() {
-            this.widget.picker.color.set(this.value);
-        }
-        update(color) {
-            this.value = color.kelvin;
-        }
-    }
     class PreviewElement {
         constructor(widget, elem) {
             this.widget = widget;
@@ -231,13 +52,266 @@ var yafowil_color = (function (exports, $$1) {
         }
     }
 
+    class Slider {
+        static component(type, size) {
+            return {
+                component: iro.ui.Slider,
+                options: {
+                    sliderType: type,
+                    sliderSize: size
+                }
+            }
+        }
+        constructor(widget, type, target, i) {
+            this.type = type;
+            this.index = i;
+            this.widget = widget;
+            this.control_elem = $('<div />')
+                .addClass(`control ${type}`)
+                .appendTo(target);
+            this.label_elem = $(`<span />`)
+                .appendTo(this.control_elem);
+            this.input_elem = $('<input />')
+                .addClass('control-input')
+                .appendTo(this.control_elem);
+        }
+    }
+    class HueSlider extends Slider {
+        constructor(widget, color, type, i) {
+            super(widget, type, i);
+            this.input_elem.attr({type: 'numeric', min: 0, max:360, maxlength:3});
+            this.input_elem.val(color.hsl.h);
+            this.label_elem.text(`H: `);
+            this.on_input = this.on_input.bind(this);
+            this.input_elem.on('input', this.on_input);
+        }
+        get value() {
+            return parseInt(this.input_elem.val());
+        }
+        set value(value) {
+            this.input_elem.val(value);
+        }
+        on_input() {
+            let clr = this.widget.picker.color.hsl;
+            clr.h = this.value;
+            if (clr.h >= 360) {
+                clr.h = 360;
+            }
+            this.widget.picker.color.set(clr);
+        }
+        update(color) {
+            this.value = color.hsl.h;
+        }
+    }
+    class SaturationSlider extends Slider {
+        constructor(widget, color, type, i) {
+            super(widget, type, i);
+            this.input_elem.attr({type: 'numeric', min: 0, max:100, maxlength:3});
+            this.input_elem.val(color.hsl.s);
+            this.label_elem.text(`S: `);
+            this.on_input = this.on_input.bind(this);
+            this.input_elem.on('input', this.on_input);
+        }
+        get value() {
+            return parseInt(this.input_elem.val());
+        }
+        set value(value) {
+            this.input_elem.val(value);
+        }
+        on_input() {
+            let clr = this.widget.picker.color.hsl;
+            clr.h = this.value;
+            if (clr.s >= 100) {
+                clr.s = 100;
+            }
+            this.widget.picker.color.set(clr);
+        }
+        update(color) {
+            this.value = color.hsl.s;
+        }
+    }
+    class ValueSlider extends Slider {
+        constructor(widget, color, type, i) {
+            super(widget, type, i);
+            this.input_elem.attr({type: 'numeric', min: 0, max:100, maxlength:3});
+            this.input_elem.val(color.hsl.l);
+            this.label_elem.text(`L: `);
+            this.on_input = this.on_input.bind(this);
+            this.input_elem.on('input', this.on_input);
+        }
+        get value() {
+            return parseInt(this.input_elem.val());
+        }
+        set value(value) {
+            this.input_elem.val(value);
+        }
+        on_input() {
+            let clr = this.widget.picker.color.hsl;
+            clr.l = this.value;
+            if (clr.l >= 100) {
+                clr.l = 100;
+            }
+            this.widget.picker.color.set(clr);
+        }
+        update(color) {
+            this.value = color.hsl.l;
+        }
+    }
+    class AlphaSlider extends Slider {
+        constructor(widget, color, type, i) {
+            super(widget, type, i);
+            this.input_elem.attr({type:'number', step:0.1, min:0, max:1});
+            this.input_elem.val(color.hsla.a);
+            this.label_elem.text(`A: `);
+            this.on_input = this.on_input.bind(this);
+            this.input_elem.on('input', this.on_input);
+        }
+        get value() {
+            return parseFloat(this.input_elem.val());
+        }
+        set value(value) {
+            this.input_elem.val(value);
+        }
+        on_input() {
+            let clr = this.widget.picker.color.hsla;
+            if (this.value >= 1) {
+                this.value = 1;
+            }
+            clr.a = this.value;
+            this.widget.picker.color.set(clr);
+        }
+        update(color) {
+            this.value = color.hsla.a;
+        }
+    }
+    class KelvinSlider extends Slider {
+        constructor(widget, color, type, i) {
+            super(widget, type, i);
+            this.input_elem.attr({type: 'numeric'});
+            this.input_elem.val(color.kelvin);
+            this.label_elem.text(`K: `);
+            this.on_input = this.on_input.bind(this);
+            this.input_elem.on('input', this.on_input);
+        }
+        get value() {
+            return parseInt(this.input_elem.val());
+        }
+        set value(value) {
+            this.input_elem.val(value);
+        }
+        on_input() {
+            this.widget.picker.color.set(this.value);
+        }
+        update(color) {
+            this.value = color.kelvin;
+        }
+    }
+    class RedSlider extends Slider {
+        constructor(widget, color, type, i) {
+            super(widget, type, i);
+            this.input_elem.attr({type: 'numeric'});
+            this.input_elem.val(color.rgb.r);
+            this.label_elem.text(`R: `);
+            this.on_input = this.on_input.bind(this);
+            this.input_elem.on('input', this.on_input);
+        }
+        get value() {
+            return this.input_elem.val();
+        }
+        set value(value) {
+            this.input_elem.val(value);
+        }
+        on_input() {
+            let val = this.input_elem.val();
+            if (val >= 255) {
+                val = 255;
+            } else if (val <=0 || NaN) {
+                val = 0;
+            }
+            this.input_elem.val(val);
+            this.widget.picker.color.setChannel('rgb', 'r', val);
+        }
+        update(color) {
+            this.value = color.rgb.r;
+        }
+    }
+    class GreenSlider extends Slider {
+        constructor(widget, color, type, i) {
+            super(widget, type, i);
+            this.input_elem.attr({type: 'numeric'});
+            this.input_elem.val(color.rgb.g);
+            this.label_elem.text(`G: `);
+            this.on_input = this.on_input.bind(this);
+            this.input_elem.on('input', this.on_input);
+        }
+        get value() {
+            return this.input_elem.val();
+        }
+        set value(value) {
+            this.input_elem.val(value);
+        }
+        on_input() {
+            let val = this.input_elem.val();
+            if (val >= 255) {
+                val = 255;
+            } else if (val <=0 || NaN) {
+                val = 0;
+            }
+            this.input_elem.val(val);
+            this.widget.picker.color.setChannel('rgb', 'g', val);
+        }
+        update(color) {
+            this.value = color.rgb.g;
+        }
+    }
+    class BlueSlider extends Slider {
+        constructor(widget, color, type, i) {
+            super(widget, type, i);
+            this.input_elem.attr({type: 'numeric'});
+            this.input_elem.val(color.rgb.b);
+            this.label_elem.text(`B: `);
+            this.on_input = this.on_input.bind(this);
+            this.input_elem.on('input', this.on_input);
+        }
+        get value() {
+            return this.input_elem.val();
+        }
+        set value(value) {
+            this.input_elem.val(value);
+        }
+        on_input() {
+            let val = this.input_elem.val();
+            if (val >= 255) {
+                val = 255;
+            } else if (val <=0 || NaN) {
+                val = 0;
+            }
+            this.input_elem.val(val);
+            this.widget.picker.color.setChannel('rgb', 'b', val);
+        }
+        update(color) {
+            this.value = color.rgb.b;
+        }
+    }
+    let factories = {
+        hue: HueSlider,
+        saturation: SaturationSlider,
+        value: ValueSlider,
+        alpha: AlphaSlider,
+        kelvin: KelvinSlider,
+        red: RedSlider,
+        green: GreenSlider,
+        blue: BlueSlider
+    };
+
     class ColorWidget {
         static initialize(context) {
-            $$1('input.color-picker', context).each(function(index) {
-                let elem = $$1(this);
+            $('input.color-picker', context).each(function(index) {
+                let elem = $(this);
                 let options = {
                     preview_elem: elem.data('preview_elem'),
                     elements: elem.data('elements'),
+                    sliders: elem.data('sliders'),
                     box_width: elem.data('box_width'),
                     box_height: elem.data('box_height'),
                     slider_size: elem.data('slider_size'),
@@ -253,73 +327,54 @@ var yafowil_color = (function (exports, $$1) {
                 .data('color_widget', this)
                 .attr('spellcheck', "false")
                 .attr('maxlength', 7);
-            this.dropdown_elem = $$1(`<div />`)
+            this.dropdown_elem = $(`<div />`)
                 .addClass('color-picker-wrapper')
                 .css('top', this.elem.outerHeight())
                 .insertAfter(this.elem);
-            this.picker_container = $$1('<div />')
+            this.picker_container = $('<div />')
                 .addClass('color-picker-container')
                 .appendTo(this.dropdown_elem);
-            this.close_btn = $$1(`<button />`)
+            this.close_btn = $(`<button />`)
                 .addClass('close-button')
                 .text('✕')
-                .appendTo(this.dropdown_elem);        this.add_color_btn = $$1(`<button />`)
+                .appendTo(this.dropdown_elem);        this.add_color_btn = $(`<button />`)
                 .addClass('add_color')
                 .text('+ Add');
-            this.remove_color_btn = $$1(`<button />`)
+            this.remove_color_btn = $(`<button />`)
                 .addClass('remove_color')
                 .text('- Remove');
-            this.buttons = $$1('<div />')
+            this.buttons = $('<div />')
                 .addClass('buttons')
                 .append(this.add_color_btn)
                 .append(this.remove_color_btn)
-                .appendTo(this.dropdown_elem);        this.swatches_container = $$1(`<div />`)
+                .appendTo(this.dropdown_elem);        this.swatches_container = $(`<div />`)
                 .addClass('color-picker-recent')
                 .appendTo(this.dropdown_elem);
+            this.input_container = $(`<div />`)
+                .addClass('color-picker-inputs')
+                .insertBefore(this.buttons);
+            this.rgb_container = $(`<div />`)
+                .addClass('color-picker-rgb')
+                .appendTo(this.input_container);
+            this.hsl_container = $(`<div />`)
+                .addClass('color-picker-hsl')
+                .appendTo(this.input_container);
             this.index = index;
             this.slider_size = options.slider_size;
-            let iro_opts = {
-                color: options.color,
-                width: options.box_width,
-                layout: []
-            };
-            if (options.elements.includes('box')) {
-                iro_opts.layout.push({
-                    component: iro.ui.Box,
-                    options: {}
-                });
-            }
-            if (options.elements.includes('hex')) {
-                iro_opts.layout.push(this.create_slider('hue'));
-            }
-            if (options.elements.includes('kelvin')) {
-                iro_opts.layout.push(this.create_slider('kelvin'));
-            }
-            if (options.elements.includes('hsl')) {
-                iro_opts.layout.push(this.create_slider('hue'));
-                iro_opts.layout.push(this.create_slider('saturation'));
-                iro_opts.layout.push(this.create_slider('value'));
-            }
-            if (options.elements.includes('rgb') || options.elements.includes('rgba')) {
-                iro_opts.layout.push(this.create_slider('red'));
-                iro_opts.layout.push(this.create_slider('green'));
-                iro_opts.layout.push(this.create_slider('blue'));
-            }
-            if (options.elements.includes('rgba')) {
-                iro_opts.layout.push(this.create_slider('alpha'));
-            }
-            if (options.box_height) {
-                iro_opts.boxHeight = options.box_height;
-            }
+            let prev_elem = options.preview_elem ? $(options.preview_elem) :
+                $(`<span />`).addClass('color-picker-color');
+            this.preview = new PreviewElement(this, prev_elem);
+            let iro_opts = this.init_opts(options);
             this.picker = new iro.ColorPicker(this.picker_container.get(0), iro_opts);
             this.swatches = [];
             this.fixed_swatches = [];
             this.fix_swatches(options.swatches);
             this.parse_json();
-            this.init_options(options);
             this.color = this.picker.color.clone();
             this.elem.val(this.color.hexString);
-            this.preview.color = this.color.rgbaString;
+            if (this.preview) {
+                this.preview.color = this.color.rgbaString;
+            }
             this.elem.on('input', () => {
                 let hex = this.elem.val();
                 if (hex.length === 0) {
@@ -330,7 +385,7 @@ var yafowil_color = (function (exports, $$1) {
             });
             this.on_resize = this.on_resize.bind(this);
             this.on_resize();
-            $$1(window).on('resize', this.on_resize);
+            $(window).on('resize', this.on_resize);
             this.create_swatch = this.create_swatch.bind(this);
             this.add_color_btn.on('click', this.create_swatch);
             this.remove_swatch = this.remove_swatch.bind(this);
@@ -356,44 +411,41 @@ var yafowil_color = (function (exports, $$1) {
                 active_swatch.select();
             }
         }
-        init_options(options) {
-            let prev_elem = options.preview_elem ? $$1(options.preview_elem) :
-                $$1(`<span />`).addClass('color-picker-color');
-            this.preview = new PreviewElement(this, prev_elem);
-            this.box_dimensions = {
-                width: options.box_width || null,
-                height: options.box_height || null
+        init_opts(opts) {
+            let iro_opts = {
+                color: opts.color,
+                width: opts.box_width,
+                layout: []
             };
-            let clr = this.picker.color;
-            this.displays = {};
-            if (options.elements.includes('hsl')) {
-                this.displays.hsl = new ColorHSLInput(this, clr.hsl);
-            } else {
-                this.buttons.addClass('hsl-false');
+            if (opts.elements.includes('box')) {
+                iro_opts.layout.push({
+                    component: iro.ui.Box,
+                    options: {}
+                });
             }
-            if (options.elements.includes('rgba')) {
-                this.displays.rgb = new ColorRGBInput(this, clr.rgba);
-            } else if (options.elements.includes('rgb')) {
-                this.displays.rgb = new ColorRGBInput(this, clr.rgb);
-            }
-            if (options.elements.includes('hex')) {
-                this.displays.hex = new ColorHexInput(this, clr.hexString);
-            }
-            if (options.elements.includes('kelvin')) {
-                this.displays.kelvin = new ColorKelvinInput(this, clr.kelvin);
-            }
-        }
-        create_slider(type) {
-            return {
-                component: iro.ui.Slider,
-                options: {
-                    sliderType: type,
-                    sliderSize: this.slider_size
+            let clr = new iro.Color(opts.color);
+            this.sliders = {};
+            opts.sliders.forEach((type, i) => {
+                iro_opts.layout.push(Slider.component(type, opts.slider_size));
+                let factory = factories[type];
+                let target = this.input_container;
+                if (type === 'hue' || type === 'saturation' || type === 'value') {
+                    target = this.hsl_container;
+                    target.css('display', 'flex');
+                } else if (type === 'red' || type === 'green' || type === 'blue') {
+                    target = this.rgb_container;
+                    target.css('display', 'flex');
+                } else {
+                    target = $(`<div />`)
+                        .addClass(`color-picker-${type}`)
+                        .appendTo(this.input_container);
                 }
-            }
+                this.sliders[type] = new factory(this, clr, type, target, i);
+            });
+            return iro_opts;
         }
         on_resize(e) {
-            if ($$1(window).width() <= 450) {
+            if ($(window).width() <= 450) {
                 if (!this.dropdown_elem.hasClass('mobile')) {
                     this.dropdown_elem.addClass('mobile');
                     this.picker.state.layoutDirection = 'horizontal';
@@ -401,10 +453,10 @@ var yafowil_color = (function (exports, $$1) {
                 if (this.box_dimensions.height) {
                     this.picker.state.boxHeight = null;
                 }
-                let calc_width = $$1(window).width() * 0.3;
+                let calc_width = $(window).width() * 0.3;
                 this.picker.resize(calc_width);
             } else
-            if ($$1(window).width() > 450 && this.dropdown_elem.hasClass('mobile')) {
+            if ($(window).width() > 450 && this.dropdown_elem.hasClass('mobile')) {
                 this.dropdown_elem.removeClass('mobile');
                 this.picker.state.layoutDirection = 'vertical';
                 if (this.box_dimensions.height) {
@@ -417,15 +469,15 @@ var yafowil_color = (function (exports, $$1) {
             this.color = this.picker.color.clone();
             this.preview.color = this.color.rgbaString;
             this.elem.val(this.color.hexString);
-            for (let opt in this.displays) {
-                this.displays[opt].update(this.color);
+            for (let type in this.sliders) {
+                this.sliders[type].update(this.color);
             }
         }
         open(evt) {
             if (this.dropdown_elem.css('display') === "none") {
                 this.dropdown_elem.show();
-                $$1(window).on('keydown', this.on_keydown);
-                $$1(window).on('mousedown', this.on_click);
+                $(window).on('keydown', this.on_keydown);
+                $(window).on('mousedown', this.on_click);
             } else {
                 this.close();
             }
@@ -455,8 +507,8 @@ var yafowil_color = (function (exports, $$1) {
             }
             this.dropdown_elem.hide();
             this.elem.blur();
-            $$1(window).off('keydown', this.on_keydown);
-            $$1(window).off('mousedown', this.on_click);
+            $(window).off('keydown', this.on_keydown);
+            $(window).off('mousedown', this.on_click);
         }
         color_equals(color) {
             if (color instanceof iro.Color &&
@@ -531,6 +583,7 @@ var yafowil_color = (function (exports, $$1) {
                     this.active_swatch.select();
                     this.picker.color.set(this.active_swatch.color);
                 } else {
+                    this.swatches_container.hide();
                     this.picker.color.reset();
                 }
                 localStorage.removeItem(`color-swatches-${this.index}`);

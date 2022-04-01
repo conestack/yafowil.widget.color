@@ -1,12 +1,9 @@
-import $ from 'jquery';
 import {
-    ColorHexInput,
-    ColorHSLInput,
-    ColorRGBInput,
-    ColorKelvinInput,
     ColorSwatch,
-    PreviewElement
+    PreviewElement,
 } from './components';
+
+import {Slider, factories} from './sliders.js';
 
 export class ColorWidget {
 
@@ -16,6 +13,7 @@ export class ColorWidget {
             let options = {
                 preview_elem: elem.data('preview_elem'),
                 elements: elem.data('elements'),
+                sliders: elem.data('sliders'),
                 box_width: elem.data('box_width'),
                 box_height: elem.data('box_height'),
                 slider_size: elem.data('slider_size'),
@@ -58,45 +56,24 @@ export class ColorWidget {
         this.swatches_container = $(`<div />`)
             .addClass('color-picker-recent')
             .appendTo(this.dropdown_elem);
+        this.input_container = $(`<div />`)
+            .addClass('color-picker-inputs')
+            .insertBefore(this.buttons);
+        this.rgb_container = $(`<div />`)
+            .addClass('color-picker-rgb')
+            .appendTo(this.input_container);
+        this.hsl_container = $(`<div />`)
+            .addClass('color-picker-hsl')
+            .appendTo(this.input_container);
 
         this.index = index;
         this.slider_size = options.slider_size;
 
-        let iro_opts = {
-            color: options.color,
-            width: options.box_width,
-            layout: []
-        }
+        let prev_elem = options.preview_elem ? $(options.preview_elem) :
+            $(`<span />`).addClass('color-picker-color');
+        this.preview = new PreviewElement(this, prev_elem);
 
-        if (options.elements.includes('box')) {
-            iro_opts.layout.push({
-                component: iro.ui.Box,
-                options: {}
-            });
-        }
-        if (options.elements.includes('hex')) {
-            iro_opts.layout.push(this.create_slider('hue'));
-        }
-        if (options.elements.includes('kelvin')) {
-            iro_opts.layout.push(this.create_slider('kelvin'));
-        }
-        if (options.elements.includes('hsl')) {
-            iro_opts.layout.push(this.create_slider('hue'));
-            iro_opts.layout.push(this.create_slider('saturation'));
-            iro_opts.layout.push(this.create_slider('value'));
-        }
-        if (options.elements.includes('rgb') || options.elements.includes('rgba')) {
-            iro_opts.layout.push(this.create_slider('red'));
-            iro_opts.layout.push(this.create_slider('green'));
-            iro_opts.layout.push(this.create_slider('blue'));
-        }
-        if (options.elements.includes('rgba')) {
-            iro_opts.layout.push(this.create_slider('alpha'));
-        }
-        if (options.box_height) {
-            iro_opts.boxHeight = options.box_height;
-        }
-
+        let iro_opts = this.init_opts(options);
         this.picker = new iro.ColorPicker(this.picker_container.get(0), iro_opts);
 
         this.swatches = []; // saved colors
@@ -105,12 +82,13 @@ export class ColorWidget {
 
         // json
         this.parse_json();
-        this.init_options(options);
 
         // color related
         this.color = this.picker.color.clone();
         this.elem.val(this.color.hexString);
-        this.preview.color = this.color.rgbaString;
+        if (this.preview) {
+            this.preview.color = this.color.rgbaString;
+        }
 
         // events
         this.elem.on('input', () => {
@@ -151,45 +129,40 @@ export class ColorWidget {
         }
     }
 
-    init_options(options) {
-        let prev_elem = options.preview_elem ? $(options.preview_elem) :
-            $(`<span />`).addClass('color-picker-color');
-        this.preview = new PreviewElement(this, prev_elem);
+    init_opts(opts) {
+        let iro_opts = {
+            color: opts.color,
+            width: opts.box_width,
+            layout: []
+        }
 
-        this.box_dimensions = {
-            width: options.box_width || null,
-            height: options.box_height || null
+        if (opts.elements.includes('box')) {
+            iro_opts.layout.push({
+                component: iro.ui.Box,
+                options: {}
+            });
         }
-        // color formats
-        let clr = this.picker.color;
-        this.displays = {};
-
-        if (options.elements.includes('hsl')) {
-            this.displays.hsl = new ColorHSLInput(this, clr.hsl);
-        } else {
-            this.buttons.addClass('hsl-false');
-        }
-        if (options.elements.includes('rgba')) {
-            this.displays.rgb = new ColorRGBInput(this, clr.rgba);
-        } else if (options.elements.includes('rgb')) {
-            this.displays.rgb = new ColorRGBInput(this, clr.rgb);
-        }
-        if (options.elements.includes('hex')) {
-            this.displays.hex = new ColorHexInput(this, clr.hexString);
-        }
-        if (options.elements.includes('kelvin')) {
-            this.displays.kelvin = new ColorKelvinInput(this, clr.kelvin);
-        }
-    }
-
-    create_slider(type) {
-        return {
-            component: iro.ui.Slider,
-            options: {
-                sliderType: type,
-                sliderSize: this.slider_size
+        let clr = new iro.Color(opts.color);
+        this.sliders = {};
+        opts.sliders.forEach((type, i) => {
+            iro_opts.layout.push(Slider.component(type, opts.slider_size));
+            let factory = factories[type];
+            let target = this.input_container;
+            if (type === 'hue' || type === 'saturation' || type === 'value') {
+                target = this.hsl_container;
+                target.css('display', 'flex');
+            } else if (type === 'red' || type === 'green' || type === 'blue') {
+                target = this.rgb_container;
+                target.css('display', 'flex');
+            } else {
+                target = $(`<div />`)
+                    .addClass(`color-picker-${type}`)
+                    .appendTo(this.input_container);
             }
-        }
+            this.sliders[type] = new factory(this, clr, type, target, i);
+        });
+
+        return iro_opts;
     }
 
     on_resize(e) {
@@ -219,8 +192,8 @@ export class ColorWidget {
         this.preview.color = this.color.rgbaString;
         this.elem.val(this.color.hexString);
 
-        for (let opt in this.displays) {
-            this.displays[opt].update(this.color);
+        for (let type in this.sliders) {
+            this.sliders[type].update(this.color);
         }
     }
 
@@ -348,6 +321,7 @@ export class ColorWidget {
                 this.active_swatch.select();
                 this.picker.color.set(this.active_swatch.color);
             } else {
+                this.swatches_container.hide();
                 this.picker.color.reset();
             }
             localStorage.removeItem(`color-swatches-${this.index}`);

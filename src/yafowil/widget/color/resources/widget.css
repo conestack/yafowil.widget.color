@@ -56,28 +56,6 @@ div.color-picker-wrapper {
     width: 90vw;
     max-width: 90vw;
 }
-.color-picker-wrapper.mobile div.hsl-display {
-    flex-direction: column;
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: 0;
-    margin-right: 30px;
-    padding-top: 20px;
-}
-.color-picker-wrapper.mobile div.hsl-display input {
-    width: auto;
-}
-.color-picker-wrapper.mobile div.hsl-display > div {
-    margin: 5px;
-}
-.color-picker-wrapper.mobile div.hex-display {
-    display: none;
-}
-.color-picker-wrapper.mobile div.hex-display input {
-    margin: 0;
-    width: auto;
-}
 .color-picker-wrapper.mobile .buttons.hsl-false {
     display: flex;
     flex-direction: column;
@@ -177,25 +155,6 @@ button.remove_color {
     float: right;
 }
 
-div.hsl-display, div.rgb-display {
-    margin: 7px;
-    display: flex;
-    justify-content: space-between;
-}
-
-div.hsl-display > div, div.rgb-display > div {
-    display: inline-block;
-}
-
-div.hsl-display input, div.rgb-display input {
-    display: inline-block;
-    width: 50px;
-    margin-left: 6px;
-    padding-left: 5px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-}
-
 div.hex-display {
     margin: 7px;
     display: flex;
@@ -210,13 +169,42 @@ div.hex-display input {
     padding-left: 5px;
 }
 
-div.kelvin-display {
-    margin: 7px;
+.color-picker-inputs {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
 }
 
-div.kelvin-display input {
+input.control-input {
+    height: 20px;
+    width: 40px;
     border: 1px solid #ccc;
+    margin-left: 5px;
+}
+
+.control {
+    padding: 0 4px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.color-picker-rgb, .color-picker-hsl {
+    display: none;
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 3px;
     border-radius: 3px;
-    margin-left: 10px;
-    padding-left: 5px;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.color-picker-kelvin, .color-picker-alpha {
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 3px;
+    border-radius: 3px;
+    flex-direction: row;
+    width: 50%;
+    justify-content: space-between;
 }
