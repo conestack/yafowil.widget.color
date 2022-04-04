@@ -20,7 +20,9 @@ color_options = [
     'box_height',
     'slider_size',
     'color',
-    'swatches'
+    'swatches',
+    'temp',
+    'format'
 ]
 
 
@@ -78,19 +80,40 @@ If color value empty, return as extracted value.
 
 # Additional Options
 
+factory.defaults['color.format'] = 'hexString'
+factory.doc['props']['color.format'] = """\
+Specify the output format of the color picker color.
+Values: [Str].
+
+Available options:
+- hexString
+- hslString
+- hslaString
+- rgbString
+- rgbaString
+- kelvin
+"""
+
 factory.defaults['color.preview_elem'] = None
 factory.doc['props']['color.preview_elem'] = """\
 Add an optional preview elem.
 Values: [True|False|None (default)].
 """
 
-factory.defaults['color.elements'] = ['box']
+factory.defaults['color.elements'] = []
 factory.doc['props']['color.elements'] = """\
-Add option to display and edit hsl color values.
+Specify input elements to show specific color values.
 Values: [List(Str)|None].
 
 Available options:
-- box
+- r (red)
+- g (green)
+- b (blue)
+- h (hue)
+- s (saturation)
+- v (value)
+- a (alpha)
+- k (kelvin)
 """
 
 factory.defaults['color.box_width'] = 250
@@ -105,14 +128,21 @@ Set the initial height of the color box (in pixels).
 Values: [px].
 """
 
-factory.defaults['color.sliders'] = ['hue']
+factory.defaults['color.sliders'] = ['box', 'h']
 factory.doc['props']['color.sliders'] = """\
 Add additional sliders to layout.
 Values: [List(Str)|None].
 
 Available options:
-- hue
-- kelvin
+- box
+- r (red)
+- g (green)
+- b (blue)
+- h (hue)
+- s (saturation)
+- v (value)
+- a (alpha)
+- k (kelvin)
 """
 
 factory.defaults['color.slider_size'] = 10
@@ -124,8 +154,9 @@ Values: [px].
 factory.defaults['color.color'] = '#000000'
 factory.doc['props']['color.color'] = """\
 Set the inital picker color if no swatches are specified.
-The color can be passed as hex or hsl value.
-Values: [String(hex), Obj(hsl)].
+The color can be passed as hexString, hslString, hslaString,
+rgbString, rgbaString or kelvin number.
+Values: [String()].
 """
 
 factory.defaults['color.swatches'] = None
@@ -133,4 +164,10 @@ factory.doc['props']['color.swatches'] = """\
 Set swatches to be initialized.
 Given swatches can't be deleted in the widget.
 Values: [Array(Dict)].
+"""
+
+factory.defaults['color.temp'] = {'min': 3000, 'max': 10000}
+factory.doc['props']['color.temp'] = """\
+Set the minimum and maximum kelvin temperature.
+Values: [Dict('min': 2200-11000, 'max': 2200-11000)].
 """

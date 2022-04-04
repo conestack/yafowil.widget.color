@@ -44,6 +44,7 @@ The color of your element is set by css 'background-color' attribute.
         'color',
         name='colorwidget',
         props={
+            'sliders': ['box', 'h', 'a'],
             'preview_elem': '<div id="my-preview" style="border-radius: 50%; width:100px; height:100px; margin:20px; border: 1px solid gray;" />',
             'color': '#4287f5'
         }
@@ -58,7 +59,7 @@ def preview_example():
         props={
             'label': 'Color Widget with preview element',
             'elements': [],
-            'sliders': ['hue', 'alpha'],
+            'sliders': ['box', 'h', 'a'],
             'preview_elem': '<div id="my-preview" style="border-radius: 50%; width:100px; height:100px; margin:20px; border: 1px solid gray;" />',
             'color': '#4287f5'
         })
@@ -70,11 +71,11 @@ def preview_example():
 
 
 
-DOC_HSL = """
-Color Widget with HSL option
+DOC_HSV = """
+Color Widget with HSV option
 ----------------------------
 
-Add an option to edit and view HSL values of the currently selected color.
+Add an option to edit and view HSV values of the currently selected color.
 
 
 .. code-block:: python
@@ -83,26 +84,29 @@ Add an option to edit and view HSL values of the currently selected color.
         'color',
         name='colorwidget',
         props={
-            'label': 'Color Widget with hsl option',
-            'elements': ['hsl']
+            'label': 'Color Widget with hsv option',
+            'elements': ['h', 's', 'v', 'a'],
+            'sliders': ['h', 's', 'v', 'a'],
+            'format': 'hsvaString'
         }
     )
 """
 
 
-def hsl_example():
+def hsv_example():
     part = factory(u'fieldset', name='yafowil.widget.color')
     part['color'] = factory(
         '#field:color',
         props={
-            'label': 'Color Widget with hsl option',
-            'elements': [],
-            'sliders': ['hue', 'saturation', 'value'],
+            'label': 'Color Widget with hsv option',
+            'elements': ['h', 's', 'v', 'a'],
+            'sliders': ['h', 's', 'v', 'a'],
+            'format': 'hsvaString'
         })
     return {
         'widget': part,
-        'doc': DOC_HSL,
-        'title': 'Color with HSL option',
+        'doc': DOC_HSV,
+        'title': 'Color with HSV option',
     }
 
 
@@ -124,7 +128,9 @@ RGBA values.
         name='colorwidget',
         props={
             'label': 'Color Widget with rgb option',
-            'elements': ['rgb', 'rgba']
+            'elements': ['r', 'g', 'b'],
+            'sliders': ['r', 'g', 'b'],
+            'format': 'rgbString'
         }
     )
 """
@@ -136,8 +142,9 @@ def rgb_example():
         '#field:color',
         props={
             'label': 'Color Widget with rgb option',
-            'elements': [],
-            'sliders': ['red', 'green', 'blue'],
+            'elements': ['r', 'g', 'b'],
+            'sliders': ['r', 'g', 'b'],
+            'format': 'rgbString'
         })
     return {
         'widget': part,
@@ -163,8 +170,12 @@ Adds a Kelvin temperature slider.
         name='colorwidget',
         props={
             'label': 'Color Widget with Kelvin option',
-            'elements': ['kelvin'],
-            'slider_size': 30
+            'elements': ['k'],
+            'sliders': ['k'],
+            'slider_size': 30,
+            'format': 'kelvin',
+            'color': '#ffffff',
+            'temp': {'min': 4000, 'max': 8000}
         }
     )
 """
@@ -176,9 +187,12 @@ def kelvin_example():
         '#field:color',
         props={
             'label': 'Color Widget with Kelvin option',
-            'elements': [],
-            'sliders': ['kelvin'],
-            'slider_size': 30
+            'elements': ['k'],
+            'sliders': ['k'],
+            'slider_size': 30,
+            'format': 'kelvin',
+            'color': '#ffffff',
+            'temp': {'min': 4000, 'max': 8000}
         })
     return {
         'widget': part,
@@ -221,7 +235,7 @@ def dim_example():
             'box_width': 400,
             'box_height': 100,
             'slider_size' : 20,
-            'sliders': ['hue'],
+            'sliders': ['h'],
         })
     return {
         'widget': part,
@@ -256,7 +270,27 @@ Supported formats:
         'color',
         name='colorwidget',
         props={
-            'label': 'Color Widget swatches'
+            'label': 'Color Widget swatches',
+            'elements': ['h', 's', 'v', 'r', 'g', 'b', 'a'],
+            'sliders': ['h', 's', 'v', 'a'],
+            'color': '#ff0000',
+            'swatches': [
+                [255, 0, 0],          # default interpretation as rgb
+                [255, 150, 0, 0.5],     # default interpretation as rgba
+                'rgb(255,255,0)',      # rgb string
+                'rgba(255,255,0,0.5)',  # rgba string
+                'hsl(100, 100%, 50%)',   # hsl string
+                '#00fff0',              # hex string
+                {                       # hsl object
+                    'h': '200',
+                    's': '100',
+                    'l': '50'
+                }, {                    # rgb object
+                    'r': 150,
+                    'g': 0,
+                    'b': 255
+                }
+            ]
         }
     )
 """
@@ -268,23 +302,24 @@ def swatches_example():
         '#field:color',
         props={
             'label': 'Color Widget swatches',
-            'elements': [],
-            'sliders': ['hue', 'alpha'],
+            'elements': ['h', 's', 'v', 'r', 'g', 'b', 'a'],
+            'sliders': ['h', 's', 'v', 'a'],
+            'color': '#ff0000',
             'swatches': [
-                [60, 100, 50],          # default interpretation as rgb
-                [60, 100, 50, 0.5],     # default interpretation as rgba
-                'rgb(255,100,50)',      # rgb string
-                'rgba(60,100,50,0.5)',  # rgba string
-                'hsl(189, 65%, 66%)',   # hsl string
-                '#ff00d9',              # hex string
+                [255, 0, 0],          # default interpretation as rgb
+                [255, 150, 0, 0.5],     # default interpretation as rgba
+                'rgb(255,255,0)',      # rgb string
+                'rgba(255,255,0,0.5)',  # rgba string
+                'hsl(100, 100%, 50%)',   # hsl string
+                '#00fff0',              # hex string
                 {                       # hsl object
-                    'h': '60',
+                    'h': '200',
                     's': '100',
                     'l': '50'
                 }, {                    # rgb object
-                    'r': 20,
-                    'g': 20,
-                    'b': 50
+                    'r': 150,
+                    'g': 0,
+                    'b': 255
                 }
             ]
         })
@@ -306,9 +341,14 @@ def TEST():
         '#field:color',
         props={
             'label': 'Color Widget dimensions',
-            'elements': ['box'],
-            'sliders': ['red', 'green', 'blue', 'hue', 'saturation', 'value', 'kelvin', 'alpha'],
-            'swatches': ['#fff700']
+            'elements': ['h', 's', 'v', 'a'],
+            'sliders': ['box', 'h', 's', 'v', 'a'],
+            'swatches': ['#fff700'],
+            'temp': {
+                'min': 4000,
+                'max': 8000
+            },
+            'format': 'hslaString'
         })
     return {
         'widget': part,
@@ -321,11 +361,11 @@ def TEST():
 def get_example():
     return [
         default_example(),
-        hsl_example(),
+        hsv_example(),
         rgb_example(),
         kelvin_example(),
         preview_example(),
-        dim_example(),
+        # dim_example(),
         swatches_example(),
-        TEST()
+        # TEST()
     ]
