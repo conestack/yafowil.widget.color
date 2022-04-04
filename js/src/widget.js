@@ -1,9 +1,10 @@
 import {
     ColorSwatch,
+    InputElement,
     PreviewElement,
 } from './components';
 
-import {SliderInput, factories} from './inputs.js';
+import {SliderInput, input_factories} from './inputs.js';
 
 export class ColorWidget {
 
@@ -11,6 +12,7 @@ export class ColorWidget {
         $('input.color-picker', context).each(function(index) {
             let elem = $(this);
             let options = {
+                format: elem.data('format'),
                 preview_elem: elem.data('preview_elem'),
                 elements: elem.data('elements'),
                 sliders: elem.data('sliders'),
@@ -18,7 +20,8 @@ export class ColorWidget {
                 box_height: elem.data('box_height'),
                 slider_size: elem.data('slider_size'),
                 color: elem.data('color'),
-                swatches: elem.data('swatches')
+                swatches: elem.data('swatches'),
+                temp: elem.data('temp')
             };
             new ColorWidget(elem, options, index);
         });
@@ -28,9 +31,7 @@ export class ColorWidget {
         this.elem = elem;
         this.elem
             .data('color_widget', this)
-            .attr('spellcheck', "false")
-            .attr('maxlength', 7);
-
+            .attr('spellcheck', "false");
         this.dropdown_elem = $(`<div />`)
             .addClass('color-picker-wrapper')
             .css('top', this.elem.outerHeight())
@@ -62,7 +63,7 @@ export class ColorWidget {
         this.rgb_container = $(`<div />`)
             .addClass('color-picker-rgb')
             .appendTo(this.input_container);
-        this.hsl_container = $(`<div />`)
+        this.hsv_container = $(`<div />`)
             .addClass('color-picker-hsl')
             .appendTo(this.input_container);
 
@@ -75,6 +76,7 @@ export class ColorWidget {
 
         let iro_opts = this.init_opts(options);
         this.picker = new iro.ColorPicker(this.picker_container.get(0), iro_opts);
+        this.init_inputs(options);
 
         this.swatches = []; // saved colors
         this.fixed_swatches = [];
@@ -85,23 +87,13 @@ export class ColorWidget {
 
         // color related
         this.color = this.picker.color.clone();
-        this.elem.val(this.color.hexString);
+        this.main_input = new InputElement(this, this.elem, this.color, options.format);
+
         if (this.preview) {
             this.preview.color = this.color.rgbaString;
         }
 
         // events
-        this.elem.on('input', () => {
-            let hex = this.elem.val();
-            if (hex.length === 0) {
-                this.elem.val('#');
-            } else {
-                this.picker.color.set(hex);
-            }
-        });
-        this.on_resize = this.on_resize.bind(this);
-        this.on_resize();
-        $(window).on('resize', this.on_resize);
         this.create_swatch = this.create_swatch.bind(this);
         this.add_color_btn.on('click', this.create_swatch);
         this.remove_swatch = this.remove_swatch.bind(this);
@@ -135,62 +127,40 @@ export class ColorWidget {
             width: opts.box_width,
             layout: []
         }
-
-        if (opts.elements.includes('box')) {
-            iro_opts.layout.push({
-                component: iro.ui.Box,
-                options: {}
-            });
-        }
-        let clr = new iro.Color(opts.color);
-        this.sliders = {};
-        opts.sliders.forEach((type, i) => {
-            iro_opts.layout.push(SliderInput.component(type, opts.slider_size));
-            let factory = factories[type];
-            let target = this.input_container;
-            if (type === 'hue' || type === 'saturation' || type === 'value') {
-                target = this.hsl_container;
-                target.css('display', 'flex');
-            } else if (type === 'red' || type === 'green' || type === 'blue') {
-                target = this.rgb_container;
-                target.css('display', 'flex');
+        opts.sliders.forEach(name => {
+            let type = SliderInput.types[name];
+            if (type === 'box') {
+                iro_opts.layout.push({
+                    component: iro.ui.Box,
+                    options: {}
+                });
+            } else if (type === 'kelvin') {
+                iro_opts.layout.push(SliderInput.component(
+                    type,
+                    opts.slider_size,
+                    opts.temp
+                ));
             } else {
-                target = $(`<div />`)
-                    .addClass(`color-picker-${type}`)
-                    .appendTo(this.input_container);
+                iro_opts.layout.push(SliderInput.component(type, opts.slider_size));
             }
-            this.sliders[type] = new factory(this, clr, type, target, i);
         });
 
         return iro_opts;
     }
 
-    on_resize(e) {
-        if ($(window).width() <= 450) {
-            if (!this.dropdown_elem.hasClass('mobile')) {
-                this.dropdown_elem.addClass('mobile');
-                this.picker.state.layoutDirection = 'horizontal';
-            }
-            if (this.box_dimensions.height) {
-                this.picker.state.boxHeight = null;
-            }
-            let calc_width = $(window).width() * 0.3;
-            this.picker.resize(calc_width);
-        } else
-        if ($(window).width() > 450 && this.dropdown_elem.hasClass('mobile')) {
-            this.dropdown_elem.removeClass('mobile');
-            this.picker.state.layoutDirection = 'vertical';
-            if (this.box_dimensions.height) {
-                this.picker.state.boxHeight = this.box_dimensions.height;
-            }
-            this.picker.resize(this.box_dimensions.width);
-        }
+    init_inputs(opts) {
+        this.sliders = {};
+        let clr = new iro.Color(opts.color);
+        opts.elements.forEach(type => {
+            let factory = input_factories[type];
+            this.sliders[type] = new factory(this, clr, type);
+        });
     }
 
     update_color() {
         this.color = this.picker.color.clone();
         this.preview.color = this.color.rgbaString;
-        this.elem.val(this.color.hexString);
+        this.main_input.update_color(this.color);
 
         for (let type in this.sliders) {
             this.sliders[type].update(this.color);
@@ -240,10 +210,10 @@ export class ColorWidget {
 
     color_equals(color) {
         if (color instanceof iro.Color &&
-            color.hsla.h === this.color.hsla.h &&
-            color.hsla.s === this.color.hsla.s &&
-            color.hsla.l === this.color.hsla.l &&
-            color.hsla.a === this.color.hsla.a) {
+            color.hsva.h === this.color.hsva.h &&
+            color.hsva.s === this.color.hsva.s &&
+            color.hsva.v === this.color.hsva.v &&
+            color.hsva.a === this.color.hsva.a) {
             return true;
         }
     }
@@ -336,7 +306,7 @@ export class ColorWidget {
     set_swatches() {
         let swatches = [];
         for (let swatch of this.swatches) {
-            swatches.push(swatch.color.hsla);
+            swatches.push(swatch.color.hsva);
         }
         localStorage.setItem(`color-swatches-${this.index}`, JSON.stringify(swatches));
     }

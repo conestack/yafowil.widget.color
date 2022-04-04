@@ -32,6 +32,137 @@ export class ColorSwatch {
     }
 }
 
+export class InputElement {
+
+    constructor(widget, elem, color, format) {
+        this.widget = widget;
+        this.elem = elem;
+        if (this.format === 'hexString') {
+            this.elem.attr('maxlength', 7);
+        }
+        this.format = format;
+        this.color = color;
+
+        this.update_color(color);
+
+        this.on_input = this.on_input.bind(this);
+        this.elem.on('input', this.on_input);
+        this.update_color = this.update_color.bind(this);
+    }
+
+    on_input(e) {
+        let val = this.elem.val();
+        if (this.format === 'hsvString') {
+            let hsv = this.parse_hsv(val);
+            this.widget.picker.color.set(hsv);
+        } else if (this.format === 'hsvaString') {
+            let hsva = this.parse_hsva(val);
+            this.widget.picker.color.set(hsva);
+        }
+        if (this.type === 'hexString' && val.length === 0) {
+            this.elem.val('#');
+        } else {
+            this.widget.picker.color.set(val);
+        }
+    }
+
+    hsvString(color) {
+        let h = parseInt(color.hsv.h),
+            s = parseInt(color.hsv.s),
+            v = parseInt(color.hsv.v);
+        return `hsv(${h}, ${s}%, ${v}%)`;
+    }
+
+    hsvaString(color) {
+        let h = parseInt(color.hsva.h),
+            s = parseInt(color.hsva.s),
+            v = parseInt(color.hsva.v),
+            a = parseFloat(color.hsva.a);
+        return `hsva(${h}, ${s}%, ${v}%, ${a})`;
+    }
+
+    parse_hsv(str) {
+        let s = str.slice(4, -1);
+        s = s.replace(/\%+/g, function(m, i){
+            if(str[i-1] === ' ') {
+                return "0";
+            } else {
+                return '';
+            }
+        });
+        if (s[0] === ',') {
+            s = '0' + s;
+        }
+        let hsv = JSON.parse(`[${s}]`);
+        if (hsv[0] > 360) {
+            hsv[0] = 360;
+        }
+        if (hsv[1] > 100) {
+            hsv[1] = 100;
+        }
+        if (hsv[2] > 100) {
+            hsv[2] = 100;
+        }
+        return {
+            h: hsv[0],
+            s: hsv[1],
+            v: hsv[2]
+        }
+    }
+
+    parse_hsva(str) {
+        let s = str.slice(5, -1);
+
+        s = s.replace(/% ?/g, "");
+        s = s.replace(/, ?/g, function(m, i) {
+            if (s[i-1] === ' ' || !s[i-1]) {
+                return "0" + m;
+            } else {
+                if (!s[i+2]) {
+                    return m + '0';
+                } else {
+                    return m;
+                }
+            }
+        });
+        console.log(s)
+
+        let hsva = JSON.parse(`[${s}]`);
+        if (hsva[0] > 360) {
+            hsva[0] = 360;
+        }
+        if (hsva[1] > 100) {
+            hsva[1] = 100;
+        }
+        if (hsva[2] > 100) {
+            hsva[2] = 100;
+        }
+        if (hsva[3] > 1) {
+            hsva[3] = 1;
+        }
+        return {
+            h: hsva[0],
+            s: hsva[1],
+            v: hsva[2],
+            a: hsva[3]
+        }
+    }
+
+    update_color(color) {
+        if (this.format === 'hsvString') {
+            let str = this.hsvString(color);
+            this.elem.val(str);
+        } else if (this.format === 'hsvaString') {
+            let str = this.hsvaString(color);
+            this.elem.val(str);
+        } else if (this.format === 'kelvin') {
+            this.elem.val(parseInt(color.kelvin));
+        } else {
+            this.elem.val(color[this.format]);
+        }
+    }
+}
+
 export class ColorHexInput {
 
     constructor(widget, hex) {

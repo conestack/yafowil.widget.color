@@ -188,18 +188,7 @@ input.control-input {
     justify-content: space-around;
 }
 
-.color-picker-rgb, .color-picker-hsl {
-    display: none;
-    background: #f9f9f9;
-    border: 1px solid #ccc;
-    padding: 3px;
-    border-radius: 3px;
-    flex-direction: row;
-    width: 100%;
-    justify-content: space-between;
-}
-
-.color-picker-kelvin, .color-picker-alpha {
+.color-picker-input {
     background: #f9f9f9;
     border: 1px solid #ccc;
     padding: 3px;

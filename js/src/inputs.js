@@ -1,34 +1,36 @@
-let targets = {
-    hue: 'hsl',
-    saturation: 'hsl',
-    value: 'hsl',
-    alpha: '',
-    kelvin: 'kelvin',
-    red: 'rgb',
-    green: 'rgb',
-    blue: 'rgb'
-}
-
 export class SliderInput {
 
-    static component(type, size) {
+    static types = {
+        box: 'box',
+        r: 'red',
+        g: 'green',
+        b: 'blue',
+        a: 'alpha',
+        h: 'hue',
+        s: 'saturation',
+        v: 'value',
+        k: 'kelvin'
+    }
+
+    static component(type, size, temp) {
         return {
             component: iro.ui.Slider,
             options: {
                 sliderType: type,
-                sliderSize: size
+                sliderSize: size,
+                minTemperature: temp ? temp.min : undefined,
+                maxTemperature: temp ? temp.max : undefined
             }
         }
     }
 
-    constructor(widget, type, target, i) {
+    constructor(widget, type) {
         this.type = type;
-        this.index = i;
         this.widget = widget;
 
         this.control_elem = $('<div />')
             .addClass(`control ${type}`)
-            .appendTo(target);
+            .appendTo(widget.input_container);
         this.label_elem = $(`<span />`)
             .appendTo(this.control_elem);
         this.input_elem = $('<input />')
@@ -39,10 +41,10 @@ export class SliderInput {
 
 export class HueSliderInput extends SliderInput {
 
-    constructor(widget, color, type, i) {
-        super(widget, type, i);
+    constructor(widget, color, type) {
+        super(widget, type);
         this.input_elem.attr({type: 'numeric', min: 0, max:360, maxlength:3});
-        this.input_elem.val(color.hsl.h);
+        this.input_elem.val(color.hsva.h);
         this.label_elem.text(`H: `);
 
         this.on_input = this.on_input.bind(this);
@@ -58,7 +60,7 @@ export class HueSliderInput extends SliderInput {
     }
 
     on_input() {
-        let clr = this.widget.picker.color.hsl;
+        let clr = this.widget.picker.color.hsva;
         clr.h = this.value;
         if (clr.h >= 360) {
             clr.h = 360;
@@ -67,16 +69,16 @@ export class HueSliderInput extends SliderInput {
     }
 
     update(color) {
-        this.value = color.hsl.h;
+        this.value = color.hsva.h;
     }
 }
 
 export class SaturationSliderInput extends SliderInput {
 
-    constructor(widget, color, type, i) {
-        super(widget, type, i);
+    constructor(widget, color, type) {
+        super(widget, type);
         this.input_elem.attr({type: 'numeric', min: 0, max:100, maxlength:3});
-        this.input_elem.val(color.hsl.s);
+        this.input_elem.val(color.hsva.s);
         this.label_elem.text(`S: `);
 
         this.on_input = this.on_input.bind(this);
@@ -92,7 +94,7 @@ export class SaturationSliderInput extends SliderInput {
     }
 
     on_input() {
-        let clr = this.widget.picker.color.hsl;
+        let clr = this.widget.picker.color.hsva;
         clr.h = this.value;
         if (clr.s >= 100) {
             clr.s = 100;
@@ -101,17 +103,17 @@ export class SaturationSliderInput extends SliderInput {
     }
 
     update(color) {
-        this.value = color.hsl.s;
+        this.value = color.hsva.s;
     }
 }
 
 export class ValueSliderInput extends SliderInput {
 
-    constructor(widget, color, type, i) {
-        super(widget, type, i);
+    constructor(widget, color, type) {
+        super(widget, type);
         this.input_elem.attr({type: 'numeric', min: 0, max:100, maxlength:3});
-        this.input_elem.val(color.hsl.l);
-        this.label_elem.text(`L: `);
+        this.input_elem.val(color.hsva.v);
+        this.label_elem.text(`V: `);
 
         this.on_input = this.on_input.bind(this);
         this.input_elem.on('input', this.on_input);
@@ -126,7 +128,7 @@ export class ValueSliderInput extends SliderInput {
     }
 
     on_input() {
-        let clr = this.widget.picker.color.hsl;
+        let clr = this.widget.picker.color.hsva;
         clr.l = this.value;
         if (clr.l >= 100) {
             clr.l = 100;
@@ -135,16 +137,16 @@ export class ValueSliderInput extends SliderInput {
     }
 
     update(color) {
-        this.value = color.hsl.l;
+        this.value = color.hsva.v;
     }
 }
 
 export class AlphaSliderInput extends SliderInput {
 
-    constructor(widget, color, type, i) {
-        super(widget, type, i);
+    constructor(widget, color, type) {
+        super(widget, type);
         this.input_elem.attr({type:'number', step:0.1, min:0, max:1});
-        this.input_elem.val(color.hsla.a);
+        this.input_elem.val(color.hsva.a);
         this.label_elem.text(`A: `);
 
         this.on_input = this.on_input.bind(this);
@@ -160,8 +162,7 @@ export class AlphaSliderInput extends SliderInput {
     }
 
     on_input() {
-        let clr = this.widget.picker.color.hsla;
-
+        let clr = this.widget.picker.color.hsva;
         if (this.value >= 1) {
             this.value = 1;
         }
@@ -170,14 +171,14 @@ export class AlphaSliderInput extends SliderInput {
     }
 
     update(color) {
-        this.value = color.hsla.a;
+        this.value = color.hsva.a;
     }
 }
 
 export class KelvinSliderInput extends SliderInput {
 
-    constructor(widget, color, type, i) {
-        super(widget, type, i);
+    constructor(widget, color, type) {
+        super(widget, type);
         this.input_elem.attr({type: 'numeric'});
         this.input_elem.val(color.kelvin);
         this.label_elem.text(`K: `);
@@ -199,16 +200,16 @@ export class KelvinSliderInput extends SliderInput {
     }
 
     update(color) {
-        this.value = color.kelvin;
+        this.value = parseInt(color.kelvin);
     }
 }
 
 export class RedSliderInput extends SliderInput {
 
-    constructor(widget, color, type, i) {
-        super(widget, type, i);
+    constructor(widget, color, type) {
+        super(widget, type);
         this.input_elem.attr({type: 'numeric'});
-        this.input_elem.val(color.rgb.r);
+        this.input_elem.val(color.rgba.r);
         this.label_elem.text(`R: `);
 
         this.on_input = this.on_input.bind(this);
@@ -231,20 +232,20 @@ export class RedSliderInput extends SliderInput {
             val = 0;
         }
         this.input_elem.val(val);
-        this.widget.picker.color.setChannel('rgb', 'r', val);
+        this.widget.picker.color.setChannel('rgba', 'r', val);
     }
 
     update(color) {
-        this.value = color.rgb.r;
+        this.value = color.rgba.r;
     }
 }
 
 export class GreenSliderInput extends SliderInput {
 
-    constructor(widget, color, type, i) {
-        super(widget, type, i);
+    constructor(widget, color, type) {
+        super(widget, type);
         this.input_elem.attr({type: 'numeric'});
-        this.input_elem.val(color.rgb.g);
+        this.input_elem.val(color.rgba.g);
         this.label_elem.text(`G: `);
 
         this.on_input = this.on_input.bind(this);
@@ -267,20 +268,20 @@ export class GreenSliderInput extends SliderInput {
             val = 0;
         }
         this.input_elem.val(val);
-        this.widget.picker.color.setChannel('rgb', 'g', val);
+        this.widget.picker.color.setChannel('rgba', 'g', val);
     }
 
     update(color) {
-        this.value = color.rgb.g;
+        this.value = color.rgba.g;
     }
 }
 
 export class BlueSliderInput extends SliderInput {
 
-    constructor(widget, color, type, i) {
-        super(widget, type, i);
+    constructor(widget, color, type) {
+        super(widget, type);
         this.input_elem.attr({type: 'numeric'});
-        this.input_elem.val(color.rgb.b);
+        this.input_elem.val(color.rgba.b);
         this.label_elem.text(`B: `);
 
         this.on_input = this.on_input.bind(this);
@@ -303,21 +304,21 @@ export class BlueSliderInput extends SliderInput {
             val = 0;
         }
         this.input_elem.val(val);
-        this.widget.picker.color.setChannel('rgb', 'b', val);
+        this.widget.picker.color.setChannel('rgba', 'b', val);
     }
 
     update(color) {
-        this.value = color.rgb.b;
+        this.value = color.rgba.b;
     }
 }
 
-export let factories = {
-    hue: HueSliderInput,
-    saturation: SaturationSliderInput,
-    value: ValueSliderInput,
-    alpha: AlphaSliderInput,
-    kelvin: KelvinSliderInput,
-    red: RedSliderInput,
-    green: GreenSliderInput,
-    blue: BlueSliderInput
+export let input_factories = {
+    h: HueSliderInput,
+    s: SaturationSliderInput,
+    v: ValueSliderInput,
+    a: AlphaSliderInput,
+    k: KelvinSliderInput,
+    r: RedSliderInput,
+    g: GreenSliderInput,
+    b: BlueSliderInput
 }
