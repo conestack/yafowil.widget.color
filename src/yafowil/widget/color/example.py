@@ -128,9 +128,9 @@ RGBA values.
         name='colorwidget',
         props={
             'label': 'Color Widget with rgb option',
-            'elements': ['r', 'g', 'b'],
-            'sliders': ['r', 'g', 'b'],
-            'format': 'rgbString'
+            'elements': ['r', 'g', 'b', 'a'],
+            'sliders': ['r', 'g', 'b', 'a'],
+            'format': 'rgbaString'
         }
     )
 """
@@ -142,9 +142,9 @@ def rgb_example():
         '#field:color',
         props={
             'label': 'Color Widget with rgb option',
-            'elements': ['r', 'g', 'b'],
-            'sliders': ['r', 'g', 'b'],
-            'format': 'rgbString'
+            'elements': ['r', 'g', 'b', 'a'],
+            'sliders': ['r', 'g', 'b', 'a'],
+            'format': 'rgbaString'
         })
     return {
         'widget': part,
@@ -341,7 +341,7 @@ def TEST():
         '#field:color',
         props={
             'label': 'Color Widget dimensions',
-            'elements': ['h', 's', 'v', 'a'],
+            'elements': ['h', 's', 'v', 'a', 'hex'],
             'sliders': ['box', 'h', 's', 'v', 'a'],
             'swatches': ['#fff700'],
             'temp': {
@@ -360,12 +360,12 @@ def TEST():
 
 def get_example():
     return [
-        default_example(),
-        hsv_example(),
-        rgb_example(),
-        kelvin_example(),
-        preview_example(),
+        # default_example(),
+        # hsv_example(),
+        # rgb_example(),
+        # kelvin_example(),
+        # preview_example(),
         # dim_example(),
-        swatches_example(),
-        # TEST()
+        # swatches_example(),
+        TEST()
     ]

@@ -44,7 +44,7 @@ export class HueSliderInput extends SliderInput {
     constructor(widget, color, type) {
         super(widget, type);
         this.input_elem.attr({type: 'numeric', min: 0, max:360, maxlength:3});
-        this.input_elem.val(color.hsva.h);
+        this.input_elem.val(color.hsla.h);
         this.label_elem.text(`H: `);
 
         this.on_input = this.on_input.bind(this);
@@ -60,7 +60,7 @@ export class HueSliderInput extends SliderInput {
     }
 
     on_input() {
-        let clr = this.widget.picker.color.hsva;
+        let clr = this.widget.picker.color.hsla;
         clr.h = this.value;
         if (clr.h >= 360) {
             clr.h = 360;
@@ -69,7 +69,7 @@ export class HueSliderInput extends SliderInput {
     }
 
     update(color) {
-        this.value = color.hsva.h;
+        this.value = color.hsla.h;
     }
 }
 
@@ -78,7 +78,7 @@ export class SaturationSliderInput extends SliderInput {
     constructor(widget, color, type) {
         super(widget, type);
         this.input_elem.attr({type: 'numeric', min: 0, max:100, maxlength:3});
-        this.input_elem.val(color.hsva.s);
+        this.input_elem.val(color.hsla.s);
         this.label_elem.text(`S: `);
 
         this.on_input = this.on_input.bind(this);
@@ -94,7 +94,7 @@ export class SaturationSliderInput extends SliderInput {
     }
 
     on_input() {
-        let clr = this.widget.picker.color.hsva;
+        let clr = this.widget.picker.color.hsla;
         clr.h = this.value;
         if (clr.s >= 100) {
             clr.s = 100;
@@ -103,7 +103,7 @@ export class SaturationSliderInput extends SliderInput {
     }
 
     update(color) {
-        this.value = color.hsva.s;
+        this.value = color.hsla.s;
     }
 }
 
@@ -112,8 +112,8 @@ export class ValueSliderInput extends SliderInput {
     constructor(widget, color, type) {
         super(widget, type);
         this.input_elem.attr({type: 'numeric', min: 0, max:100, maxlength:3});
-        this.input_elem.val(color.hsva.v);
-        this.label_elem.text(`V: `);
+        this.input_elem.val(color.hsla.l);
+        this.label_elem.text(`L: `);
 
         this.on_input = this.on_input.bind(this);
         this.input_elem.on('input', this.on_input);
@@ -128,7 +128,7 @@ export class ValueSliderInput extends SliderInput {
     }
 
     on_input() {
-        let clr = this.widget.picker.color.hsva;
+        let clr = this.widget.picker.color.hsla;
         clr.l = this.value;
         if (clr.l >= 100) {
             clr.l = 100;
@@ -137,7 +137,7 @@ export class ValueSliderInput extends SliderInput {
     }
 
     update(color) {
-        this.value = color.hsva.v;
+        this.value = color.hsla.l;
     }
 }
 
@@ -146,7 +146,7 @@ export class AlphaSliderInput extends SliderInput {
     constructor(widget, color, type) {
         super(widget, type);
         this.input_elem.attr({type:'number', step:0.1, min:0, max:1});
-        this.input_elem.val(color.hsva.a);
+        this.input_elem.val(color.hsla.a);
         this.label_elem.text(`A: `);
 
         this.on_input = this.on_input.bind(this);
@@ -162,7 +162,7 @@ export class AlphaSliderInput extends SliderInput {
     }
 
     on_input() {
-        let clr = this.widget.picker.color.hsva;
+        let clr = this.widget.picker.color.hsla;
         if (this.value >= 1) {
             this.value = 1;
         }
@@ -171,7 +171,7 @@ export class AlphaSliderInput extends SliderInput {
     }
 
     update(color) {
-        this.value = color.hsva.a;
+        this.value = color.hsla.a;
     }
 }
 
@@ -312,6 +312,42 @@ export class BlueSliderInput extends SliderInput {
     }
 }
 
+export class HexSliderInput extends SliderInput {
+
+    constructor(widget, color, type) {
+        super(widget, type);
+        this.input_elem
+            .attr({type: 'text', spellcheck: false, maxlength: 7})
+            .css('width', '65px')
+            .val(color.hexString);
+        this.label_elem.text(`HEX: `);
+
+        this.on_input = this.on_input.bind(this);
+        this.input_elem.on('input', this.on_input);
+    }
+
+    get value() {
+        return this.input_elem.val();
+    }
+
+    set value(hex) {
+        this.input_elem.val(hex);
+    }
+
+    on_input() {
+        if (this.value.length === 0) {
+            this.input_elem.val('#');
+        } else {
+            this.widget.picker.color.set(this.value);
+        }
+    }
+
+    update(color) {
+        this.value = color.hexString;
+    }
+}
+
+
 export let input_factories = {
     h: HueSliderInput,
     s: SaturationSliderInput,
@@ -320,5 +356,6 @@ export let input_factories = {
     k: KelvinSliderInput,
     r: RedSliderInput,
     g: GreenSliderInput,
-    b: BlueSliderInput
+    b: BlueSliderInput,
+    hex: HexSliderInput
 }

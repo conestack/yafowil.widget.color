@@ -44,103 +44,14 @@ var yafowil_color = (function (exports, $$1) {
         }
         on_input(e) {
             let val = this.elem.val();
-            if (this.format === 'hsvString') {
-                let hsv = this.parse_hsv(val);
-                this.widget.picker.color.set(hsv);
-            } else if (this.format === 'hsvaString') {
-                let hsva = this.parse_hsva(val);
-                this.widget.picker.color.set(hsva);
-            }
             if (this.type === 'hexString' && val.length === 0) {
                 this.elem.val('#');
             } else {
                 this.widget.picker.color.set(val);
             }
         }
-        hsvString(color) {
-            let h = parseInt(color.hsv.h),
-                s = parseInt(color.hsv.s),
-                v = parseInt(color.hsv.v);
-            return `hsv(${h}, ${s}%, ${v}%)`;
-        }
-        hsvaString(color) {
-            let h = parseInt(color.hsva.h),
-                s = parseInt(color.hsva.s),
-                v = parseInt(color.hsva.v),
-                a = parseFloat(color.hsva.a);
-            return `hsva(${h}, ${s}%, ${v}%, ${a})`;
-        }
-        parse_hsv(str) {
-            let s = str.slice(4, -1);
-            s = s.replace(/\%+/g, function(m, i){
-                if(str[i-1] === ' ') {
-                    return "0";
-                } else {
-                    return '';
-                }
-            });
-            if (s[0] === ',') {
-                s = '0' + s;
-            }
-            let hsv = JSON.parse(`[${s}]`);
-            if (hsv[0] > 360) {
-                hsv[0] = 360;
-            }
-            if (hsv[1] > 100) {
-                hsv[1] = 100;
-            }
-            if (hsv[2] > 100) {
-                hsv[2] = 100;
-            }
-            return {
-                h: hsv[0],
-                s: hsv[1],
-                v: hsv[2]
-            }
-        }
-        parse_hsva(str) {
-            let s = str.slice(5, -1);
-            s = s.replace(/% ?/g, "");
-            s = s.replace(/, ?/g, function(m, i) {
-                if (s[i-1] === ' ' || !s[i-1]) {
-                    return "0" + m;
-                } else {
-                    if (!s[i+2]) {
-                        return m + '0';
-                    } else {
-                        return m;
-                    }
-                }
-            });
-            console.log(s);
-            let hsva = JSON.parse(`[${s}]`);
-            if (hsva[0] > 360) {
-                hsva[0] = 360;
-            }
-            if (hsva[1] > 100) {
-                hsva[1] = 100;
-            }
-            if (hsva[2] > 100) {
-                hsva[2] = 100;
-            }
-            if (hsva[3] > 1) {
-                hsva[3] = 1;
-            }
-            return {
-                h: hsva[0],
-                s: hsva[1],
-                v: hsva[2],
-                a: hsva[3]
-            }
-        }
         update_color(color) {
-            if (this.format === 'hsvString') {
-                let str = this.hsvString(color);
-                this.elem.val(str);
-            } else if (this.format === 'hsvaString') {
-                let str = this.hsvaString(color);
-                this.elem.val(str);
-            } else if (this.format === 'kelvin') {
+            if (this.format === 'kelvin') {
                 this.elem.val(parseInt(color.kelvin));
             } else {
                 this.elem.val(color[this.format]);
@@ -211,7 +122,7 @@ var yafowil_color = (function (exports, $$1) {
         constructor(widget, color, type) {
             super(widget, type);
             this.input_elem.attr({type: 'numeric', min: 0, max:360, maxlength:3});
-            this.input_elem.val(color.hsva.h);
+            this.input_elem.val(color.hsla.h);
             this.label_elem.text(`H: `);
             this.on_input = this.on_input.bind(this);
             this.input_elem.on('input', this.on_input);
@@ -223,7 +134,7 @@ var yafowil_color = (function (exports, $$1) {
             this.input_elem.val(value);
         }
         on_input() {
-            let clr = this.widget.picker.color.hsva;
+            let clr = this.widget.picker.color.hsla;
             clr.h = this.value;
             if (clr.h >= 360) {
                 clr.h = 360;
@@ -231,14 +142,14 @@ var yafowil_color = (function (exports, $$1) {
             this.widget.picker.color.set(clr);
         }
         update(color) {
-            this.value = color.hsva.h;
+            this.value = color.hsla.h;
         }
     }
     class SaturationSliderInput extends SliderInput {
         constructor(widget, color, type) {
             super(widget, type);
             this.input_elem.attr({type: 'numeric', min: 0, max:100, maxlength:3});
-            this.input_elem.val(color.hsva.s);
+            this.input_elem.val(color.hsla.s);
             this.label_elem.text(`S: `);
             this.on_input = this.on_input.bind(this);
             this.input_elem.on('input', this.on_input);
@@ -250,7 +161,7 @@ var yafowil_color = (function (exports, $$1) {
             this.input_elem.val(value);
         }
         on_input() {
-            let clr = this.widget.picker.color.hsva;
+            let clr = this.widget.picker.color.hsla;
             clr.h = this.value;
             if (clr.s >= 100) {
                 clr.s = 100;
@@ -258,15 +169,15 @@ var yafowil_color = (function (exports, $$1) {
             this.widget.picker.color.set(clr);
         }
         update(color) {
-            this.value = color.hsva.s;
+            this.value = color.hsla.s;
         }
     }
     class ValueSliderInput extends SliderInput {
         constructor(widget, color, type) {
             super(widget, type);
             this.input_elem.attr({type: 'numeric', min: 0, max:100, maxlength:3});
-            this.input_elem.val(color.hsva.v);
-            this.label_elem.text(`V: `);
+            this.input_elem.val(color.hsla.l);
+            this.label_elem.text(`L: `);
             this.on_input = this.on_input.bind(this);
             this.input_elem.on('input', this.on_input);
         }
@@ -277,7 +188,7 @@ var yafowil_color = (function (exports, $$1) {
             this.input_elem.val(value);
         }
         on_input() {
-            let clr = this.widget.picker.color.hsva;
+            let clr = this.widget.picker.color.hsla;
             clr.l = this.value;
             if (clr.l >= 100) {
                 clr.l = 100;
@@ -285,14 +196,14 @@ var yafowil_color = (function (exports, $$1) {
             this.widget.picker.color.set(clr);
         }
         update(color) {
-            this.value = color.hsva.v;
+            this.value = color.hsla.l;
         }
     }
     class AlphaSliderInput extends SliderInput {
         constructor(widget, color, type) {
             super(widget, type);
             this.input_elem.attr({type:'number', step:0.1, min:0, max:1});
-            this.input_elem.val(color.rgba.a);
+            this.input_elem.val(color.hsla.a);
             this.label_elem.text(`A: `);
             this.on_input = this.on_input.bind(this);
             this.input_elem.on('input', this.on_input);
@@ -304,7 +215,7 @@ var yafowil_color = (function (exports, $$1) {
             this.input_elem.val(value);
         }
         on_input() {
-            let clr = this.widget.picker.color.rgba;
+            let clr = this.widget.picker.color.hsla;
             if (this.value >= 1) {
                 this.value = 1;
             }
@@ -312,7 +223,7 @@ var yafowil_color = (function (exports, $$1) {
             this.widget.picker.color.set(clr);
         }
         update(color) {
-            this.value = color.rgba.a;
+            this.value = color.hsla.a;
         }
     }
     class KelvinSliderInput extends SliderInput {
@@ -424,6 +335,34 @@ var yafowil_color = (function (exports, $$1) {
             this.value = color.rgba.b;
         }
     }
+    class HexSliderInput extends SliderInput {
+        constructor(widget, color, type) {
+            super(widget, type);
+            this.input_elem
+                .attr({type: 'text', spellcheck: false, maxlength: 7})
+                .css('width', '65px')
+                .val(color.hexString);
+            this.label_elem.text(`HEX: `);
+            this.on_input = this.on_input.bind(this);
+            this.input_elem.on('input', this.on_input);
+        }
+        get value() {
+            return this.input_elem.val();
+        }
+        set value(hex) {
+            this.input_elem.val(hex);
+        }
+        on_input() {
+            if (this.value.length === 0) {
+                this.input_elem.val('#');
+            } else {
+                this.widget.picker.color.set(this.value);
+            }
+        }
+        update(color) {
+            this.value = color.hexString;
+        }
+    }
     let input_factories = {
         h: HueSliderInput,
         s: SaturationSliderInput,
@@ -432,7 +371,8 @@ var yafowil_color = (function (exports, $$1) {
         k: KelvinSliderInput,
         r: RedSliderInput,
         g: GreenSliderInput,
-        b: BlueSliderInput
+        b: BlueSliderInput,
+        hex: HexSliderInput
     };
 
     class ColorWidget {
@@ -485,12 +425,6 @@ var yafowil_color = (function (exports, $$1) {
             this.input_container = $(`<div />`)
                 .addClass('color-picker-inputs')
                 .insertBefore(this.buttons);
-            this.rgb_container = $(`<div />`)
-                .addClass('color-picker-rgb')
-                .appendTo(this.input_container);
-            this.hsv_container = $(`<div />`)
-                .addClass('color-picker-hsl')
-                .appendTo(this.input_container);
             this.index = index;
             this.slider_size = options.slider_size;
             let prev_elem = options.preview_elem ? $(options.preview_elem) :
@@ -613,10 +547,10 @@ var yafowil_color = (function (exports, $$1) {
         }
         color_equals(color) {
             if (color instanceof iro.Color &&
-                color.hsva.h === this.color.hsva.h &&
-                color.hsva.s === this.color.hsva.s &&
-                color.hsva.v === this.color.hsva.v &&
-                color.hsva.a === this.color.hsva.a) {
+                color.hsla.h === this.color.hsla.h &&
+                color.hsla.s === this.color.hsla.s &&
+                color.hsla.v === this.color.hsla.v &&
+                color.hsla.a === this.color.hsla.a) {
                 return true;
             }
         }
@@ -698,7 +632,7 @@ var yafowil_color = (function (exports, $$1) {
         set_swatches() {
             let swatches = [];
             for (let swatch of this.swatches) {
-                swatches.push(swatch.color.hsva);
+                swatches.push(swatch.color.hsla);
             }
             localStorage.setItem(`color-swatches-${this.index}`, JSON.stringify(swatches));
         }

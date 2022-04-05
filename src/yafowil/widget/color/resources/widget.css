@@ -1,199 +1,115 @@
-span.color-picker-color {
-    display: inline-block;
-    width: 28px;
-    height: 28px;
-    border: #ccc 3px solid;
-    box-shadow: inset 0px 0px 3px rgb(0 0 0 / 40%);
-    background: conic-gradient(
-        rgb(204, 204, 204) 25%,
-        rgb(255, 255, 255) 0deg,
-        rgb(255, 255, 255) 50%,
-        rgb(204, 204, 204) 0deg,
-        rgb(204, 204, 204) 75%,
-        rgb(255, 255, 255) 0deg)
-        0% 0% / 8px 8px;
-    margin-left: 5px;
-    position: absolute;
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-span.color-picker-color .color-layer {
-    width: 100%;
-    height: 100%;
-}
-
-.transparent {
-    background: conic-gradient(
-        rgb(204, 204, 204) 25%,
-        rgb(255, 255, 255) 0deg,
-        rgb(255, 255, 255) 50%,
-        rgb(204, 204, 204) 0deg,
-        rgb(204, 204, 204) 75%,
-        rgb(255, 255, 255) 0deg)
-        0% 0% / 8px 8px;
-    overflow: hidden;
-}
-.preview-color-layer {
-    width: 100%;
-    height: 100%;
-}
-
 div.color-picker-wrapper {
-    position: absolute;
-    z-index: 10;
-    width: min-content;
-    max-width: fit-content;
-    padding: 20px;
-    border: 1px solid rgb(226, 226, 226);
-    border-radius: 10px;
-    box-shadow: 0px 3px 10px rgb(0 0 0 / 10%);
-    background: #fff;
-    display: none;
+  display: none;
+  position: absolute;
+  width: min-content;
+  max-width: fit-content;
+  padding: 20px;
+  border: 1px solid rgb(226, 226, 226);
+  border-radius: 10px;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  z-index: 10;
+}
+div.color-picker-wrapper button.close-button {
+  position: absolute;
+  right: 0px;
+  top: 3px;
+  float: right;
+  background: none;
+  border: none;
+  opacity: 0.4;
+}
+div.color-picker-wrapper div.buttons {
+  width: 100%;
+  height: 20px;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+div.color-picker-wrapper div.buttons button.add_color {
+  background: none;
+  border: none;
+  float: left;
+}
+div.color-picker-wrapper div.buttons button.remove_color {
+  background: none;
+  border: none;
+  float: right;
+}
+div.color-picker-wrapper div.color-picker-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+div.color-picker-wrapper div.color-picker-inputs .control {
+  display: flex;
+  margin: 4px;
+  justify-content: space-around;
+}
+div.color-picker-wrapper div.color-picker-inputs .control > span {
+  width: 15px;
+}
+div.color-picker-wrapper div.color-picker-inputs .control.hex > span {
+  width: min-content;
+}
+div.color-picker-wrapper div.color-picker-inputs .control input.control-input {
+  height: 20px;
+  width: 40px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  margin-left: 5px;
+}
+div.color-picker-wrapper div.color-picker-recent {
+  display: none;
+  width: 100%;
+  padding: 5px;
+}
+div.color-picker-wrapper div.color-picker-recent div.color-swatch {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin: 2px;
+  border-radius: 3px;
+  background: conic-gradient(rgb(204, 204, 204) 25%, rgb(255, 255, 255) 0deg, rgb(255, 255, 255) 50%, rgb(204, 204, 204) 0deg, rgb(204, 204, 204) 75%, rgb(255, 255, 255) 0deg) 0% 0%/8px 8px;
+  box-shadow: inset 0px 0px 3px rgba(0, 0, 0, 0.4);
+}
+div.color-picker-wrapper div.color-picker-recent div.color-swatch.selected {
+  box-shadow: 0px 0px 0px 2px #00b3ff;
+}
+div.color-picker-wrapper div.color-picker-recent div.color-swatch .swatch-color-layer {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
 }
 
-.color-picker-wrapper.mobile {
-    width: 90vw;
-    max-width: 90vw;
+span.color-picker-color {
+  position: absolute;
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  margin-left: 5px;
+  border: #ccc 3px solid;
+  border-radius: 4px;
+  box-shadow: inset 0px 0px 3px rgba(0, 0, 0, 0.4);
+  background: conic-gradient(rgb(204, 204, 204) 25%, rgb(255, 255, 255) 0deg, rgb(255, 255, 255) 50%, rgb(204, 204, 204) 0deg, rgb(204, 204, 204) 75%, rgb(255, 255, 255) 0deg) 0% 0%/8px 8px;
+  overflow: hidden;
 }
-.color-picker-wrapper.mobile .buttons.hsl-false {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    top: 20px;
-    right: 25px;
-    width: 30%;
-    height: fit-content;
+span.color-picker-color.transparent {
+  background: conic-gradient(rgb(204, 204, 204) 25%, rgb(255, 255, 255) 0deg, rgb(255, 255, 255) 50%, rgb(204, 204, 204) 0deg, rgb(204, 204, 204) 75%, rgb(255, 255, 255) 0deg) 0% 0%/8px 8px;
+  overflow: hidden;
 }
-.color-picker-wrapper.mobile .buttons.hsl-false button {
-    width: 100%;
-}
-.color-picker-wrapper.mobile .buttons {
-    height: 40px;
-}
-.color-picker-wrapper.mobile .buttons button {
-    width: 45%;
-    padding: 3px;
-    border: 1px solid #d8d8d8;
-    border-radius: 10px;
-    background: white;
-    margin: 10px 2%;
-    box-shadow: 1px 1px 3px #ccc;
-}
-.color-picker-wrapper.mobile button.close-button {
-    top: 0;
-    font-size: 30px;
-}
-.color-picker-wrapper.mobile div.color-swatch {
-    width: calc(100% / 6 - 8px);
-    margin: 4px;
-}
-.color-picker-wrapper.mobile .IroColorPicker {
-    margin-left: 6px;
-}
-
-
-button.close-button{
-    float: right;
-    background: none;
-    border: none;
-    position: absolute;
-    right: 0px;
-    top: 3px;
-    opacity: .4;
-}
-
-div.color-picker-recent {
-    width: 100%;
-    padding: 5px;
-    display: none;
-}
-
-div.color-swatch {
-    width: 20px;
-    height: 20px;
-    display: inline-block;
-    margin: 2px;
-    border-radius: 3px;
-    background: conic-gradient(
-        rgb(204, 204, 204) 25%,
-        rgb(255, 255, 255) 0deg,
-        rgb(255, 255, 255) 50%,
-        rgb(204, 204, 204) 0deg,
-        rgb(204, 204, 204) 75%,
-        rgb(255, 255, 255) 0deg)
-        0% 0% / 8px 8px;
-    box-shadow: inset 0px 0px 3px rgb(0 0 0 / 40%);
-}
-
-div.color-swatch .swatch-color-layer {
-    width: 100%;
-    height: 100%;
-    border-radius: inherit;
-}
-
-div.color-swatch.selected {
-    box-shadow: 0px 0px 0px 2px #00b3ff;
-}
-
-div.buttons {
-    width: 100%;
-    height: 20px;
-    margin-top: .5rem;
-    margin-bottom: .5rem;
-}
-
-button.add_color {
-    background: none;
-    border: none;
-    float:left;
-}
-
-button.remove_color {
-    background: none;
-    border: none;
-    float: right;
-}
-
-div.hex-display {
-    margin: 7px;
-    display: flex;
-    align-items: center;
-}
-
-div.hex-display input {
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    width: 100%;
-    margin-left: 10px;
-    padding-left: 5px;
-}
-
-.color-picker-inputs {
-    margin-top: 20px;
-    display: flex;
-    flex-wrap: wrap;
-}
-
-input.control-input {
-    height: 20px;
-    width: 40px;
-    border: 1px solid #ccc;
-    margin-left: 5px;
-}
-
-.control {
-    padding: 0 4px;
-    display: flex;
-    justify-content: space-around;
+span.color-picker-color .preview-color-layer {
+  width: 100%;
+  height: 100%;
 }
 
 .color-picker-input {
-    background: #f9f9f9;
-    border: 1px solid #ccc;
-    padding: 3px;
-    border-radius: 3px;
-    flex-direction: row;
-    width: 50%;
-    justify-content: space-between;
+  width: 50%;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 3px;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 3px;
 }
+
+/*# sourceMappingURL=widget.css.map */

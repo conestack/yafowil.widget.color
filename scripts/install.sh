@@ -20,7 +20,8 @@ npm --save-dev install \
     karma-module-resolver-preprocessor \
     rollup \
     rollup-plugin-cleanup \
-    rollup-plugin-terser
+    rollup-plugin-terser \
+    sass
 
 npm --save install @jaames/iro
 npm --no-save install https://github.com/jquery/jquery#main

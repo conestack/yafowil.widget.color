@@ -60,12 +60,6 @@ export class ColorWidget {
         this.input_container = $(`<div />`)
             .addClass('color-picker-inputs')
             .insertBefore(this.buttons);
-        this.rgb_container = $(`<div />`)
-            .addClass('color-picker-rgb')
-            .appendTo(this.input_container);
-        this.hsv_container = $(`<div />`)
-            .addClass('color-picker-hsl')
-            .appendTo(this.input_container);
 
         this.index = index;
         this.slider_size = options.slider_size;
@@ -210,10 +204,10 @@ export class ColorWidget {
 
     color_equals(color) {
         if (color instanceof iro.Color &&
-            color.hsva.h === this.color.hsva.h &&
-            color.hsva.s === this.color.hsva.s &&
-            color.hsva.v === this.color.hsva.v &&
-            color.hsva.a === this.color.hsva.a) {
+            color.hsla.h === this.color.hsla.h &&
+            color.hsla.s === this.color.hsla.s &&
+            color.hsla.v === this.color.hsla.v &&
+            color.hsla.a === this.color.hsla.a) {
             return true;
         }
     }
@@ -306,7 +300,7 @@ export class ColorWidget {
     set_swatches() {
         let swatches = [];
         for (let swatch of this.swatches) {
-            swatches.push(swatch.color.hsva);
+            swatches.push(swatch.color.hsla);
         }
         localStorage.setItem(`color-swatches-${this.index}`, JSON.stringify(swatches));
     }
