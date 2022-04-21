@@ -81,7 +81,6 @@ var yafowil_color = (function (exports, $$1) {
             this.widget.open();
         }
     }
-
     class SliderInput {
         static types = {
             box: 'box',
@@ -187,7 +186,7 @@ var yafowil_color = (function (exports, $$1) {
             this.fix_swatches(options.swatches);
             this.parse_json();
             this.color = this.picker.color.clone();
-            this.main_input = new InputElement(this, this.elem, this.color, options.format);
+            this.input_elem = new InputElement(this, this.elem, this.color, options.format);
             if (this.preview) {
                 this.preview.color = this.color.rgbaString;
             }
@@ -251,18 +250,10 @@ var yafowil_color = (function (exports, $$1) {
             });
             return iro_opts;
         }
-        init_inputs(opts) {
-            this.sliders = {};
-            let clr = new iro.Color(opts.color);
-            opts.elements.forEach(type => {
-                let factory = input_factories[type];
-                this.sliders[type] = new factory(this, clr, type);
-            });
-        }
         update_color() {
             this.color = this.picker.color.clone();
             this.preview.color = this.color.rgbaString;
-            this.main_input.update_color(this.color);
+            this.input_elem.update_color(this.color);
         }
         open(evt) {
             if (this.dropdown_elem.css('display') === "none") {

@@ -96,3 +96,47 @@ export class PreviewElement {
         this.widget.open();
     }
 }
+
+export class SliderInput {
+
+    static types = {
+        box: 'box',
+        r: 'red',
+        g: 'green',
+        b: 'blue',
+        a: 'alpha',
+        h: 'hue',
+        s: 'saturation',
+        v: 'value',
+        k: 'kelvin'
+    }
+
+    static component(type, opts) {
+        return {
+            component: iro.ui.Slider,
+            options: {
+                sliderType: type,
+                sliderSize: opts.size,
+                sliderLength: opts.length,
+                minTemperature: opts.temp ? opts.temp.min : undefined,
+                maxTemperature: opts.temp ? opts.temp.max : undefined,
+                disabled: opts.disabled,
+                showInput: opts.showInput
+            }
+        }
+    }
+
+    constructor(widget, type) {
+        this.type = type;
+        this.widget = widget;
+
+        this.control_elem = $('<div />')
+            .addClass(`control ${type}`)
+            .appendTo(widget.input_container);
+        this.label_elem = $(`<span />`)
+            .appendTo(this.control_elem);
+        this.input_elem = $('<input />')
+            .addClass('control-input')
+            .appendTo(this.control_elem);
+    }
+}
