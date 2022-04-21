@@ -4,7 +4,7 @@ import {
     PreviewElement,
 } from './components';
 
-import {SliderInput, input_factories} from './inputs.js';
+import {SliderInput/* , input_factories */} from './inputs.js';
 
 export class ColorWidget {
 
@@ -21,7 +21,10 @@ export class ColorWidget {
                 slider_size: elem.data('slider_size'),
                 color: elem.data('color'),
                 swatches: elem.data('swatches'),
-                temp: elem.data('temp')
+                temp: elem.data('temp'),
+                disabled: elem.data('disabled'),
+                show_inputs: elem.data('show_inputs'),
+                slider_length: elem.data('slider_length')
             };
             new ColorWidget(elem, options, index);
         });
@@ -70,7 +73,7 @@ export class ColorWidget {
 
         let iro_opts = this.init_opts(options);
         this.picker = new iro.ColorPicker(this.picker_container.get(0), iro_opts);
-        this.init_inputs(options);
+        // this.init_inputs(options);
 
         this.swatches = []; // saved colors
         this.fixed_swatches = [];
@@ -119,6 +122,7 @@ export class ColorWidget {
         let iro_opts = {
             color: opts.color,
             width: opts.box_width,
+            layoutDirection: 'vertical',
             layout: []
         }
         opts.sliders.forEach(name => {
@@ -130,12 +134,21 @@ export class ColorWidget {
                 });
             } else if (type === 'kelvin') {
                 iro_opts.layout.push(SliderInput.component(
-                    type,
-                    opts.slider_size,
-                    opts.temp
+                    type, {
+                        size: opts.slider_size,
+                        disabled: opts.disabled,
+                        temp: opts.temp,
+                        showInput: opts.show_inputs
+                    }
                 ));
             } else {
-                iro_opts.layout.push(SliderInput.component(type, opts.slider_size));
+                iro_opts.layout.push(SliderInput.component(type, 
+                    {
+                        size: opts.slider_size,
+                        disabled: opts.disabled,
+                        showInput: opts.show_inputs,
+                        length: opts.slider_length
+                    }));
             }
         });
 
@@ -156,9 +169,9 @@ export class ColorWidget {
         this.preview.color = this.color.rgbaString;
         this.main_input.update_color(this.color);
 
-        for (let type in this.sliders) {
-            this.sliders[type].update(this.color);
-        }
+        // for (let type in this.sliders) {
+        //     this.sliders[type].update(this.color);
+        // }
     }
 
     open(evt) {
@@ -204,10 +217,10 @@ export class ColorWidget {
 
     color_equals(color) {
         if (color instanceof iro.Color &&
-            color.hsla.h === this.color.hsla.h &&
-            color.hsla.s === this.color.hsla.s &&
-            color.hsla.v === this.color.hsla.v &&
-            color.hsla.a === this.color.hsla.a) {
+            color.hsva.h === this.color.hsva.h &&
+            color.hsva.s === this.color.hsva.s &&
+            color.hsva.v === this.color.hsva.v &&
+            color.hsva.a === this.color.hsva.a) {
             return true;
         }
     }
@@ -300,7 +313,7 @@ export class ColorWidget {
     set_swatches() {
         let swatches = [];
         for (let swatch of this.swatches) {
-            swatches.push(swatch.color.hsla);
+            swatches.push(swatch.color.hsva);
         }
         localStorage.setItem(`color-swatches-${this.index}`, JSON.stringify(swatches));
     }

@@ -12,14 +12,17 @@ export class SliderInput {
         k: 'kelvin'
     }
 
-    static component(type, size, temp) {
+    static component(type, opts) {
         return {
             component: iro.ui.Slider,
             options: {
                 sliderType: type,
-                sliderSize: size,
-                minTemperature: temp ? temp.min : undefined,
-                maxTemperature: temp ? temp.max : undefined
+                sliderSize: opts.size,
+                sliderLength: opts.length,
+                minTemperature: opts.temp ? opts.temp.min : undefined,
+                maxTemperature: opts.temp ? opts.temp.max : undefined,
+                disabled: opts.disabled,
+                showInput: opts.showInput
             }
         }
     }
@@ -346,7 +349,6 @@ export class HexSliderInput extends SliderInput {
         this.value = color.hexString;
     }
 }
-
 
 export let input_factories = {
     h: HueSliderInput,

@@ -94,14 +94,17 @@ var yafowil_color = (function (exports, $$1) {
             v: 'value',
             k: 'kelvin'
         }
-        static component(type, size, temp) {
+        static component(type, opts) {
             return {
                 component: iro.ui.Slider,
                 options: {
                     sliderType: type,
-                    sliderSize: size,
-                    minTemperature: temp ? temp.min : undefined,
-                    maxTemperature: temp ? temp.max : undefined
+                    sliderSize: opts.size,
+                    sliderLength: opts.length,
+                    minTemperature: opts.temp ? opts.temp.min : undefined,
+                    maxTemperature: opts.temp ? opts.temp.max : undefined,
+                    disabled: opts.disabled,
+                    showInput: opts.showInput
                 }
             }
         }
@@ -118,262 +121,6 @@ var yafowil_color = (function (exports, $$1) {
                 .appendTo(this.control_elem);
         }
     }
-    class HueSliderInput extends SliderInput {
-        constructor(widget, color, type) {
-            super(widget, type);
-            this.input_elem.attr({type: 'numeric', min: 0, max:360, maxlength:3});
-            this.input_elem.val(color.hsla.h);
-            this.label_elem.text(`H: `);
-            this.on_input = this.on_input.bind(this);
-            this.input_elem.on('input', this.on_input);
-        }
-        get value() {
-            return parseInt(this.input_elem.val());
-        }
-        set value(value) {
-            this.input_elem.val(value);
-        }
-        on_input() {
-            let clr = this.widget.picker.color.hsla;
-            clr.h = this.value;
-            if (clr.h >= 360) {
-                clr.h = 360;
-            }
-            this.widget.picker.color.set(clr);
-        }
-        update(color) {
-            this.value = color.hsla.h;
-        }
-    }
-    class SaturationSliderInput extends SliderInput {
-        constructor(widget, color, type) {
-            super(widget, type);
-            this.input_elem.attr({type: 'numeric', min: 0, max:100, maxlength:3});
-            this.input_elem.val(color.hsla.s);
-            this.label_elem.text(`S: `);
-            this.on_input = this.on_input.bind(this);
-            this.input_elem.on('input', this.on_input);
-        }
-        get value() {
-            return parseInt(this.input_elem.val());
-        }
-        set value(value) {
-            this.input_elem.val(value);
-        }
-        on_input() {
-            let clr = this.widget.picker.color.hsla;
-            clr.h = this.value;
-            if (clr.s >= 100) {
-                clr.s = 100;
-            }
-            this.widget.picker.color.set(clr);
-        }
-        update(color) {
-            this.value = color.hsla.s;
-        }
-    }
-    class ValueSliderInput extends SliderInput {
-        constructor(widget, color, type) {
-            super(widget, type);
-            this.input_elem.attr({type: 'numeric', min: 0, max:100, maxlength:3});
-            this.input_elem.val(color.hsla.l);
-            this.label_elem.text(`L: `);
-            this.on_input = this.on_input.bind(this);
-            this.input_elem.on('input', this.on_input);
-        }
-        get value() {
-            return parseInt(this.input_elem.val());
-        }
-        set value(value) {
-            this.input_elem.val(value);
-        }
-        on_input() {
-            let clr = this.widget.picker.color.hsla;
-            clr.l = this.value;
-            if (clr.l >= 100) {
-                clr.l = 100;
-            }
-            this.widget.picker.color.set(clr);
-        }
-        update(color) {
-            this.value = color.hsla.l;
-        }
-    }
-    class AlphaSliderInput extends SliderInput {
-        constructor(widget, color, type) {
-            super(widget, type);
-            this.input_elem.attr({type:'number', step:0.1, min:0, max:1});
-            this.input_elem.val(color.hsla.a);
-            this.label_elem.text(`A: `);
-            this.on_input = this.on_input.bind(this);
-            this.input_elem.on('input', this.on_input);
-        }
-        get value() {
-            return parseFloat(this.input_elem.val());
-        }
-        set value(value) {
-            this.input_elem.val(value);
-        }
-        on_input() {
-            let clr = this.widget.picker.color.hsla;
-            if (this.value >= 1) {
-                this.value = 1;
-            }
-            clr.a = this.value;
-            this.widget.picker.color.set(clr);
-        }
-        update(color) {
-            this.value = color.hsla.a;
-        }
-    }
-    class KelvinSliderInput extends SliderInput {
-        constructor(widget, color, type) {
-            super(widget, type);
-            this.input_elem.attr({type: 'numeric'});
-            this.input_elem.val(color.kelvin);
-            this.label_elem.text(`K: `);
-            this.on_input = this.on_input.bind(this);
-            this.input_elem.on('input', this.on_input);
-        }
-        get value() {
-            return parseInt(this.input_elem.val());
-        }
-        set value(value) {
-            this.input_elem.val(value);
-        }
-        on_input() {
-            this.widget.picker.color.set(this.value);
-        }
-        update(color) {
-            this.value = parseInt(color.kelvin);
-        }
-    }
-    class RedSliderInput extends SliderInput {
-        constructor(widget, color, type) {
-            super(widget, type);
-            this.input_elem.attr({type: 'numeric'});
-            this.input_elem.val(color.rgba.r);
-            this.label_elem.text(`R: `);
-            this.on_input = this.on_input.bind(this);
-            this.input_elem.on('input', this.on_input);
-        }
-        get value() {
-            return this.input_elem.val();
-        }
-        set value(value) {
-            this.input_elem.val(value);
-        }
-        on_input() {
-            let val = this.input_elem.val();
-            if (val >= 255) {
-                val = 255;
-            } else if (val <=0 || NaN) {
-                val = 0;
-            }
-            this.input_elem.val(val);
-            this.widget.picker.color.setChannel('rgba', 'r', val);
-        }
-        update(color) {
-            this.value = color.rgba.r;
-        }
-    }
-    class GreenSliderInput extends SliderInput {
-        constructor(widget, color, type) {
-            super(widget, type);
-            this.input_elem.attr({type: 'numeric'});
-            this.input_elem.val(color.rgba.g);
-            this.label_elem.text(`G: `);
-            this.on_input = this.on_input.bind(this);
-            this.input_elem.on('input', this.on_input);
-        }
-        get value() {
-            return this.input_elem.val();
-        }
-        set value(value) {
-            this.input_elem.val(value);
-        }
-        on_input() {
-            let val = this.input_elem.val();
-            if (val >= 255) {
-                val = 255;
-            } else if (val <=0 || NaN) {
-                val = 0;
-            }
-            this.input_elem.val(val);
-            this.widget.picker.color.setChannel('rgba', 'g', val);
-        }
-        update(color) {
-            this.value = color.rgba.g;
-        }
-    }
-    class BlueSliderInput extends SliderInput {
-        constructor(widget, color, type) {
-            super(widget, type);
-            this.input_elem.attr({type: 'numeric'});
-            this.input_elem.val(color.rgba.b);
-            this.label_elem.text(`B: `);
-            this.on_input = this.on_input.bind(this);
-            this.input_elem.on('input', this.on_input);
-        }
-        get value() {
-            return this.input_elem.val();
-        }
-        set value(value) {
-            this.input_elem.val(value);
-        }
-        on_input() {
-            let val = this.input_elem.val();
-            if (val >= 255) {
-                val = 255;
-            } else if (val <=0 || NaN) {
-                val = 0;
-            }
-            this.input_elem.val(val);
-            this.widget.picker.color.setChannel('rgba', 'b', val);
-        }
-        update(color) {
-            this.value = color.rgba.b;
-        }
-    }
-    class HexSliderInput extends SliderInput {
-        constructor(widget, color, type) {
-            super(widget, type);
-            this.input_elem
-                .attr({type: 'text', spellcheck: false, maxlength: 7})
-                .css('width', '65px')
-                .val(color.hexString);
-            this.label_elem.text(`HEX: `);
-            this.on_input = this.on_input.bind(this);
-            this.input_elem.on('input', this.on_input);
-        }
-        get value() {
-            return this.input_elem.val();
-        }
-        set value(hex) {
-            this.input_elem.val(hex);
-        }
-        on_input() {
-            if (this.value.length === 0) {
-                this.input_elem.val('#');
-            } else {
-                this.widget.picker.color.set(this.value);
-            }
-        }
-        update(color) {
-            this.value = color.hexString;
-        }
-    }
-    let input_factories = {
-        h: HueSliderInput,
-        s: SaturationSliderInput,
-        v: ValueSliderInput,
-        a: AlphaSliderInput,
-        k: KelvinSliderInput,
-        r: RedSliderInput,
-        g: GreenSliderInput,
-        b: BlueSliderInput,
-        hex: HexSliderInput
-    };
 
     class ColorWidget {
         static initialize(context) {
@@ -389,7 +136,10 @@ var yafowil_color = (function (exports, $$1) {
                     slider_size: elem.data('slider_size'),
                     color: elem.data('color'),
                     swatches: elem.data('swatches'),
-                    temp: elem.data('temp')
+                    temp: elem.data('temp'),
+                    disabled: elem.data('disabled'),
+                    show_inputs: elem.data('show_inputs'),
+                    slider_length: elem.data('slider_length')
                 };
                 new ColorWidget(elem, options, index);
             });
@@ -432,7 +182,6 @@ var yafowil_color = (function (exports, $$1) {
             this.preview = new PreviewElement(this, prev_elem);
             let iro_opts = this.init_opts(options);
             this.picker = new iro.ColorPicker(this.picker_container.get(0), iro_opts);
-            this.init_inputs(options);
             this.swatches = [];
             this.fixed_swatches = [];
             this.fix_swatches(options.swatches);
@@ -471,6 +220,7 @@ var yafowil_color = (function (exports, $$1) {
             let iro_opts = {
                 color: opts.color,
                 width: opts.box_width,
+                layoutDirection: 'vertical',
                 layout: []
             };
             opts.sliders.forEach(name => {
@@ -482,12 +232,21 @@ var yafowil_color = (function (exports, $$1) {
                     });
                 } else if (type === 'kelvin') {
                     iro_opts.layout.push(SliderInput.component(
-                        type,
-                        opts.slider_size,
-                        opts.temp
+                        type, {
+                            size: opts.slider_size,
+                            disabled: opts.disabled,
+                            temp: opts.temp,
+                            showInput: opts.show_inputs
+                        }
                     ));
                 } else {
-                    iro_opts.layout.push(SliderInput.component(type, opts.slider_size));
+                    iro_opts.layout.push(SliderInput.component(type,
+                        {
+                            size: opts.slider_size,
+                            disabled: opts.disabled,
+                            showInput: opts.show_inputs,
+                            length: opts.slider_length
+                        }));
                 }
             });
             return iro_opts;
@@ -504,9 +263,6 @@ var yafowil_color = (function (exports, $$1) {
             this.color = this.picker.color.clone();
             this.preview.color = this.color.rgbaString;
             this.main_input.update_color(this.color);
-            for (let type in this.sliders) {
-                this.sliders[type].update(this.color);
-            }
         }
         open(evt) {
             if (this.dropdown_elem.css('display') === "none") {
@@ -547,10 +303,10 @@ var yafowil_color = (function (exports, $$1) {
         }
         color_equals(color) {
             if (color instanceof iro.Color &&
-                color.hsla.h === this.color.hsla.h &&
-                color.hsla.s === this.color.hsla.s &&
-                color.hsla.v === this.color.hsla.v &&
-                color.hsla.a === this.color.hsla.a) {
+                color.hsva.h === this.color.hsva.h &&
+                color.hsva.s === this.color.hsva.s &&
+                color.hsva.v === this.color.hsva.v &&
+                color.hsva.a === this.color.hsva.a) {
                 return true;
             }
         }
@@ -632,7 +388,7 @@ var yafowil_color = (function (exports, $$1) {
         set_swatches() {
             let swatches = [];
             for (let swatch of this.swatches) {
-                swatches.push(swatch.color.hsla);
+                swatches.push(swatch.color.hsva);
             }
             localStorage.setItem(`color-swatches-${this.index}`, JSON.stringify(swatches));
         }

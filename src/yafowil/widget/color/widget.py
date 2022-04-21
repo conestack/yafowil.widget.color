@@ -22,7 +22,10 @@ color_options = [
     'color',
     'swatches',
     'temp',
-    'format'
+    'format',
+    'disabled',
+    'show_inputs',
+    'slider_length'
 ]
 
 
@@ -170,4 +173,22 @@ factory.defaults['color.temp'] = {'min': 3000, 'max': 10000}
 factory.doc['props']['color.temp'] = """\
 Set the minimum and maximum kelvin temperature.
 Values: [Dict('min': 2200-11000, 'max': 2200-11000)].
+"""
+
+factory.defaults['color.disabled'] = False
+factory.doc['props']['color.disabled'] = """\
+Disable or enable input field editing.
+Values: [True | False].
+"""
+
+factory.defaults['color.show_inputs'] = False
+factory.doc['props']['color.show_inputs'] = """\
+Show or hide slider input elements.
+Values: [True|False(Default)].
+"""
+
+factory.defaults['color.slider_length'] = None
+factory.doc['props']['color.slider_length'] = """\
+Slider length prop WIP
+Values: [True|False(Default)].
 """
