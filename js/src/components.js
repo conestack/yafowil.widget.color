@@ -6,11 +6,11 @@ export class ColorSwatch {
         this.fixed = fixed;
 
         this.elem = $('<div />')
-            .addClass('color-swatch')
+            .addClass('color-swatch layer-transparent')
             .appendTo(this.widget.swatches_container);
 
         this.color_layer = $('<div />')
-            .addClass('swatch-color-layer')
+            .addClass('layer-color')
             .css('background-color', this.color.rgbaString)
             .appendTo(this.elem);
 
@@ -37,12 +37,12 @@ export class InputElement {
     constructor(widget, elem, color, format) {
         this.widget = widget;
         this.elem = elem;
+
+        this.format = format || 'hexString';
         if (this.format === 'hexString') {
             this.elem.attr('maxlength', 7);
         }
-        this.format = format;
         this.color = color;
-
         this.update_color(color);
 
         this.on_input = this.on_input.bind(this);
@@ -52,11 +52,7 @@ export class InputElement {
 
     on_input(e) {
         let val = this.elem.val();
-        if (this.type === 'hexString' && val.length === 0) {
-            this.elem.val('#');
-        } else {
-            this.widget.picker.color.set(val);
-        }
+        this.widget.picker.color.set(val);
     }
 
     update_color(color) {
@@ -70,15 +66,15 @@ export class InputElement {
 
 export class PreviewElement {
 
-    constructor(widget, elem) {
+    constructor(widget, elem, color) {
         this.widget = widget;
         this.layer = $('<div />')
-            .addClass('preview-color-layer');
+            .addClass('layer-color');
         this.elem = elem
-            .addClass('transparent')
+            .addClass('layer-transparent')
             .append(this.layer)
             .insertAfter(this.widget.elem);
-
+        this.color = color.rgbaString;
         this.on_click = this.on_click.bind(this);
         this.elem.on('click', this.on_click);
     }
@@ -97,46 +93,14 @@ export class PreviewElement {
     }
 }
 
-export class SliderInput {
-
-    static types = {
-        box: 'box',
-        r: 'red',
-        g: 'green',
-        b: 'blue',
-        a: 'alpha',
-        h: 'hue',
-        s: 'saturation',
-        v: 'value',
-        k: 'kelvin'
-    }
-
-    static component(type, opts) {
-        return {
-            component: iro.ui.Slider,
-            options: {
-                sliderType: type,
-                sliderSize: opts.size,
-                sliderLength: opts.length,
-                minTemperature: opts.temp ? opts.temp.min : undefined,
-                maxTemperature: opts.temp ? opts.temp.max : undefined,
-                disabled: opts.disabled,
-                showInput: opts.showInput
-            }
-        }
-    }
-
-    constructor(widget, type) {
-        this.type = type;
-        this.widget = widget;
-
-        this.control_elem = $('<div />')
-            .addClass(`control ${type}`)
-            .appendTo(widget.input_container);
-        this.label_elem = $(`<span />`)
-            .appendTo(this.control_elem);
-        this.input_elem = $('<input />')
-            .addClass('control-input')
-            .appendTo(this.control_elem);
-    }
+export const slider_components = {
+    box: 'box',
+    r: 'red',
+    g: 'green',
+    b: 'blue',
+    a: 'alpha',
+    h: 'hue',
+    s: 'saturation',
+    v: 'value',
+    k: 'kelvin'
 }

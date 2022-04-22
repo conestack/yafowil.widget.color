@@ -2,7 +2,7 @@ import {
     ColorSwatch,
     InputElement,
     PreviewElement,
-    SliderInput
+    slider_components
 } from './components';
 
 export class ColorWidget {
@@ -13,14 +13,13 @@ export class ColorWidget {
             let options = {
                 format: elem.data('format'),
                 preview_elem: elem.data('preview_elem'),
-                elements: elem.data('elements'),
                 sliders: elem.data('sliders'),
                 box_width: elem.data('box_width'),
                 box_height: elem.data('box_height'),
                 slider_size: elem.data('slider_size'),
                 color: elem.data('color'),
                 swatches: elem.data('swatches'),
-                temp: elem.data('temp'),
+                temperature: elem.data('temperature'),
                 disabled: elem.data('disabled'),
                 show_inputs: elem.data('show_inputs'),
                 slider_length: elem.data('slider_length')
@@ -66,10 +65,6 @@ export class ColorWidget {
         this.index = index;
         this.slider_size = options.slider_size;
 
-        let prev_elem = options.preview_elem ? $(options.preview_elem) :
-            $(`<span />`).addClass('color-picker-color');
-        this.preview = new PreviewElement(this, prev_elem);
-
         let iro_opts = this.init_opts(options);
         this.picker = new iro.ColorPicker(this.picker_container.get(0), iro_opts);
 
@@ -83,10 +78,9 @@ export class ColorWidget {
         // color related
         this.color = this.picker.color.clone();
         this.input_elem = new InputElement(this, this.elem, this.color, options.format);
-
-        if (this.preview) {
-            this.preview.color = this.color.rgbaString;
-        }
+        let prev_elem = options.preview_elem ? $(options.preview_elem) :
+            $(`<span />`).addClass('color-picker-color layer-transparent');
+        this.preview = new PreviewElement(this, prev_elem, this.color);
 
         // events
         this.create_swatch = this.create_swatch.bind(this);
@@ -120,33 +114,32 @@ export class ColorWidget {
         let iro_opts = {
             color: opts.color,
             width: opts.box_width,
+            boxHeight: opts.box_height || opts.box_width,
             layoutDirection: 'vertical',
             layout: []
         }
-        opts.sliders.forEach(name => {
-            let type = SliderInput.types[name];
+        const sliders = opts.sliders || [];
+        sliders.forEach(name => {
+            let type = slider_components[name];
+
             if (type === 'box') {
                 iro_opts.layout.push({
                     component: iro.ui.Box,
                     options: {}
                 });
-            } else if (type === 'kelvin') {
-                iro_opts.layout.push(SliderInput.component(
-                    type, {
-                        size: opts.slider_size,
+            } else {
+                iro_opts.layout.push({
+                    component: iro.ui.Slider,
+                    options: {
+                        sliderType: type,
+                        sliderSize: opts.slider_size,
+                        sliderLength: opts.slider_length,
+                        minTemperature: opts.temperature ? opts.temperature.min : undefined,
+                        maxTemperature: opts.temperature ? opts.temperature.max : undefined,
                         disabled: opts.disabled,
-                        temp: opts.temp,
                         showInput: opts.show_inputs
                     }
-                ));
-            } else {
-                iro_opts.layout.push(SliderInput.component(type, 
-                    {
-                        size: opts.slider_size,
-                        disabled: opts.disabled,
-                        showInput: opts.show_inputs,
-                        length: opts.slider_length
-                    }));
+                });
             }
         });
 
