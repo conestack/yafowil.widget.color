@@ -14,14 +14,13 @@ _ = TSF('yafowil.widget.color')
 
 color_options = [
     'preview_elem',
-    'elements',
     'sliders',
     'box_width',
     'box_height',
     'slider_size',
     'color',
     'swatches',
-    'temp',
+    'temperature',
     'format',
     'disabled',
     'show_inputs',
@@ -103,22 +102,6 @@ Add an optional preview elem.
 Values: [True|False|None (default)].
 """
 
-factory.defaults['color.elements'] = []
-factory.doc['props']['color.elements'] = """\
-Specify input elements to show specific color values.
-Values: [List(Str)|None].
-
-Available options:
-- r (red)
-- g (green)
-- b (blue)
-- h (hue)
-- s (saturation)
-- v (value)
-- a (alpha)
-- k (kelvin)
-"""
-
 factory.defaults['color.box_width'] = 250
 factory.doc['props']['color.box_width'] = """\
 Set the initial width of the color box (in pixels).
@@ -169,8 +152,8 @@ Given swatches can't be deleted in the widget.
 Values: [Array(Dict)].
 """
 
-factory.defaults['color.temp'] = {'min': 3000, 'max': 10000}
-factory.doc['props']['color.temp'] = """\
+factory.defaults['color.temperature'] = {'min': 3000, 'max': 10000}
+factory.doc['props']['color.temperature'] = """\
 Set the minimum and maximum kelvin temperature.
 Values: [Dict('min': 2200-11000, 'max': 2200-11000)].
 """

@@ -7,10 +7,10 @@ var yafowil_color = (function (exports, $$1) {
             this.color = color;
             this.fixed = fixed;
             this.elem = $('<div />')
-                .addClass('color-swatch')
+                .addClass('color-swatch layer-transparent')
                 .appendTo(this.widget.swatches_container);
             this.color_layer = $('<div />')
-                .addClass('swatch-color-layer')
+                .addClass('layer-color')
                 .css('background-color', this.color.rgbaString)
                 .appendTo(this.elem);
             this.destroy = this.destroy.bind(this);
@@ -32,10 +32,10 @@ var yafowil_color = (function (exports, $$1) {
         constructor(widget, elem, color, format) {
             this.widget = widget;
             this.elem = elem;
+            this.format = format || 'hexString';
             if (this.format === 'hexString') {
                 this.elem.attr('maxlength', 7);
             }
-            this.format = format;
             this.color = color;
             this.update_color(color);
             this.on_input = this.on_input.bind(this);
@@ -44,11 +44,7 @@ var yafowil_color = (function (exports, $$1) {
         }
         on_input(e) {
             let val = this.elem.val();
-            if (this.type === 'hexString' && val.length === 0) {
-                this.elem.val('#');
-            } else {
-                this.widget.picker.color.set(val);
-            }
+            this.widget.picker.color.set(val);
         }
         update_color(color) {
             if (this.format === 'kelvin') {
@@ -59,14 +55,15 @@ var yafowil_color = (function (exports, $$1) {
         }
     }
     class PreviewElement {
-        constructor(widget, elem) {
+        constructor(widget, elem, color) {
             this.widget = widget;
             this.layer = $('<div />')
-                .addClass('preview-color-layer');
+                .addClass('layer-color');
             this.elem = elem
-                .addClass('transparent')
+                .addClass('layer-transparent')
                 .append(this.layer)
                 .insertAfter(this.widget.elem);
+            this.color = color.rgbaString;
             this.on_click = this.on_click.bind(this);
             this.elem.on('click', this.on_click);
         }
@@ -81,45 +78,17 @@ var yafowil_color = (function (exports, $$1) {
             this.widget.open();
         }
     }
-    class SliderInput {
-        static types = {
-            box: 'box',
-            r: 'red',
-            g: 'green',
-            b: 'blue',
-            a: 'alpha',
-            h: 'hue',
-            s: 'saturation',
-            v: 'value',
-            k: 'kelvin'
-        }
-        static component(type, opts) {
-            return {
-                component: iro.ui.Slider,
-                options: {
-                    sliderType: type,
-                    sliderSize: opts.size,
-                    sliderLength: opts.length,
-                    minTemperature: opts.temp ? opts.temp.min : undefined,
-                    maxTemperature: opts.temp ? opts.temp.max : undefined,
-                    disabled: opts.disabled,
-                    showInput: opts.showInput
-                }
-            }
-        }
-        constructor(widget, type) {
-            this.type = type;
-            this.widget = widget;
-            this.control_elem = $('<div />')
-                .addClass(`control ${type}`)
-                .appendTo(widget.input_container);
-            this.label_elem = $(`<span />`)
-                .appendTo(this.control_elem);
-            this.input_elem = $('<input />')
-                .addClass('control-input')
-                .appendTo(this.control_elem);
-        }
-    }
+    const slider_components = {
+        box: 'box',
+        r: 'red',
+        g: 'green',
+        b: 'blue',
+        a: 'alpha',
+        h: 'hue',
+        s: 'saturation',
+        v: 'value',
+        k: 'kelvin'
+    };
 
     class ColorWidget {
         static initialize(context) {
@@ -128,14 +97,13 @@ var yafowil_color = (function (exports, $$1) {
                 let options = {
                     format: elem.data('format'),
                     preview_elem: elem.data('preview_elem'),
-                    elements: elem.data('elements'),
                     sliders: elem.data('sliders'),
                     box_width: elem.data('box_width'),
                     box_height: elem.data('box_height'),
                     slider_size: elem.data('slider_size'),
                     color: elem.data('color'),
                     swatches: elem.data('swatches'),
-                    temp: elem.data('temp'),
+                    temperature: elem.data('temperature'),
                     disabled: elem.data('disabled'),
                     show_inputs: elem.data('show_inputs'),
                     slider_length: elem.data('slider_length')
@@ -176,9 +144,6 @@ var yafowil_color = (function (exports, $$1) {
                 .insertBefore(this.buttons);
             this.index = index;
             this.slider_size = options.slider_size;
-            let prev_elem = options.preview_elem ? $(options.preview_elem) :
-                $(`<span />`).addClass('color-picker-color');
-            this.preview = new PreviewElement(this, prev_elem);
             let iro_opts = this.init_opts(options);
             this.picker = new iro.ColorPicker(this.picker_container.get(0), iro_opts);
             this.swatches = [];
@@ -187,9 +152,9 @@ var yafowil_color = (function (exports, $$1) {
             this.parse_json();
             this.color = this.picker.color.clone();
             this.input_elem = new InputElement(this, this.elem, this.color, options.format);
-            if (this.preview) {
-                this.preview.color = this.color.rgbaString;
-            }
+            let prev_elem = options.preview_elem ? $(options.preview_elem) :
+                $(`<span />`).addClass('color-picker-color layer-transparent');
+            this.preview = new PreviewElement(this, prev_elem, this.color);
             this.create_swatch = this.create_swatch.bind(this);
             this.add_color_btn.on('click', this.create_swatch);
             this.remove_swatch = this.remove_swatch.bind(this);
@@ -219,33 +184,31 @@ var yafowil_color = (function (exports, $$1) {
             let iro_opts = {
                 color: opts.color,
                 width: opts.box_width,
+                boxHeight: opts.box_height || opts.box_width,
                 layoutDirection: 'vertical',
                 layout: []
             };
-            opts.sliders.forEach(name => {
-                let type = SliderInput.types[name];
+            const sliders = opts.sliders || [];
+            sliders.forEach(name => {
+                let type = slider_components[name];
                 if (type === 'box') {
                     iro_opts.layout.push({
                         component: iro.ui.Box,
                         options: {}
                     });
-                } else if (type === 'kelvin') {
-                    iro_opts.layout.push(SliderInput.component(
-                        type, {
-                            size: opts.slider_size,
+                } else {
+                    iro_opts.layout.push({
+                        component: iro.ui.Slider,
+                        options: {
+                            sliderType: type,
+                            sliderSize: opts.slider_size,
+                            sliderLength: opts.slider_length,
+                            minTemperature: opts.temperature ? opts.temperature.min : undefined,
+                            maxTemperature: opts.temperature ? opts.temperature.max : undefined,
                             disabled: opts.disabled,
-                            temp: opts.temp,
                             showInput: opts.show_inputs
                         }
-                    ));
-                } else {
-                    iro_opts.layout.push(SliderInput.component(type,
-                        {
-                            size: opts.slider_size,
-                            disabled: opts.disabled,
-                            showInput: opts.show_inputs,
-                            length: opts.slider_length
-                        }));
+                    });
                 }
             });
             return iro_opts;

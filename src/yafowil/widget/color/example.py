@@ -58,7 +58,6 @@ def preview_example():
         '#field:color',
         props={
             'label': 'Color Widget with preview element',
-            'elements': [],
             'sliders': ['box', 'h', 'a'],
             'preview_elem': '<div id="my-preview" style="border-radius: 50%; width:100px; height:100px; margin:20px; border: 1px solid gray;" />',
             'color': '#4287f5'
@@ -85,9 +84,8 @@ Add an option to edit and view HSV values of the currently selected color.
         name='colorwidget',
         props={
             'label': 'Color Widget with hsv option',
-            'elements': ['h', 's', 'v', 'a'],
             'sliders': ['h', 's', 'v', 'a'],
-            'format': 'hsvaString'
+            'format': 'hslaString'
         }
     )
 """
@@ -99,9 +97,8 @@ def hsv_example():
         '#field:color',
         props={
             'label': 'Color Widget with hsv option',
-            'elements': ['h', 's', 'v', 'a'],
             'sliders': ['h', 's', 'v', 'a'],
-            'format': 'hsvaString'
+            'format': 'hslaString'
         })
     return {
         'widget': part,
@@ -128,7 +125,6 @@ RGBA values.
         name='colorwidget',
         props={
             'label': 'Color Widget with rgb option',
-            'elements': ['r', 'g', 'b', 'a'],
             'sliders': ['r', 'g', 'b', 'a'],
             'format': 'rgbaString'
         }
@@ -142,7 +138,6 @@ def rgb_example():
         '#field:color',
         props={
             'label': 'Color Widget with rgb option',
-            # 'elements': ['r', 'g', 'b', 'a'],
             'sliders': ['r', 'g', 'b', 'a'],
             'show_inputs': True,
             'format': 'rgbaString'
@@ -175,7 +170,7 @@ Adds a Kelvin temperature slider.
             'slider_size': 30,
             'format': 'kelvin',
             'color': '#ffffff',
-            'temp': {'min': 4000, 'max': 8000}
+            'temperature': {'min': 4000, 'max': 8000}
         }
     )
 """
@@ -191,7 +186,7 @@ def kelvin_example():
             'slider_size': 30,
             'format': 'kelvin',
             'color': '#ffffff',
-            'temp': {'min': 4000, 'max': 8000}
+            'temperature': {'min': 4000, 'max': 8000}
         })
     return {
         'widget': part,
@@ -234,7 +229,7 @@ def dim_example():
             'box_width': 400,
             'box_height': 100,
             'slider_size' : 20,
-            'sliders': ['h'],
+            'sliders': ['box', 'h'],
         })
     return {
         'widget': part,
@@ -270,7 +265,6 @@ Supported formats:
         name='colorwidget',
         props={
             'label': 'Color Widget swatches',
-            'elements': ['h', 's', 'v', 'r', 'g', 'b', 'a'],
             'sliders': ['h', 's', 'v', 'a'],
             'color': '#ff0000',
             'swatches': [
@@ -301,7 +295,6 @@ def swatches_example():
         '#field:color',
         props={
             'label': 'Color Widget swatches',
-            'elements': ['h', 's', 'v', 'r', 'g', 'b', 'a'],
             'sliders': ['h', 's', 'v', 'a'],
             'color': '#ff0000',
             'swatches': [
@@ -345,7 +338,7 @@ def TEST():
             'format': 'rgbaString',
             'show_inputs': True,
             # 'slider_length': 100,
-            # 'temp': {'min': 4000, 'max': 8000}
+            # 'temperature': {'min': 4000, 'max': 8000}
             'disabled': False
         })
     return {
@@ -359,11 +352,11 @@ def TEST():
 def get_example():
     return [
         default_example(),
-        # hsv_example(),
-        # rgb_example(),
+        hsv_example(),
+        rgb_example(),
         kelvin_example(),
-        # preview_example(),
-        # dim_example(),
-        # swatches_example(),
-        TEST()
+        preview_example(),
+        dim_example(),
+        swatches_example(),
+        # TEST()
     ]
