@@ -1,4 +1,5 @@
 import {ColorWidget} from '../src/widget.js';
+import $ from 'jquery'
 
 let elem = $('<input class="color-picker"/>');
 let widget;
@@ -35,15 +36,14 @@ QUnit.module('ColorWidget', hooks => {
         ColorWidget.initialize();
         widget = elem.data('color_widget');
         assert.strictEqual(widget.elem.attr('spellcheck'), 'false');
-        assert.strictEqual(widget.elem.attr('maxlength'), '7');
 
         // preview element
-        assert.ok(widget.preview_elem.hasClass('color-picker-color'));
+        assert.ok(widget.preview.elem.hasClass('color-picker-color'));
         assert.strictEqual(widget.swatches.length, 0);
         assert.strictEqual(widget.elem.val(), '#ffffff');
         // hex white gets transformed to rgb value
         assert.strictEqual(
-            widget.preview_elem.css('background-color'),
+            widget.preview.layer.css('background-color'),
             'rgb(255, 255, 255)'
         );
         // iro picker exists
@@ -76,26 +76,8 @@ QUnit.module('ColorWidget', hooks => {
         }
         let widget = new ColorWidget(elem, options);
         // preview element is set
-        assert.deepEqual(widget.preview_elem, prev_elem);
+        assert.ok(widget.preview.elem.is('div#preview'));
         prev_elem.remove();
-    });
-
-    QUnit.test('init_options: hsl_display', assert => {
-        let options = {
-            hsl_display: true
-        }
-        let widget = new ColorWidget(elem, options);
-        assert.ok(widget.hsl_display);
-        assert.deepEqual(widget.hsl_display.value, widget.picker.color.hsl);
-    });
-
-    QUnit.test('init_options: hex_display', assert => {
-        let widget = new ColorWidget(elem, {hex_display: true});
-        assert.ok(widget.hex_display);
-        assert.strictEqual(
-            widget.hex_display.value,
-            widget.picker.color.hexString
-        );
     });
 
     QUnit.test('input', assert => {
@@ -110,7 +92,7 @@ QUnit.module('ColorWidget', hooks => {
         // empty input
         widget.elem.val('');
         widget.elem.trigger('input');
-        assert.strictEqual(widget.elem.val(), "#");
+        assert.strictEqual(widget.elem.val(), "");
 
         // correct hex input
         widget.elem.val('#213öasd');
@@ -138,9 +120,9 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual(widget.dropdown_elem.css('display'), 'none');
 
         // click on preview elem
-        widget.preview_elem.trigger('click');
+        widget.preview.elem.trigger('click');
         assert.strictEqual(widget.dropdown_elem.css('display'), 'block');
-        widget.preview_elem.trigger('click');
+        widget.preview.elem.trigger('click');
         assert.strictEqual(widget.dropdown_elem.css('display'), 'none');
     });
 
@@ -195,7 +177,7 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual(widget.swatches_container.css('display'), 'none');
 
         // open menu by click
-        widget.preview_elem.trigger('click');
+        widget.preview.elem.trigger('click');
         assert.strictEqual(widget.swatches.length, 0);
 
         // click add color
@@ -204,8 +186,8 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual(widget.swatches_container.css('display'), 'block');
         assert.strictEqual(widget.swatches.length, 1);
         assert.deepEqual(
-            widget.swatches[0].color.hsl,
-            widget.picker.color.hsl
+            widget.swatches[0].color.hsva,
+            widget.picker.color.hsva
         );
 
         // add same color again
@@ -217,7 +199,7 @@ QUnit.module('ColorWidget', hooks => {
         widget.add_color_btn.trigger('click');
         assert.strictEqual(widget.swatches.length, 2);
         assert.strictEqual(
-            widget.preview_elem.css('background-color'),
+            widget.preview.layer.css('background-color'),
             'rgb(204, 204, 204)'
         );
         assert.ok(widget.swatches[1].elem.hasClass('selected'));
@@ -230,7 +212,7 @@ QUnit.module('ColorWidget', hooks => {
             '#ffffff'
         );
         assert.strictEqual(
-            widget.preview_elem.css('background-color'),
+            widget.preview.layer.css('background-color'),
             'rgb(255, 255, 255)'
         );
         assert.false(widget.swatches[1].elem.hasClass('selected'));
@@ -239,7 +221,7 @@ QUnit.module('ColorWidget', hooks => {
         // JSON localStorage
         let swatches = [];
         for (let swatch of widget.swatches) {
-            swatches.push(swatch.color.hsl);
+            swatches.push(swatch.color.hsva);
         }
         assert.strictEqual(
             localStorage.getItem('color-swatches-0'),
@@ -270,7 +252,7 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual(widget.swatches_container.css('display'), 'none');
 
         // open menu by click
-        widget.preview_elem.trigger('click');
+        widget.preview.elem.trigger('click');
         assert.strictEqual(widget.swatches.length, 0);
 
         let colors = [
@@ -279,72 +261,23 @@ QUnit.module('ColorWidget', hooks => {
             '#fe9185'
         ]
         // add swatches
-        for (let i = 0; i < 13; i++) {
+        for (let i = 0; i <= 10; i++) {
             widget.picker.color.set(colors[i]);
             widget.add_color_btn.trigger('click');
         }
-        assert.strictEqual(widget.swatches.length, 12);
+        assert.strictEqual(widget.swatches.length, 10);
     });
 
     QUnit.test('custom dimensions', assert => {
-        let original_width = $(window).width();
-
         // initialize
         let widget = new ColorWidget(elem, {
-            color:'#ffffff',
+            color: '#ffffff',
             box_width: 600,
             box_height: 300
         });
 
         assert.strictEqual(widget.picker.state.width, 600);
         assert.strictEqual(widget.picker.state.boxHeight, 300);
-
-        viewport.set(400);
-        $(window).trigger('resize');
-
-        let done = assert.async();
-        setTimeout(() => {
-            assert.strictEqual(widget.picker.state.width, $(window).width() * 0.3);
-            assert.notOk(widget.picker.state.boxHeight);
-            viewport.set(original_width);
-            $(window).trigger('resize');
-            done();
-        });
-
-        let done2 = assert.async();
-        setTimeout(() => {
-            assert.strictEqual(widget.picker.state.width, 600);
-            assert.strictEqual(widget.picker.state.boxHeight, 300);
-            done2();
-        });
-    });
-
-    QUnit.module('mobile and resize', hooks => {
-        let original_width = $(window).width();
-        hooks.afterEach(() => {
-            viewport.set(original_width);
-        });
-
-        QUnit.test('mobile initialization', assert => {
-            viewport.set(300);
-            // initialize
-            let widget = new ColorWidget(elem, {color:'#ffffff'});
-            assert.ok(widget.dropdown_elem.hasClass('mobile'));
-        });
-
-        QUnit.test('resizing', assert => {
-            // initialize
-            let widget = new ColorWidget(elem, {color:'#ffffff'});
-            assert.notOk(widget.dropdown_elem.hasClass('mobile'));
-
-            viewport.set(300);
-            $(window).trigger('resize');
-            assert.ok(widget.dropdown_elem.hasClass('mobile'));
-
-            viewport.set(1000);
-            $(window).trigger('resize');
-            assert.notOk(widget.dropdown_elem.hasClass('mobile'));
-        });
     });
 
     QUnit.module('ColorSwatch', hooks => {
@@ -432,92 +365,33 @@ QUnit.module('ColorWidget', hooks => {
         });
     });
 
-    QUnit.module('ColorHSLInput', hooks => {
-        hooks.beforeEach(() => {
-            widget = new ColorWidget(elem, {
-                color:'#ffffff',
-                hsl_display: true
-            });
-        });
+    QUnit.test('Opts', assert => {
+        let opts = {
+            color: '#f00',
+            sliders: ['box', 'r', 'g', 'b', 'a', 'k', 'h', 's', 'v', 'x'],
+            format: 'rgbaString',
+            box_width: 500,
+            box_height: 100,
+            slider_size: 30,
+            swatches: [[255, 0, 0], 'rgb(50,255,255)', {r:0, g:255, b:0}],
+            temperature: {min: 4000, max: 10000},
+            disabled: true,
+            show_inputs: true,
+            slider_length: 100
+        }
+        widget = new ColorWidget(elem, opts, 0);
 
-        QUnit.test('constructor', assert => {
-            assert.ok(widget.hsl_display.elem.is('div.hsl-display'));
-            assert.ok(widget.hsl_display.hue_input
-                .is('input.h[type="number"][min="0"][max="360"]')
-            );
-            assert.ok(widget.hsl_display.saturation_input
-                .is('input.s[type="number"][min="0"][max="100"]')
-            );
-            assert.ok(widget.hsl_display.lightness_input
-                .is('input.l[type="number"][min="0"][max="100"]')
-            );
-        });
+        assert.strictEqual(widget.picker.props.boxHeight, opts.box_height);
+        assert.strictEqual(widget.picker.props.width, opts.box_width);
+        assert.strictEqual(
+            widget.picker.props.layout[6].options.minTemperature,
+           opts.temperature.min
+        );
+        assert.strictEqual(
+            widget.picker.props.layout[6].options.maxTemperature,
+           opts.temperature.max
+        );
 
-        QUnit.test('get/set hsl', assert => {
-            // hsl on init
-            assert.deepEqual(widget.hsl_display.value, widget.color.hsl);
-
-            // set hsl
-            widget.picker.color.set({ h: 100, s: 100, l: 20 });
-            assert.strictEqual(widget.hsl_display.hue_input.val(), "100");
-            assert.strictEqual(widget.hsl_display.saturation_input.val(), "100");
-            assert.strictEqual(widget.hsl_display.lightness_input.val(), "20");
-
-            // input h
-            widget.hsl_display.hue_input.val(200);
-            widget.hsl_display.hue_input.trigger('input');
-            assert.deepEqual(widget.color.hsl, widget.hsl_display.value);
-
-            // input s
-            widget.hsl_display.saturation_input.val(80);
-            widget.hsl_display.saturation_input.trigger('input');
-            assert.deepEqual(widget.color.hsl, widget.hsl_display.value);
-
-            // input h
-            widget.hsl_display.lightness_input.val(50);
-            widget.hsl_display.lightness_input.trigger('input');
-            assert.deepEqual(widget.color.hsl, widget.hsl_display.value);
-        });
-    });
-
-    QUnit.module('ColorHexInput', hooks => {
-        hooks.beforeEach(() => {
-            widget = new ColorWidget(elem, {
-                color:'#ffffff',
-                hex_display: true
-            });
-        });
-
-        QUnit.test('constructor', assert => {
-            assert.ok(widget.hex_display.elem.is('div.hex-display'));
-            assert.ok(widget.hex_display.input
-                .is('input[spellcheck="false"][maxlength="7"]')
-            );
-        });
-
-        QUnit.test('get/set value', assert => {
-            // hex on init
-            assert.strictEqual(widget.color.hexString, widget.hex_display.value);
-
-            // set hex
-            widget.hex_display.value = "#cccccc";
-            assert.strictEqual(
-                widget.hex_display.input.val(),
-                widget.hex_display.value
-            );
-
-            // trigger input
-            widget.hex_display.input.val("#ffffff");
-            widget.hex_display.input.trigger('input');
-            assert.strictEqual(widget.color.hexString, "#ffffff");
-
-            // empty input
-            widget.hex_display.input.val("");
-            widget.hex_display.input.trigger('input');
-            assert.strictEqual(widget.hex_display.input.val(), "#");
-
-            widget.picker.color.set({ h: 100, s: 100, l: 20 });
-            assert.strictEqual(widget.hex_display.value, '#226600');
-        });
+        assert.ok(true);
     });
 });
