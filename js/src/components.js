@@ -37,7 +37,6 @@ export class InputElement {
     constructor(widget, elem, color, format) {
         this.widget = widget;
         this.elem = elem;
-
         this.format = format || 'hexString';
         if (this.format === 'hexString') {
             this.elem.attr('maxlength', 7);
@@ -52,7 +51,11 @@ export class InputElement {
 
     on_input(e) {
         let val = this.elem.val();
-        this.widget.picker.color.set(val);
+        if (this.format === 'kelvin') {
+            this.widget.picker.color.kelvin = parseInt(val);
+        } else {
+            this.widget.picker.color.set(val);
+        }
     }
 
     update_color(color) {

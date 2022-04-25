@@ -44,7 +44,11 @@ var yafowil_color = (function (exports, $$1) {
         }
         on_input(e) {
             let val = this.elem.val();
-            this.widget.picker.color.set(val);
+            if (this.format === 'kelvin') {
+                this.widget.picker.color.kelvin = parseInt(val);
+            } else {
+                this.widget.picker.color.set(val);
+            }
         }
         update_color(color) {
             if (this.format === 'kelvin') {
@@ -281,6 +285,7 @@ var yafowil_color = (function (exports, $$1) {
                     color = swatch;
                 } else {
                     console.log(`ERROR: not supported color format at ${swatch}`);
+                    return;
                 }
                 this.fixed_swatches.push(
                     new ColorSwatch(this, new iro.Color(color), true)

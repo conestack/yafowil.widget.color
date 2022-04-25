@@ -332,14 +332,12 @@ def TEST():
     part['color'] = factory(
         '#field:color',
         props={
-            'label': 'Color Widget dimensions',
-            'sliders': ['box', 'r', 'g', 'b', 'a'],
-            # 'swatches': ['#fff700'],
-            'format': 'rgbaString',
+            'label': 'Color Widget TEST',
+            'sliders': ['k'],
+            'format': 'rgbString',
             'show_inputs': True,
-            # 'slider_length': 100,
-            # 'temperature': {'min': 4000, 'max': 8000}
-            'disabled': False
+            # 'box_width': 800,
+            'temperature': {'min': 2000, 'max': 8000}
         })
     return {
         'widget': part,
@@ -351,12 +349,12 @@ def TEST():
 
 def get_example():
     return [
-        default_example(),
-        hsv_example(),
-        rgb_example(),
-        kelvin_example(),
-        preview_example(),
-        dim_example(),
-        swatches_example(),
-        # TEST()
+        # default_example(),
+        # hsv_example(),
+        # rgb_example(),
+        # kelvin_example(),
+        # preview_example(),
+        # dim_example(),
+        # swatches_example(),
+        TEST()
     ]

@@ -221,6 +221,7 @@ export class ColorWidget {
                 color = swatch;
             } else {
                 console.log(`ERROR: not supported color format at ${swatch}`);
+                return;
             }
             this.fixed_swatches.push(
                 new ColorSwatch(this, new iro.Color(color), true)
