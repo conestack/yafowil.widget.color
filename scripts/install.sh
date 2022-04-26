@@ -23,7 +23,6 @@ npm --save-dev install \
     rollup-plugin-terser \
     sass
 
-# npm --save install @jaames/iro
 npm --no-save install https://github.com/jquery/jquery#main
 
 python3 -m venv .
