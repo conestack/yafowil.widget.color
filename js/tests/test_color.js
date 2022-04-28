@@ -77,6 +77,7 @@ QUnit.module('ColorWidget', hooks => {
         let widget = new ColorWidget(elem, options);
         // preview element is set
         assert.ok(widget.preview.elem.is('div#preview'));
+        assert.strictEqual(widget.preview.color, widget.color.rgbaString);
         prev_elem.remove();
     });
 
@@ -100,17 +101,42 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual(widget.picker.color.hexString, "#cccccc");
     });
 
-    QUnit.test.todo('kelvin input', assert => {
+    QUnit.test('kelvin input', assert => {
         // initialize
         let widget = new ColorWidget(elem, {
             color: '#ffffff',
-            format: 'kelvin'
+            format: 'kelvin',
+            temperature: {min: 3000, max: 8000}
         });
 
         widget.elem.val(6000);
         widget.elem.trigger('input');
-        // this is an iro.js issue with kelvin conversion.
-        assert.strictEqual(parseInt(widget.picker.color.kelvin), 5995);
+        // issue with kelvin conversion in original iro.js
+        // this test utilizes a modified fork.
+        assert.strictEqual(parseInt(widget.picker.color.kelvin), 6000);
+
+        // input events under minimum character length
+        widget.elem.val(5);
+        widget.elem.trigger('input');
+        assert.strictEqual(parseInt(widget.picker.color.kelvin), 6000);
+        widget.elem.val(58);
+        widget.elem.trigger('input');
+        assert.strictEqual(parseInt(widget.picker.color.kelvin), 6000);
+        widget.elem.val(582);
+        widget.elem.trigger('input');
+        assert.strictEqual(parseInt(widget.picker.color.kelvin), 6000);
+        // value changes if over minimum value
+        widget.elem.val(5823);
+        widget.elem.trigger('input');
+        assert.strictEqual(parseInt(widget.picker.color.kelvin), 5823);
+        // value caps if over maximum value
+        widget.elem.val(58234);
+        widget.elem.trigger('input');
+        assert.strictEqual(parseInt(widget.picker.color.kelvin), 8000);
+        // value caps if under minimum value
+        widget.elem.val(1234);
+        widget.elem.trigger('input');
+        assert.strictEqual(parseInt(widget.picker.color.kelvin), 3000);
     });
 
 
