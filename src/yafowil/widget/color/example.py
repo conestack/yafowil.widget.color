@@ -19,21 +19,72 @@ def default_example():
     part['color'] = factory(
         '#field:color',
         props={
-            'label': 'Color Widget'
+            'label': 'A default Color Picker'
         })
     return {
         'widget': part,
         'doc': DOC_COLOR,
-        'title': 'Color',
+        'title': 'Default Color Picker',
+    }
+
+
+
+DOC_DIM = """
+Custom dimensions
+-----------------
+
+Initialize the widget color box with custom dimensions.
+The 'box_width' and 'box_height' properties change the width and height of
+the color picker box, respectively.
+Setting only one value produces a square color picker.
+
+'slider_size' defines the thickness of the slider, while 'slider_length' defines
+the length of the entire slider.
+
+All values are defined in pixels.
+
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='colorwidget',
+        props={
+            'label': 'Picker with custom dimensions',
+            'box_width': 400,
+            'box_height': 100,
+            'slider_size': 20,
+            'slider_length': 400
+        }
+    )
+"""
+
+
+def dim_example():
+    part = factory(u'fieldset', name='yafowil.widget.color')
+    part['color'] = factory(
+        '#field:color',
+        props={
+            'label': 'Picker with custom dimensions',
+            'box_width': 400,
+            'box_height': 100,
+            'slider_size': 20,
+            'slider_length': 400
+        })
+    return {
+        'widget': part,
+        'doc': DOC_DIM,
+        'title': 'Custom dimensions',
     }
 
 
 
 DOC_PREVIEW = """
-Color Widget with preview element
----------------------------------
+Custom preview elements
+-----------------------
 
-Add your own optional preview element by adding a HTML string in the 'preview_elem' option.
+Add your own optional preview element by adding a HTML string in the
+'preview_elem' option.
 
 The color of your element is set by css 'background-color' attribute.
 
@@ -44,6 +95,7 @@ The color of your element is set by css 'background-color' attribute.
         'color',
         name='colorwidget',
         props={
+            'label': 'Picker with custom preview',
             'sliders': ['box', 'h', 'a'],
             'preview_elem': '<div id="my-preview" style="border-radius: 50%; width:100px; height:100px; margin:20px; border: 1px solid gray;" />',
             'color': '#4287f5'
@@ -57,7 +109,7 @@ def preview_example():
     part['color'] = factory(
         '#field:color',
         props={
-            'label': 'Color Widget with preview element',
+            'label': 'Picker with custom preview',
             'sliders': ['box', 'h', 'a'],
             'preview_elem': '<div id="my-preview" style="border-radius: 50%; width:100px; height:100px; margin:20px; border: 1px solid gray;" />',
             'color': '#4287f5'
@@ -65,187 +117,18 @@ def preview_example():
     return {
         'widget': part,
         'doc': DOC_PREVIEW,
-        'title': 'Color with preview element',
-    }
-
-
-
-DOC_HSV = """
-Color Widget with HSV option
-----------------------------
-
-Add an option to edit and view HSV values of the currently selected color.
-
-
-.. code-block:: python
-
-    color = factory(
-        'color',
-        name='colorwidget',
-        props={
-            'label': 'Color Widget with hsv option',
-            'sliders': ['h', 's', 'v', 'a'],
-            'format': 'hslaString'
-        }
-    )
-"""
-
-
-def hsv_example():
-    part = factory(u'fieldset', name='yafowil.widget.color')
-    part['color'] = factory(
-        '#field:color',
-        props={
-            'label': 'Color Widget with hsv option',
-            'sliders': ['h', 's', 'v', 'a'],
-            'format': 'hslaString'
-        })
-    return {
-        'widget': part,
-        'doc': DOC_HSV,
-        'title': 'Color with HSV option',
-    }
-
-
-
-DOC_RGB = """
-Color Widget with RGB/RGBA option
----------------------------------
-
-Add an option to edit and view RGB/RGBA values of the currently selected color.
-
-RGB does not include alpha channel, while RGBA adds an opacity slider and allows
-RGBA values.
-
-
-.. code-block:: python
-
-    color = factory(
-        'color',
-        name='colorwidget',
-        props={
-            'label': 'Color Widget with rgb option',
-            'sliders': ['r', 'g', 'b', 'a'],
-            'format': 'rgbaString'
-        }
-    )
-"""
-
-
-def rgb_example():
-    part = factory(u'fieldset', name='yafowil.widget.color')
-    part['color'] = factory(
-        '#field:color',
-        props={
-            'label': 'Color Widget with rgb option',
-            'sliders': ['r', 'g', 'b', 'a'],
-            'show_inputs': True,
-            'format': 'rgbaString'
-        })
-    return {
-        'widget': part,
-        'doc': DOC_RGB,
-        'title': 'Color with RGB option',
-    }
-
-
-
-DOC_KELVIN = """
-Color Widget with Kelvin option
--------------------------------
-
-Add an option to edit and view Kelvin values of the currently selected color.
-
-Adds a Kelvin temperature slider.
-
-
-.. code-block:: python
-
-    color = factory(
-        'color',
-        name='colorwidget',
-        props={
-            'label': 'Color Widget with Kelvin option',
-            'sliders': ['k'],
-            'slider_size': 30,
-            'format': 'kelvin',
-            'color': '#ffffff',
-            'temperature': {'min': 4000, 'max': 8000}
-        }
-    )
-"""
-
-
-def kelvin_example():
-    part = factory(u'fieldset', name='yafowil.widget.color')
-    part['color'] = factory(
-        '#field:color',
-        props={
-            'label': 'Color Widget with Kelvin option',
-            'sliders': ['k'],
-            'slider_size': 30,
-            'format': 'kelvin',
-            'color': '#ffffff',
-            'temperature': {'min': 4000, 'max': 8000}
-        })
-    return {
-        'widget': part,
-        'doc': DOC_KELVIN,
-        'title': 'Color with Kelvin option',
-    }
-
-
-
-DOC_DIM = """
-Color Widget with custom dimensions
------------------------------------
-
-Initialize the widget color box with custom dimensions (in pixels).
-
-Set the slider height (optional).
-
-
-.. code-block:: python
-
-    color = factory(
-        'color',
-        name='colorwidget',
-        props={
-            'label': 'Color Widget dimensions',
-            'box_width': 400,
-            'box_height': 100,
-            'slider_size' : 10
-        }
-    )
-"""
-
-
-def dim_example():
-    part = factory(u'fieldset', name='yafowil.widget.color')
-    part['color'] = factory(
-        '#field:color',
-        props={
-            'label': 'Color Widget dimensions',
-            'box_width': 400,
-            'box_height': 100,
-            'slider_size' : 20,
-            'sliders': ['box', 'h'],
-        })
-    return {
-        'widget': part,
-        'doc': DOC_DIM,
-        'title': 'Color Widget dimensions',
+        'title': 'Preview element',
     }
 
 
 
 DOC_SWATCHES = """
-Color Widget with custom swatches
----------------------------------
+Fixed color swatches
+--------------------
 
 Initialize the widget with custom swatches by passing an array of elements
 in the 'swatches' option.
-Swatches passed in this option are not removable.
+Swatches passed in this option are not removable by the user.
 
 Supported formats:
 
@@ -264,7 +147,7 @@ Supported formats:
         'color',
         name='colorwidget',
         props={
-            'label': 'Color Widget swatches',
+            'label': 'Picker with fixed swatches',
             'sliders': ['h', 's', 'v', 'a'],
             'color': '#ff0000',
             'swatches': [
@@ -294,7 +177,7 @@ def swatches_example():
     part['color'] = factory(
         '#field:color',
         props={
-            'label': 'Color Widget swatches',
+            'label': 'Picker with fixed swatches',
             'sliders': ['h', 's', 'v', 'a'],
             'color': '#ff0000',
             'swatches': [
@@ -318,43 +201,196 @@ def swatches_example():
     return {
         'widget': part,
         'doc': DOC_SWATCHES,
-        'title': 'Color Widget swatches',
+        'title': 'Fixed swatches',
     }
 
 
-DOC_TEST = """
-TEST
-----
+
+DOC_INPUT = """
+Enabling input fields
+---------------------
+
+If you want to show input fields next to your sliders, set the 'show_inputs'
+property to True.
+Input fields can be set as read-only with the 'disabled' property.
+
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='colorwidget',
+        props={
+            'label': 'Picker with input fields',
+            'sliders': ['h', 's', 'v'],
+            'show_inputs' : True,
+            #'disabled': True,
+            'format': 'hexString'
+        }
+    )
 """
 
-def TEST():
+
+def input_example():
     part = factory(u'fieldset', name='yafowil.widget.color')
     part['color'] = factory(
         '#field:color',
         props={
-            'label': 'Color Widget TEST',
-            'sliders': ['k'],
-            'format': 'rgbString',
-            'show_inputs': True,
-            # 'box_width': 800,
-            'temperature': {'min': 2000, 'max': 8000}
+            'label': 'Picker with input fields',
+            'sliders': ['h', 's', 'v'],
+            'show_inputs' : True,
+            # 'disabled': True,
+            'format': 'hexString'
         })
     return {
         'widget': part,
-        'doc': DOC_TEST,
-        'title': 'Color Widget dimensions',
+        'doc': DOC_INPUT,
+        'title': 'Input Fields',
+    }
+
+
+
+DOC_RGB = """
+Example: RGB/RGBA color picker
+------------------------------
+
+The color picker widget can be used to edit and view RGB/RGBA values.
+Single channel editing is also possible.
+
+If editing a channel (for example, red), the corresponding blue and
+green channels will be fixed at the initially passed color value.
+
+Pass 'a' in the 'sliders' option to edit alpha channel value.
+
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='colorwidget',
+        props={
+            'label': 'Example: RGBA Picker',
+            'sliders': ['r', 'g', 'b', 'a'],
+            'format': 'rgbaString'
+        }
+    )
+"""
+
+
+def rgb_example():
+    part = factory(u'fieldset', name='yafowil.widget.color')
+    part['color'] = factory(
+        '#field:color',
+        props={
+            'label': 'Example: RGBA Picker',
+            'sliders': ['r', 'g', 'b', 'a'],
+            'format': 'rgbaString'
+        })
+    return {
+        'widget': part,
+        'doc': DOC_RGB,
+        'title': 'Example: RGBA',
+    }
+
+
+
+DOC_HSV = """
+Example: HSV color picker
+-------------------------
+
+Pass the following values to create a HSV/HSVA color picker.
+
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='colorwidget',
+        props={
+            'label': 'Example: HSV Picker',
+            'sliders': ['h', 's', 'v'],
+            'format': 'hslaString'
+        }
+    )
+"""
+
+
+def hsv_example():
+    part = factory(u'fieldset', name='yafowil.widget.color')
+    part['color'] = factory(
+        '#field:color',
+        props={
+            'label': 'Example: HSV Picker',
+            'sliders': ['h', 's', 'v', 'a'],
+            'format': 'hslaString'
+        })
+    return {
+        'widget': part,
+        'doc': DOC_HSV,
+        'title': 'Example: HSV',
+    }
+
+
+
+
+DOC_KELVIN = """
+Example: Temperature
+--------------------
+
+Pass 'k' in the 'sliders' option of your widget to create a color
+temperature slider.
+
+Slider Temperature defaults to 2000-12000K, if you want to override this
+behaviour pass a dict like object with min and max values.
+
+The possible kelvin temperature ranges from 1000 to 40000.
+
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='colorwidget',
+        props={
+            'label': 'Example: Temperature Picker',
+            'sliders': ['k'],
+            'slider_size': 30,
+            'format': 'kelvin',
+            'color': '#ffffff',
+            'temperature': {'min': 4000, 'max': 8000}
+        }
+    )
+"""
+
+
+def kelvin_example():
+    part = factory(u'fieldset', name='yafowil.widget.color')
+    part['color'] = factory(
+        '#field:color',
+        props={
+            'label': 'Example: Temperature Picker',
+            'sliders': ['k'],
+            'slider_size': 30,
+            'format': 'kelvin',
+            'color': '#ffffff',
+            'temperature': {'min': 4000, 'max': 8000}
+        })
+    return {
+        'widget': part,
+        'doc': DOC_KELVIN,
+        'title': 'Example: Temperature',
     }
 
 
 
 def get_example():
     return [
-        # default_example(),
-        # hsv_example(),
-        # rgb_example(),
-        # kelvin_example(),
-        # preview_example(),
-        # dim_example(),
-        # swatches_example(),
-        TEST()
+        default_example(),
+        dim_example(),
+        input_example(),
+        preview_example(),
+        swatches_example(),
+        rgb_example(),
+        hsv_example(),
+        kelvin_example()
     ]

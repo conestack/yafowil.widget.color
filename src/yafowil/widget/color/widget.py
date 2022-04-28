@@ -152,7 +152,7 @@ Given swatches can't be deleted in the widget.
 Values: [Array(Dict)].
 """
 
-factory.defaults['color.temperature'] = {'min': 1000, 'max': 40000}
+factory.defaults['color.temperature'] = {'min': 2000, 'max': 12000}
 factory.doc['props']['color.temperature'] = """\
 Set the minimum and maximum kelvin temperature.
 Values: [Dict('min': 2200-11000, 'max': 2200-11000)].
