@@ -29,13 +29,14 @@ var yafowil_color = (function (exports, $$1) {
         }
     }
     class InputElement {
-        constructor(widget, elem, color, format) {
+        constructor(widget, elem, color, format, temperature = {min: 1000, max:40000}) {
             this.widget = widget;
             this.elem = elem;
             this.format = format || 'hexString';
             if (this.format === 'hexString') {
                 this.elem.attr('maxlength', 7);
             }
+            this.temperature = temperature;
             this.color = color;
             this.update_color(color);
             this.on_input = this.on_input.bind(this);
@@ -45,14 +46,23 @@ var yafowil_color = (function (exports, $$1) {
         on_input(e) {
             let val = this.elem.val();
             if (this.format === 'kelvin') {
-                this.widget.picker.color.kelvin = parseInt(val);
+                let str = val.toString();
+                if (str.length < 4) {
+                    return;
+                } else if (val < this.temperature.min) {
+                    val = this.temperature.min;
+                } else if (val > this.temperature.max) {
+                    val = this.temperature.max;
+                }
+                this.widget.picker.color.kelvin = val;
             } else {
                 this.widget.picker.color.set(val);
             }
+            this.elem.val(val);
         }
         update_color(color) {
             if (this.format === 'kelvin') {
-                this.elem.val(parseInt(color.kelvin));
+                this.elem.val(color.kelvin);
             } else {
                 this.elem.val(color[this.format]);
             }
@@ -155,7 +165,8 @@ var yafowil_color = (function (exports, $$1) {
             this.fix_swatches(options.swatches);
             this.parse_json();
             this.color = this.picker.color.clone();
-            this.input_elem = new InputElement(this, this.elem, this.color, options.format);
+            let temp = options.temperature || {min: 2000, max: 11000};
+            this.input_elem = new InputElement(this, this.elem, this.color, options.format, temp);
             let prev_elem = options.preview_elem ? $(options.preview_elem) :
                 $(`<span />`).addClass('color-picker-color layer-transparent');
             this.preview = new PreviewElement(this, prev_elem, this.color);

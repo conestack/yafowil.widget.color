@@ -34,13 +34,14 @@ export class ColorSwatch {
 
 export class InputElement {
 
-    constructor(widget, elem, color, format) {
+    constructor(widget, elem, color, format, temperature = {min: 1000, max:40000}) {
         this.widget = widget;
         this.elem = elem;
         this.format = format || 'hexString';
         if (this.format === 'hexString') {
             this.elem.attr('maxlength', 7);
         }
+        this.temperature = temperature;
         this.color = color;
         this.update_color(color);
 
@@ -52,15 +53,24 @@ export class InputElement {
     on_input(e) {
         let val = this.elem.val();
         if (this.format === 'kelvin') {
-            this.widget.picker.color.kelvin = parseInt(val);
+            let str = val.toString();
+            if (str.length < 4) {
+                return;
+            } else if (val < this.temperature.min) {
+                val = this.temperature.min;
+            } else if (val > this.temperature.max) {
+                val = this.temperature.max;
+            }
+            this.widget.picker.color.kelvin = val;
         } else {
             this.widget.picker.color.set(val);
         }
+        this.elem.val(val);
     }
 
     update_color(color) {
         if (this.format === 'kelvin') {
-            this.elem.val(parseInt(color.kelvin));
+            this.elem.val(color.kelvin);
         } else {
             this.elem.val(color[this.format]);
         }
