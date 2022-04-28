@@ -15,11 +15,11 @@ This is the default hex color picker widget.
 
 
 def default_example():
-    part = factory(u'fieldset', name='yafowil.widget.color')
+    part = factory(u'fieldset', name='yafowil.widget.color.default')
     part['color'] = factory(
         '#field:color',
         props={
-            'label': 'A default Color Picker'
+            'label': 'Default Color Picker'
         })
     return {
         'widget': part,
@@ -61,7 +61,7 @@ All values are defined in pixels.
 
 
 def dim_example():
-    part = factory(u'fieldset', name='yafowil.widget.color')
+    part = factory(u'fieldset', name='yafowil.widget.color.dimensions')
     part['color'] = factory(
         '#field:color',
         props={
@@ -105,7 +105,7 @@ The color of your element is set by css 'background-color' attribute.
 
 
 def preview_example():
-    part = factory(u'fieldset', name='yafowil.widget.color')
+    part = factory(u'fieldset', name='yafowil.widget.color.preview')
     part['color'] = factory(
         '#field:color',
         props={
@@ -173,7 +173,7 @@ Supported formats:
 
 
 def swatches_example():
-    part = factory(u'fieldset', name='yafowil.widget.color')
+    part = factory(u'fieldset', name='yafowil.widget.color.swatches')
     part['color'] = factory(
         '#field:color',
         props={
@@ -232,7 +232,7 @@ Input fields can be set as read-only with the 'disabled' property.
 
 
 def input_example():
-    part = factory(u'fieldset', name='yafowil.widget.color')
+    part = factory(u'fieldset', name='yafowil.widget.color.inputs')
     part['color'] = factory(
         '#field:color',
         props={
@@ -278,7 +278,7 @@ Pass 'a' in the 'sliders' option to edit alpha channel value.
 
 
 def rgb_example():
-    part = factory(u'fieldset', name='yafowil.widget.color')
+    part = factory(u'fieldset', name='yafowil.widget.color.rgb_example')
     part['color'] = factory(
         '#field:color',
         props={
@@ -316,7 +316,7 @@ Pass the following values to create a HSV/HSVA color picker.
 
 
 def hsv_example():
-    part = factory(u'fieldset', name='yafowil.widget.color')
+    part = factory(u'fieldset', name='yafowil.widget.color.hsv_example')
     part['color'] = factory(
         '#field:color',
         props={
@@ -364,7 +364,7 @@ The possible kelvin temperature ranges from 1000 to 40000.
 
 
 def kelvin_example():
-    part = factory(u'fieldset', name='yafowil.widget.color')
+    part = factory(u'fieldset', name='yafowil.widget.color.temperature_example')
     part['color'] = factory(
         '#field:color',
         props={
