@@ -79,6 +79,51 @@ def dim_example():
 
 
 
+DOC_LAYOUT = """
+Horizontal Layout
+-----------------
+
+The color picker can be initalized with horizontal layout direction
+by setting 'layout_direction' to 'horizontal'.
+
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='colorwidget',
+        props={
+            'label': 'Horizontal Layout',
+            'sliders': ['box', 'h', 's', 'v'],
+            'layout_direction': 'horizontal',
+            'show_inputs': True,
+            'show_labels': True,
+            'swatches': False
+        }
+    )
+"""
+
+
+def layout_example():
+    part = factory(u'fieldset', name='yafowil.widget.color.horizontal')
+    part['color'] = factory(
+        '#field:color',
+        props={
+            'label': 'Horizontal Layout',
+            'sliders': ['box', 'h', 's', 'v'],
+            'layout_direction': 'horizontal',
+            'show_inputs': True,
+            'show_labels': True,
+            'swatches': False
+        })
+    return {
+        'widget': part,
+        'doc': DOC_LAYOUT,
+        'title': 'Horizontal Layout',
+    }
+
+
+
 DOC_PREVIEW = """
 Custom preview elements
 -----------------------
@@ -128,6 +173,10 @@ Fixed color swatches
 
 Initialize the widget with custom swatches by passing an array of elements
 in the 'swatches' option.
+
+Disable swatch functionality by passing False.
+Enable swatches without fixed swatches by passing True.
+
 Swatches passed in this option are not removable by the user.
 
 Supported formats:
@@ -271,7 +320,9 @@ Pass 'a' in the 'sliders' option to edit alpha channel value.
         props={
             'label': 'Example: RGBA Picker',
             'sliders': ['r', 'g', 'b', 'a'],
-            'format': 'rgbaString'
+            'format': 'rgbaString',
+            'show_labels': True,
+            'show_inputs': True
         }
     )
 """
@@ -284,7 +335,9 @@ def rgb_example():
         props={
             'label': 'Example: RGBA Picker',
             'sliders': ['r', 'g', 'b', 'a'],
-            'format': 'rgbaString'
+            'format': 'rgbaString',
+            'show_labels': True,
+            'show_inputs': True
         })
     return {
         'widget': part,
@@ -309,7 +362,8 @@ Pass the following values to create a HSV/HSVA color picker.
         props={
             'label': 'Example: HSV Picker',
             'sliders': ['h', 's', 'v'],
-            'format': 'hslaString'
+            'format': 'hslaString',
+            'show_labels': True
         }
     )
 """
@@ -322,7 +376,8 @@ def hsv_example():
         props={
             'label': 'Example: HSV Picker',
             'sliders': ['h', 's', 'v', 'a'],
-            'format': 'hslaString'
+            'format': 'hslaString',
+            'show_labels': True
         })
     return {
         'widget': part,
@@ -373,7 +428,8 @@ def kelvin_example():
             'slider_size': 30,
             'format': 'kelvin',
             'color': '#ffffff',
-            'temperature': {'min': 4000, 'max': 8000}
+            'temperature': {'min': 4000, 'max': 8000},
+            'swatches': False
         })
     return {
         'widget': part,
@@ -387,6 +443,7 @@ def get_example():
     return [
         default_example(),
         dim_example(),
+        layout_example(),
         input_example(),
         preview_example(),
         swatches_example(),

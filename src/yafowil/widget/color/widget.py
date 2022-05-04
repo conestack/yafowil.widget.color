@@ -24,7 +24,9 @@ color_options = [
     'format',
     'disabled',
     'show_inputs',
-    'slider_length'
+    'show_labels',
+    'slider_length',
+    'layout_direction'
 ]
 
 
@@ -145,7 +147,7 @@ rgbString, rgbaString or kelvin number.
 Values: [String()].
 """
 
-factory.defaults['color.swatches'] = None
+factory.defaults['color.swatches'] = True
 factory.doc['props']['color.swatches'] = """\
 Set swatches to be initialized.
 Given swatches can't be deleted in the widget.
@@ -170,8 +172,20 @@ Show or hide slider input elements.
 Values: [True|False(Default)].
 """
 
+factory.defaults['color.show_labels'] = False
+factory.doc['props']['color.show_labels'] = """\
+Show or hide slider label elements.
+Values: [True|False(Default)].
+"""
+
 factory.defaults['color.slider_length'] = None
 factory.doc['props']['color.slider_length'] = """\
-Slider length prop WIP
+Slider length prop
 Values: [True|False(Default)].
+"""
+
+factory.defaults['color.layout_direction'] = 'vertical'
+factory.doc['props']['color.layout_direction'] = """\
+Direction of the entire layout.
+Values: ['vertical'|'horizontal'].
 """

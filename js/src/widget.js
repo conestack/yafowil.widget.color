@@ -22,7 +22,9 @@ export class ColorWidget {
                 temperature: elem.data('temperature'),
                 disabled: elem.data('disabled'),
                 show_inputs: elem.data('show_inputs'),
-                slider_length: elem.data('slider_length')
+                show_labels: elem.data('show_labels'),
+                slider_length: elem.data('slider_length'),
+                layout_direction: elem.data('layout_direction')
             };
             new ColorWidget(elem, options, index);
         });
@@ -43,24 +45,24 @@ export class ColorWidget {
         this.close_btn = $(`<button />`)
             .addClass('close-button')
             .text('✕')
-            .appendTo(this.dropdown_elem);;
-        this.add_color_btn = $(`<button />`)
-            .addClass('add_color')
-            .text('+ Add');
-        this.remove_color_btn = $(`<button />`)
-            .addClass('remove_color')
-            .text('- Remove');
-        this.buttons = $('<div />')
-            .addClass('buttons')
-            .append(this.add_color_btn)
-            .append(this.remove_color_btn)
-            .appendTo(this.dropdown_elem);;
-        this.swatches_container = $(`<div />`)
-            .addClass('color-picker-recent')
             .appendTo(this.dropdown_elem);
-        this.input_container = $(`<div />`)
-            .addClass('color-picker-inputs')
-            .insertBefore(this.buttons);
+
+        if (options.swatches) {
+            this.add_color_btn = $(`<button />`)
+                .addClass('add_color')
+                .text('+ Add');
+            this.remove_color_btn = $(`<button />`)
+                .addClass('remove_color')
+                .text('- Remove');
+            this.buttons = $('<div />')
+                .addClass('buttons')
+                .append(this.add_color_btn)
+                .append(this.remove_color_btn)
+                .appendTo(this.dropdown_elem);
+            this.swatches_container = $(`<div />`)
+                .addClass('color-picker-recent')
+                .appendTo(this.dropdown_elem);
+        }
 
         this.index = index;
         this.slider_size = options.slider_size;
@@ -68,12 +70,14 @@ export class ColorWidget {
         let iro_opts = this.init_opts(options);
         this.picker = new iro.ColorPicker(this.picker_container.get(0), iro_opts);
 
-        this.swatches = []; // saved colors
-        this.fixed_swatches = [];
-        this.fix_swatches(options.swatches);
+        if (options.swatches) {
+            this.swatches = []; // saved colors
+            this.fixed_swatches = [];
+            this.fix_swatches(options.swatches);
 
-        // json
-        this.parse_json();
+            // json
+            this.parse_json();
+        }
 
         // color related
         this.color = this.picker.color.clone();
@@ -84,10 +88,13 @@ export class ColorWidget {
         this.preview = new PreviewElement(this, prev_elem, this.color);
 
         // events
-        this.create_swatch = this.create_swatch.bind(this);
-        this.add_color_btn.on('click', this.create_swatch);
-        this.remove_swatch = this.remove_swatch.bind(this);
-        this.remove_color_btn.on('click', this.remove_swatch);
+        if (options.swatches) {
+            this.create_swatch = this.create_swatch.bind(this);
+            this.add_color_btn.on('click', this.create_swatch);
+            this.remove_swatch = this.remove_swatch.bind(this);
+            this.remove_color_btn.on('click', this.remove_swatch);
+        }
+
         this.open = this.open.bind(this);
         this.elem.on('focus', this.open);
         this.update_color = this.update_color.bind(this);
@@ -116,7 +123,7 @@ export class ColorWidget {
             color: opts.color,
             width: opts.box_width,
             boxHeight: opts.box_height || opts.box_width,
-            layoutDirection: 'vertical',
+            layoutDirection: opts.layout_direction || 'vertical',
             layout: []
         }
         const sliders = opts.sliders || [];
@@ -138,7 +145,8 @@ export class ColorWidget {
                         minTemperature: opts.temperature ? opts.temperature.min : undefined,
                         maxTemperature: opts.temperature ? opts.temperature.max : undefined,
                         disabled: opts.disabled,
-                        showInput: opts.show_inputs
+                        showInput: opts.show_inputs,
+                        showLabel: opts.show_labels
                     }
                 });
             }

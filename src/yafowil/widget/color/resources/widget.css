@@ -1,7 +1,6 @@
 div.color-picker-wrapper {
   display: none;
   position: absolute;
-  width: min-content;
   max-width: fit-content;
   padding: 20px;
   border: 1px solid rgb(226, 226, 226);
