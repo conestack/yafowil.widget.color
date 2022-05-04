@@ -139,7 +139,7 @@ Set the height of slider elements (in pixels).
 Values: [px].
 """
 
-factory.defaults['color.color'] = '#000000'
+factory.defaults['color.color'] = '#fff'
 factory.doc['props']['color.color'] = """\
 Set the inital picker color if no swatches are specified.
 The color can be passed as hexString, hslString, hslaString,

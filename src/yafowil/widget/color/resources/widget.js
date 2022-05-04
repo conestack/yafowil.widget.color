@@ -94,6 +94,7 @@ var yafowil_color = (function (exports, $$1) {
     }
     const slider_components = {
         box: 'box',
+        wheel: 'wheel',
         r: 'red',
         g: 'green',
         b: 'blue',
@@ -216,6 +217,12 @@ var yafowil_color = (function (exports, $$1) {
                 if (type === 'box') {
                     iro_opts.layout.push({
                         component: iro.ui.Box,
+                        options: {}
+                    });
+                } else if (type === 'wheel') {
+                    console.log('wheel');
+                    iro_opts.layout.push({
+                        component: iro.ui.Wheel,
                         options: {}
                     });
                 } else {

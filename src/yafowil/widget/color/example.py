@@ -24,7 +24,43 @@ def default_example():
     return {
         'widget': part,
         'doc': DOC_COLOR,
-        'title': 'Default Color Picker',
+        'title': 'Default Color Picker'
+    }
+
+
+
+DOC_WHEEL = """
+Color Wheel
+-----------
+
+Instead of a box, the color widget can also be initialized with a color wheel.
+
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='colorwidget',
+        props={
+            'label': 'Picker with wheel',
+            'sliders': ['wheel', 'v']
+        }
+    )
+"""
+
+
+def wheel_example():
+    part = factory(u'fieldset', name='yafowil.widget.color.wheel')
+    part['color'] = factory(
+        '#field:color',
+        props={
+            'label': 'Picker with wheel',
+            'sliders': ['wheel', 'v']
+        })
+    return {
+        'widget': part,
+        'doc': DOC_WHEEL,
+        'title': 'Color wheel'
     }
 
 
@@ -33,10 +69,47 @@ DOC_DIM = """
 Custom dimensions
 -----------------
 
-Initialize the widget color box with custom dimensions.
+Initialize the widget color box or wheel with custom dimensions.
 The 'box_width' and 'box_height' properties change the width and height of
 the color picker box, respectively.
-Setting only one value produces a square color picker.
+Setting only one value on a box component produces a square color picker.
+
+All values are defined in pixels.
+
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='colorwidget',
+        props={
+            'label': 'Picker with custom dimensions',
+            'box_width': 400,
+            'box_height': 100
+        }
+    )
+"""
+
+
+def dim_example():
+    part = factory(u'fieldset', name='yafowil.widget.color.dimensions')
+    part['color'] = factory(
+        '#field:color',
+        props={
+            'label': 'Picker with custom dimensions',
+            'box_width': 400,
+            'box_height': 100
+        })
+    return {
+        'widget': part,
+        'doc': DOC_DIM,
+        'title': 'Custom dimensions'
+    }
+
+
+DOC_LENGTH = """
+Slider dimensions
+-----------------
 
 'slider_size' defines the thickness of the slider, while 'slider_length' defines
 the length of the entire slider.
@@ -50,31 +123,31 @@ All values are defined in pixels.
         'color',
         name='colorwidget',
         props={
-            'label': 'Picker with custom dimensions',
-            'box_width': 400,
-            'box_height': 100,
+            'label': 'Sliders with custom length',
+            'box_width': 200,
+            'sliders': ['box', 'h', 'a'],
             'slider_size': 20,
-            'slider_length': 400
+            'slider_length': 100
         }
     )
 """
 
 
-def dim_example():
-    part = factory(u'fieldset', name='yafowil.widget.color.dimensions')
+def length_example():
+    part = factory(u'fieldset', name='yafowil.widget.color.length')
     part['color'] = factory(
         '#field:color',
         props={
-            'label': 'Picker with custom dimensions',
-            'box_width': 400,
-            'box_height': 100,
+            'label': 'Sliders with custom length',
+            'box_width': 200,
+            'sliders': ['box', 'h', 'a'],
             'slider_size': 20,
-            'slider_length': 400
+            'slider_length': 100
         })
     return {
         'widget': part,
-        'doc': DOC_DIM,
-        'title': 'Custom dimensions',
+        'doc': DOC_LENGTH,
+        'title': 'Slider length'
     }
 
 
@@ -94,7 +167,7 @@ by setting 'layout_direction' to 'horizontal'.
         name='colorwidget',
         props={
             'label': 'Horizontal Layout',
-            'sliders': ['box', 'h', 's', 'v'],
+            'sliders': ['wheel', 's', 'v', 'a'],
             'layout_direction': 'horizontal',
             'show_inputs': True,
             'show_labels': True,
@@ -110,7 +183,7 @@ def layout_example():
         '#field:color',
         props={
             'label': 'Horizontal Layout',
-            'sliders': ['box', 'h', 's', 'v'],
+            'sliders': ['wheel', 's', 'v', 'a'],
             'layout_direction': 'horizontal',
             'show_inputs': True,
             'show_labels': True,
@@ -119,7 +192,7 @@ def layout_example():
     return {
         'widget': part,
         'doc': DOC_LAYOUT,
-        'title': 'Horizontal Layout',
+        'title': 'Horizontal Layout'
     }
 
 
@@ -162,7 +235,7 @@ def preview_example():
     return {
         'widget': part,
         'doc': DOC_PREVIEW,
-        'title': 'Preview element',
+        'title': 'Preview element'
     }
 
 
@@ -250,17 +323,17 @@ def swatches_example():
     return {
         'widget': part,
         'doc': DOC_SWATCHES,
-        'title': 'Fixed swatches',
+        'title': 'Fixed swatches'
     }
 
 
 
 DOC_INPUT = """
-Enabling input fields
----------------------
+Enabling input/label fields
+---------------------------
 
-If you want to show input fields next to your sliders, set the 'show_inputs'
-property to True.
+If you want to show input fields or labels next to your sliders, set the 'show_inputs'
+and/or 'show_labels' properties to True.
 Input fields can be set as read-only with the 'disabled' property.
 
 
@@ -273,6 +346,7 @@ Input fields can be set as read-only with the 'disabled' property.
             'label': 'Picker with input fields',
             'sliders': ['h', 's', 'v'],
             'show_inputs' : True,
+            'show_labels': True,
             #'disabled': True,
             'format': 'hexString'
         }
@@ -288,13 +362,14 @@ def input_example():
             'label': 'Picker with input fields',
             'sliders': ['h', 's', 'v'],
             'show_inputs' : True,
+            'show_labels': True,
             # 'disabled': True,
             'format': 'hexString'
         })
     return {
         'widget': part,
         'doc': DOC_INPUT,
-        'title': 'Input Fields',
+        'title': 'Input Fields'
     }
 
 
@@ -342,7 +417,7 @@ def rgb_example():
     return {
         'widget': part,
         'doc': DOC_RGB,
-        'title': 'Example: RGBA',
+        'title': 'Example: RGBA'
     }
 
 
@@ -382,7 +457,7 @@ def hsv_example():
     return {
         'widget': part,
         'doc': DOC_HSV,
-        'title': 'Example: HSV',
+        'title': 'Example: HSV'
     }
 
 
@@ -434,7 +509,7 @@ def kelvin_example():
     return {
         'widget': part,
         'doc': DOC_KELVIN,
-        'title': 'Example: Temperature',
+        'title': 'Example: Temperature'
     }
 
 
@@ -442,8 +517,10 @@ def kelvin_example():
 def get_example():
     return [
         default_example(),
-        dim_example(),
+        wheel_example(),
         layout_example(),
+        dim_example(),
+        length_example(),
         input_example(),
         preview_example(),
         swatches_example(),

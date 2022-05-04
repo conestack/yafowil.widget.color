@@ -108,6 +108,7 @@ export class PreviewElement {
 
 export const slider_components = {
     box: 'box',
+    wheel: 'wheel',
     r: 'red',
     g: 'green',
     b: 'blue',

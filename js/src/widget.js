@@ -135,6 +135,11 @@ export class ColorWidget {
                     component: iro.ui.Box,
                     options: {}
                 });
+            } else if (type === 'wheel') {
+                iro_opts.layout.push({
+                    component: iro.ui.Wheel,
+                    options: {}
+                });
             } else {
                 iro_opts.layout.push({
                     component: iro.ui.Slider,
