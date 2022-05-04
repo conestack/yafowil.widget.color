@@ -220,7 +220,6 @@ var yafowil_color = (function (exports, $$1) {
                         options: {}
                     });
                 } else if (type === 'wheel') {
-                    console.log('wheel');
                     iro_opts.layout.push({
                         component: iro.ui.Wheel,
                         options: {}
