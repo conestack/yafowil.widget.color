@@ -14,7 +14,7 @@ module.exports = function(config) {
             type: 'module',
             included: false
         }, {
-            pattern: '../../src/yafowil/widget/color/resources/iro/iro_lena.js',
+            pattern: '../../src/yafowil/widget/color/resources/iro/iro.js',
             included: true
         },
         {
@@ -54,7 +54,7 @@ module.exports = function(config) {
             ecmaVersion: 6,
             aliases: {
                 jquery: '../../node_modules/jquery/src/jquery.js',
-                iro: '../../src/yafowil/widget/color/resources/iro/iro_lena.js'
+                iro: '../../src/yafowil/widget/color/resources/iro/iro.js'
             }
         }
     });
