@@ -46,7 +46,6 @@ export class ColorWidget {
             .addClass('close-button')
             .text('✕')
             .appendTo(this.dropdown_elem);
-
         if (options.swatches) {
             this.add_color_btn = $(`<button />`)
                 .addClass('add_color')
@@ -59,25 +58,23 @@ export class ColorWidget {
                 .append(this.add_color_btn)
                 .append(this.remove_color_btn)
                 .appendTo(this.dropdown_elem);
-            this.swatches_container = $(`<div />`)
-                .addClass('color-picker-recent')
-                .appendTo(this.dropdown_elem);
         }
+        this.swatches_container = $(`<div />`)
+            .addClass('color-picker-recent')
+            .appendTo(this.dropdown_elem);
 
         this.index = index;
         this.slider_size = options.slider_size;
-
         let iro_opts = this.init_opts(options);
         this.picker = new iro.ColorPicker(this.picker_container.get(0), iro_opts);
+        this.swatches = []; // saved colors
 
         if (options.swatches) {
-            this.swatches = []; // saved colors
             this.fixed_swatches = [];
             this.fix_swatches(options.swatches);
-
-            // json
-            this.parse_json();
         }
+        // json
+        this.parse_json();
 
         // color related
         this.color = this.picker.color.clone();

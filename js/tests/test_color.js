@@ -39,7 +39,7 @@ QUnit.module('ColorWidget', hooks => {
 
         // preview element
         assert.ok(widget.preview.elem.hasClass('color-picker-color'));
-        assert.strictEqual(widget.swatches.length, 0);
+        assert.notOk(widget.swatches.length);
         assert.strictEqual(widget.elem.val(), '#ffffff');
         // hex white gets transformed to rgb value
         assert.strictEqual(
@@ -211,13 +211,11 @@ QUnit.module('ColorWidget', hooks => {
 
     QUnit.test('create_swatch, remove_swatch, set_swatches', assert => {
         // initialize
-        let widget = new ColorWidget(elem, {color: '#ffffff'}, 0);
+        let widget = new ColorWidget(elem, {color: '#ffffff', swatches: true}, 0);
         assert.strictEqual(widget.swatches_container.css('display'), 'none');
 
-        // open menu by click
-        widget.preview.elem.trigger('click');
         assert.strictEqual(widget.swatches.length, 0);
-
+        widget.picker.color.hexString = '#ff0000';
         // click add color
         widget.add_color_btn.trigger('click');
         // assertions
@@ -244,14 +242,14 @@ QUnit.module('ColorWidget', hooks => {
 
         // click on first swatch
         widget.swatches[0].elem.trigger('click');
-        assert.strictEqual(widget.color.hexString, '#ffffff');
+        assert.strictEqual(widget.color.hexString, '#ff0000');
         assert.strictEqual(
             widget.picker.color.hexString,
-            '#ffffff'
+            '#ff0000'
         );
         assert.strictEqual(
             widget.preview.layer.css('background-color'),
-            'rgb(255, 255, 255)'
+            'rgb(255, 0, 0)'
         );
         assert.false(widget.swatches[1].elem.hasClass('selected'));
         assert.ok(widget.swatches[0].elem.hasClass('selected'));
@@ -269,19 +267,19 @@ QUnit.module('ColorWidget', hooks => {
         // delete swatch with keypress
         let delKey = $.Event('keydown', { key: 'Delete' });
         $(window).trigger(delKey);
-        assert.strictEqual($('div.color-swatch').length, 1);
+        assert.strictEqual($('div.color-swatch').length, 2);
         assert.strictEqual(
             widget.picker.color.hexString,
-            '#cccccc'
+            '#ff0000'
         );
 
         // delete swatch with button
         widget.remove_color_btn.trigger('click');
-        assert.strictEqual($('div.color-swatch').length, 0);
+        assert.strictEqual($('div.color-swatch').length, 1);
         assert.notOk(localStorage.getItem('color-swatches'));
 
-        assert.strictEqual(widget.color.hexString, '#ffffff');
-        assert.strictEqual(widget.picker.color.hexString, '#ffffff');
+        assert.strictEqual(widget.color.hexString, '#cccccc');
+        assert.strictEqual(widget.picker.color.hexString, '#cccccc');
     });
 
     QUnit.test('remove fixed swatch', assert => {
@@ -300,7 +298,7 @@ QUnit.module('ColorWidget', hooks => {
 
     QUnit.test('create over 12 swatches', assert => {
         // initialize
-        let widget = new ColorWidget(elem, {color:'#ffffff'});
+        let widget = new ColorWidget(elem, {color:'#ffffff', swatches: true});
         assert.strictEqual(widget.swatches_container.css('display'), 'none');
 
         // open menu by click
