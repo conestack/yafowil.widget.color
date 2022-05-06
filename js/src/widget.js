@@ -80,8 +80,8 @@ export class ColorWidget {
         this.color = this.picker.color.clone();
         let temp = options.temperature || {min: 2000, max: 11000};
         this.input_elem = new InputElement(this, this.elem, this.color, options.format, temp);
-        let prev_elem = options.preview_elem ? $(options.preview_elem) :
-            $(`<span />`).addClass('color-picker-color layer-transparent');
+        let prev_elem = options.preview_elem ? $(options.preview_elem).addClass('yafowil-color-picker-preview') :
+            $(`<span />`).addClass('yafowil-color-picker-color layer-transparent');
         this.preview = new PreviewElement(this, prev_elem, this.color);
 
         // events

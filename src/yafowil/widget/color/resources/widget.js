@@ -156,25 +156,25 @@ var yafowil_color = (function (exports, $$1) {
                     .append(this.add_color_btn)
                     .append(this.remove_color_btn)
                     .appendTo(this.dropdown_elem);
-                this.swatches_container = $(`<div />`)
-                    .addClass('color-picker-recent')
-                    .appendTo(this.dropdown_elem);
             }
+            this.swatches_container = $(`<div />`)
+                .addClass('color-picker-recent')
+                .appendTo(this.dropdown_elem);
             this.index = index;
             this.slider_size = options.slider_size;
             let iro_opts = this.init_opts(options);
             this.picker = new iro.ColorPicker(this.picker_container.get(0), iro_opts);
+            this.swatches = [];
             if (options.swatches) {
-                this.swatches = [];
                 this.fixed_swatches = [];
                 this.fix_swatches(options.swatches);
-                this.parse_json();
             }
+            this.parse_json();
             this.color = this.picker.color.clone();
             let temp = options.temperature || {min: 2000, max: 11000};
             this.input_elem = new InputElement(this, this.elem, this.color, options.format, temp);
-            let prev_elem = options.preview_elem ? $(options.preview_elem) :
-                $(`<span />`).addClass('color-picker-color layer-transparent');
+            let prev_elem = options.preview_elem ? $(options.preview_elem).addClass('yafowil-color-picker-preview') :
+                $(`<span />`).addClass('yafowil-color-picker-color layer-transparent');
             this.preview = new PreviewElement(this, prev_elem, this.color);
             if (options.swatches) {
                 this.create_swatch = this.create_swatch.bind(this);
