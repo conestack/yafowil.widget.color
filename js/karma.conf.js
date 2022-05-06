@@ -14,7 +14,7 @@ module.exports = function(config) {
             type: 'module',
             included: false
         }, {
-            pattern: '../../node_modules/@jaames/iro/dist/iro.js',
+            pattern: '../../src/yafowil/widget/color/resources/iro/iro.js',
             included: true
         },
         {
@@ -54,7 +54,7 @@ module.exports = function(config) {
             ecmaVersion: 6,
             aliases: {
                 jquery: '../../node_modules/jquery/src/jquery.js',
-                iro: '../../node_modules/@jaames/iro/dist/iro.es.js'
+                iro: '../../src/yafowil/widget/color/resources/iro/iro.js'
             }
         }
     });
