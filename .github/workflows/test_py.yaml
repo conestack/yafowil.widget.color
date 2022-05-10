@@ -1,7 +1,9 @@
-name: Test color
+name: PY Test color
 
 on:
   push:
+    paths:
+    - '**.py'
 
 jobs:
   test:
