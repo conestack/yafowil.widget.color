@@ -38,7 +38,7 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual(widget.elem.attr('spellcheck'), 'false');
 
         // preview element
-        assert.ok(widget.preview.elem.hasClass('color-picker-color'));
+        assert.ok(widget.preview.elem.hasClass('yafowil-color-picker-color'));
         assert.notOk(widget.swatches.length);
         assert.strictEqual(widget.elem.val(), '#ffffff');
         // hex white gets transformed to rgb value
