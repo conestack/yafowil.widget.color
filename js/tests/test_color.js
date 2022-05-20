@@ -27,14 +27,14 @@ QUnit.module('ColorWidget', hooks => {
 
     QUnit.test('initialize', assert => {
         ColorWidget.initialize();
-        widget = elem.data('color_widget');
+        widget = elem.data('yafowil-color');
         assert.ok(widget.elem.attr('spellcheck'), false);
         assert.deepEqual(widget.elem, elem);
     });
 
     QUnit.test('default constructor', assert => {
         ColorWidget.initialize();
-        widget = elem.data('color_widget');
+        widget = elem.data('yafowil-color');
         assert.strictEqual(widget.elem.attr('spellcheck'), 'false');
 
         // preview element
@@ -60,7 +60,7 @@ QUnit.module('ColorWidget', hooks => {
 
         // initialize
         ColorWidget.initialize();
-        widget = elem.data('color_widget');
+        widget = elem.data('yafowil-color');
 
         // assertions
         assert.strictEqual(widget.swatches.length, 2);
@@ -83,7 +83,7 @@ QUnit.module('ColorWidget', hooks => {
 
     QUnit.test('input', assert => {
         ColorWidget.initialize();
-        widget = elem.data('color_widget');
+        widget = elem.data('yafowil-color');
 
         // correct hex input
         widget.elem.val('#cccccc');

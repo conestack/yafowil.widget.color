@@ -31,10 +31,9 @@ export class ColorWidget {
     }
 
     constructor(elem, options, index) {
+        elem.data('yafowil-color', this);
         this.elem = elem;
-        this.elem
-            .data('color_widget', this)
-            .attr('spellcheck', "false");
+        this.elem.attr('spellcheck', "false");
         this.dropdown_elem = $(`<div />`)
             .addClass('color-picker-wrapper')
             .css('top', this.elem.outerHeight())
