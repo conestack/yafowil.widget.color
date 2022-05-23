@@ -1,4 +1,4 @@
-var yafowil_color = (function (exports, $$1) {
+var yafowil_color = (function (exports, $) {
     'use strict';
 
     class ColorSwatch {
@@ -129,10 +129,9 @@ var yafowil_color = (function (exports, $$1) {
             });
         }
         constructor(elem, options, index) {
+            elem.data('yafowil-color', this);
             this.elem = elem;
-            this.elem
-                .data('color_widget', this)
-                .attr('spellcheck', "false");
+            this.elem.attr('spellcheck', "false");
             this.dropdown_elem = $(`<div />`)
                 .addClass('color-picker-wrapper')
                 .css('top', this.elem.outerHeight())
@@ -378,9 +377,11 @@ var yafowil_color = (function (exports, $$1) {
         }
     }
 
-    $$1(function() {
+    $(function() {
         if (window.ts !== undefined) {
             ts.ajax.register(ColorWidget.initialize, true);
+        } else if (window.bdajax !== undefined) {
+            bdajax.register(ColorWidget.initialize, true);
         } else {
             ColorWidget.initialize();
         }
@@ -391,9 +392,7 @@ var yafowil_color = (function (exports, $$1) {
     Object.defineProperty(exports, '__esModule', { value: true });
 
 
-    if (window.yafowil === undefined) {
-        window.yafowil = {};
-    }
+    window.yafowil = window.yafowil || {};
     window.yafowil.color = exports;
 
 

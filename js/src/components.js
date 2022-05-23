@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 export class ColorSwatch {
 
     constructor(widget, color, fixed = false) {
