@@ -13,7 +13,10 @@ resources_dir = os.path.join(os.path.dirname(__file__), 'resources')
 
 # webresource ################################################################
 
-scripts = wr.ResourceGroup(name='yafowil-color-scripts')
+scripts = wr.ResourceGroup(
+    name='yafowil-color-scripts',
+    path='yafowil.widget.color'
+)
 scripts.add(wr.ScriptResource(
     name='iro-js',
     directory=os.path.join(resources_dir, 'iro'),
@@ -28,7 +31,10 @@ scripts.add(wr.ScriptResource(
     compressed='widget.min.js'
 ))
 
-styles = wr.ResourceGroup(name='yafowil-color-styles')
+styles = wr.ResourceGroup(
+    name='yafowil-color-styles',
+    path='yafowil.widget.color'
+)
 styles.add(wr.StyleResource(
     name='yafowil-color-css',
     directory=resources_dir,
