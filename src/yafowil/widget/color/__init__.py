@@ -13,34 +13,27 @@ resources_dir = os.path.join(os.path.dirname(__file__), 'resources')
 
 # webresource ################################################################
 
-scripts = wr.ResourceGroup(name='scripts')
+scripts = wr.ResourceGroup(name='yafowil-color-scripts')
 scripts.add(wr.ScriptResource(
     name='iro-js',
-    # actually it not depends on jquery, but yafowil-color-js does
-    # think about multiple depends values in webresource
-    depends='jquery-js',
     directory=os.path.join(resources_dir, 'iro'),
     resource='iro.js',
     compressed='iro.min.js'
 ))
 scripts.add(wr.ScriptResource(
     name='yafowil-color-js',
-    depends='iro-js',
+    depends=['jquery-js', 'iro-js'],
     directory=resources_dir,
     resource='widget.js',
     compressed='widget.min.js'
 ))
 
-styles = wr.ResourceGroup(name='styles')
+styles = wr.ResourceGroup(name='yafowil-color-styles')
 styles.add(wr.StyleResource(
     name='yafowil-color-css',
     directory=resources_dir,
     resource='widget.css'
 ))
-
-resources = wr.ResourceGroup(name='color-resources')
-resources.add(scripts)
-resources.add(styles)
 
 # B/C resources ##############################################################
 
@@ -71,5 +64,7 @@ def register():
     # Default
     factory.register_theme(
         'default', 'yafowil.widget.color', resources_dir,
-        js=js, css=css, resources=resources
+        js=js, css=css
     )
+    factory.register_scripts('default', 'yafowil.widget.color', scripts)
+    factory.register_styles('default', 'yafowil.widget.color', styles)
