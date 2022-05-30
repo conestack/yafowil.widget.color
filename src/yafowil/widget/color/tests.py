@@ -32,6 +32,7 @@ class TestColorWidget(YafowilTestCase):
         factory.theme = 'default'
         resources = factory.get_resources('yafowil.widget.color')
         self.assertTrue(resources.directory.endswith(np('/color/resources')))
+        self.assertEqual(resources.name, 'yafowil.widget.color')
         self.assertEqual(resources.path, 'yafowil-color')
 
         scripts = resources.scripts
