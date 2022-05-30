@@ -18,7 +18,8 @@ class TestColorWidget(YafowilTestCase):
     def setUp(self):
         super(TestColorWidget, self).setUp()
         from yafowil.widget import color
-        reload(color.widget)
+        from yafowil.widget.color import widget
+        reload(widget)
         color.register()
 
     def test_edit_renderer(self):
