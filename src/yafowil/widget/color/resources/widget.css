@@ -9,6 +9,9 @@ div.color-picker-wrapper {
   background: #fff;
   z-index: 10;
 }
+div.color-picker-wrapper .color-picker-container {
+  margin-bottom: 15px;
+}
 div.color-picker-wrapper button.close-button {
   position: absolute;
   right: 0px;
@@ -17,6 +20,13 @@ div.color-picker-wrapper button.close-button {
   background: none;
   border: none;
   opacity: 0.4;
+}
+div.color-picker-wrapper div.iro-switch-toggle {
+  position: absolute;
+  top: 5px;
+  left: 10px;
+  opacity: 0.4;
+  font-size: 12px;
 }
 div.color-picker-wrapper div.buttons {
   width: 100%;
@@ -37,7 +47,6 @@ div.color-picker-wrapper div.buttons button.remove_color {
 div.color-picker-wrapper div.color-picker-recent {
   display: none;
   width: 100%;
-  padding: 5px;
 }
 div.color-picker-wrapper div.color-picker-recent div.color-swatch {
   display: inline-block;
@@ -45,7 +54,28 @@ div.color-picker-wrapper div.color-picker-recent div.color-swatch {
   height: 20px;
   margin: 2px;
   border-radius: 3px;
-  box-shadow: inset 0px 0px 3px rgba(0, 0, 0, 0.4);
+}
+div.color-picker-wrapper div.color-picker-recent div.color-swatch.locked::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: black;
+  border-radius: 3px;
+  clip-path: polygon(50% 0, 100% 50%, 100% 0);
+  opacity: 1;
+}
+div.color-picker-wrapper div.color-picker-recent div.color-swatch.locked::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin-left: 3px;
+  background: white;
+  transform: translate(0px, -20px);
+  border-radius: 3px;
+  clip-path: polygon(50% 0, 100% 50%, 100% 0);
+  opacity: 1;
 }
 div.color-picker-wrapper div.color-picker-recent div.color-swatch.selected {
   box-shadow: 0px 0px 0px 2px #00b3ff;
@@ -57,6 +87,7 @@ div.color-picker-wrapper div.color-picker-recent div.color-swatch.layer-transpar
 div.color-picker-wrapper div.color-picker-recent div.color-swatch > .layer-color {
   width: 100%;
   height: 100%;
+  box-shadow: inset 0px 0px 3px rgba(0, 0, 0, 0.4);
 }
 
 .yafowil-color-picker-preview.layer-transparent {

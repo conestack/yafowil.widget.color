@@ -28,12 +28,13 @@ def default_example():
     }
 
 
-
 DOC_WHEEL = """
 Color Wheel
 -----------
 
 Instead of a box, the color widget can also be initialized with a color wheel.
+
+Passing both 'box' and 'wheel' allows the user to switch between components.
 
 
 .. code-block:: python
@@ -43,7 +44,7 @@ Instead of a box, the color widget can also be initialized with a color wheel.
         name='colorwidget',
         props={
             'label': 'Picker with wheel',
-            'sliders': ['wheel', 'v']
+            'sliders': ['box', 'wheel', 'v']
         }
     )
 """
@@ -55,14 +56,13 @@ def wheel_example():
         '#field:color',
         props={
             'label': 'Picker with wheel',
-            'sliders': ['wheel', 'v']
+            'sliders': ['box', 'wheel', 'v']
         })
     return {
         'widget': part,
         'doc': DOC_WHEEL,
         'title': 'Color wheel'
     }
-
 
 
 DOC_DIM = """
@@ -151,7 +151,6 @@ def length_example():
     }
 
 
-
 DOC_LAYOUT = """
 Horizontal Layout
 -----------------
@@ -196,7 +195,6 @@ def layout_example():
     }
 
 
-
 DOC_PREVIEW = """
 Custom preview elements
 -----------------------
@@ -237,7 +235,6 @@ def preview_example():
         'doc': DOC_PREVIEW,
         'title': 'Preview element'
     }
-
 
 
 DOC_SWATCHES = """
@@ -327,7 +324,6 @@ def swatches_example():
     }
 
 
-
 DOC_INPUT = """
 Enabling input/label fields
 ---------------------------
@@ -371,7 +367,6 @@ def input_example():
         'doc': DOC_INPUT,
         'title': 'Input Fields'
     }
-
 
 
 DOC_RGB = """
@@ -421,7 +416,6 @@ def rgb_example():
     }
 
 
-
 DOC_HSV = """
 Example: HSV color picker
 -------------------------
@@ -461,8 +455,6 @@ def hsv_example():
     }
 
 
-
-
 DOC_KELVIN = """
 Example: Temperature
 --------------------
@@ -487,7 +479,9 @@ The possible kelvin temperature ranges from 1000 to 40000.
             'slider_size': 30,
             'format': 'kelvin',
             'color': '#ffffff',
-            'temperature': {'min': 4000, 'max': 8000}
+            'temperature': {'min': 4000, 'max': 8000},
+            'swatches': False,
+            'user_swatches': False
         }
     )
 """
@@ -504,7 +498,8 @@ def kelvin_example():
             'format': 'kelvin',
             'color': '#ffffff',
             'temperature': {'min': 4000, 'max': 8000},
-            'swatches': False
+            'swatches': False,
+            'user_swatches': False
         })
     return {
         'widget': part,
@@ -513,11 +508,60 @@ def kelvin_example():
     }
 
 
+DOC_SWATCHES_ONLY = """
+Example: Swatch Widget
+----------------------
+
+Pass False in the 'sliders' option of your widget to create a swatch only widget.
+
+Swatch widgets only allow selection from colors defined in the 'swatches' option.
+
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='colorwidget',
+        props={
+            'label': 'Example: Swatch Widget',
+            'sliders': False,
+            'swatches': [
+                '#ff0000',
+                '#aa2255',
+                '#4287f5'
+            ],
+            'user_swatches': False
+        }
+    )
+"""
+
+
+def swatches_only_example():
+    part = factory(u'fieldset', name='yafowil.widget.color.test')
+    part['color'] = factory(
+        '#field:color',
+        props={
+            'label': 'Example: Swatch Widget',
+            'sliders': False,
+            'swatches': [
+                '#ff0000',
+                '#aa2255',
+                '#4287f5'
+            ],
+            'user_swatches': False
+        })
+    return {
+        'widget': part,
+        'doc': DOC_SWATCHES_ONLY,
+        'title': 'Example: Temperature'
+    }
+
 
 def get_example():
     return [
         default_example(),
         wheel_example(),
+        swatches_only_example(),
         layout_example(),
         dim_example(),
         length_example(),

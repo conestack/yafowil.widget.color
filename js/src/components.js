@@ -2,19 +2,25 @@ import $ from 'jquery';
 
 export class ColorSwatch {
 
-    constructor(widget, color, fixed = false) {
+    constructor(widget, color, locked = false) {
         this.widget = widget;
         this.color = color;
-        this.fixed = fixed;
+        this.locked = locked;
 
-        this.elem = $('<div />')
-            .addClass('color-swatch layer-transparent')
-            .appendTo(this.widget.swatches_container);
+        this.elem = $('<div />').addClass('color-swatch layer-transparent');
 
         this.color_layer = $('<div />')
             .addClass('layer-color')
             .css('background-color', this.color.rgbaString)
             .appendTo(this.elem);
+
+        if (this.locked) {
+            this.elem
+                .addClass('locked')
+                .appendTo(this.widget.locked_swatches_container);
+        } else {
+            this.elem.appendTo(this.widget.user_swatches_container);
+        }
 
         this.destroy = this.destroy.bind(this);
         this.select = this.select.bind(this);
