@@ -55,27 +55,14 @@ div.color-picker-wrapper div.color-picker-recent div.color-swatch {
   margin: 2px;
   border-radius: 3px;
 }
-div.color-picker-wrapper div.color-picker-recent div.color-swatch.locked::before {
-  content: "";
-  position: absolute;
+div.color-picker-wrapper div.color-picker-recent div.color-swatch.locked > .swatch-mark {
   width: 20px;
   height: 20px;
-  background: black;
-  border-radius: 3px;
-  clip-path: polygon(50% 0, 100% 50%, 100% 0);
-  opacity: 1;
-}
-div.color-picker-wrapper div.color-picker-recent div.color-swatch.locked::after {
-  content: "";
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  margin-left: 3px;
   background: white;
-  transform: translate(0px, -20px);
+  border: 1px solid #ccc;
   border-radius: 3px;
-  clip-path: polygon(50% 0, 100% 50%, 100% 0);
-  opacity: 1;
+  transform: translateY(-100%);
+  background: linear-gradient(135deg, transparent 0 76%, rgba(0, 0, 0, 0.3803921569) 75% 77%, white 83% 100%);
 }
 div.color-picker-wrapper div.color-picker-recent div.color-swatch.selected {
   box-shadow: 0px 0px 0px 2px #00b3ff;

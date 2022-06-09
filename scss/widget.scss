@@ -69,29 +69,14 @@ div.color-picker-wrapper {
             margin: 2px;
             border-radius: 3px;
 
-            &.locked {
-                &::before {
-                    content: "";
-                    position: absolute;
-                    width: 20px;
-                    height: 20px;
-                    background: black;
-                    border-radius: 3px;
-                    clip-path: polygon(50% 0, 100% 50%, 100% 0);
-                    opacity: 1;
-                }
-                &::after {
-                    content: "";
-                    position: absolute;
-                    width: 16px;
-                    height: 16px;
-                    margin-left: 3px;
-                    background: white;
-                    transform: translate(0px, -20px);
-                    border-radius: 3px;
-                    clip-path: polygon(50% 0, 100% 50%, 100% 0);
-                    opacity: 1;
-                }
+            &.locked > .swatch-mark {
+                width: 20px;
+                height: 20px;
+                background: white;
+                border: 1px solid #ccc;
+                border-radius: 3px;
+                transform: translateY(-100%);
+                background: linear-gradient(135deg, transparent 0 76%, #00000061 75% 77%, white 83% 100%);
             }
             &.selected {
                 box-shadow: 0px 0px 0px 2px #00b3ff;

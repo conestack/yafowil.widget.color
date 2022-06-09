@@ -44,7 +44,7 @@ Passing both 'box' and 'wheel' allows the user to switch between components.
         name='colorwidget',
         props={
             'label': 'Picker with wheel',
-            'sliders': ['box', 'wheel', 'v']
+            'sliders': ['wheel', 'box', 'v']
         }
     )
 """
@@ -56,7 +56,7 @@ def wheel_example():
         '#field:color',
         props={
             'label': 'Picker with wheel',
-            'sliders': ['box', 'wheel', 'v']
+            'sliders': ['wheel', 'box', 'v']
         })
     return {
         'widget': part,
@@ -238,18 +238,17 @@ def preview_example():
 
 
 DOC_SWATCHES = """
-Fixed color swatches
---------------------
+Color swatches
+--------------
 
 Initialize the widget with custom swatches by passing an array of elements
 in the 'swatches' option.
 
-Disable swatch functionality by passing False.
-Enable swatches without fixed swatches by passing True.
+Enable/Disable locked swatches by setting the "swatches" option to True/False.
 
-Swatches passed in this option are not removable by the user.
+Enable/Disable user swatches by setting the "user_swatches" option to True/False.
 
-Supported formats:
+Supported formats (locked swatches):
 
 - Number Array (will default to rgb / rgba value)
 - rgb string
@@ -266,7 +265,7 @@ Supported formats:
         'color',
         name='colorwidget',
         props={
-            'label': 'Picker with fixed swatches',
+            'label': 'Picker with locked swatches',
             'sliders': ['h', 's', 'v', 'a'],
             'color': '#ff0000',
             'swatches': [
@@ -285,7 +284,8 @@ Supported formats:
                     'g': 0,
                     'b': 255
                 }
-            ]
+            ],
+            'user_swatches': True
         }
     )
 """
@@ -296,7 +296,7 @@ def swatches_example():
     part['color'] = factory(
         '#field:color',
         props={
-            'label': 'Picker with fixed swatches',
+            'label': 'Picker with locked swatches',
             'sliders': ['h', 's', 'v', 'a'],
             'color': '#ff0000',
             'swatches': [
@@ -320,7 +320,7 @@ def swatches_example():
     return {
         'widget': part,
         'doc': DOC_SWATCHES,
-        'title': 'Fixed swatches'
+        'title': 'Locked swatches'
     }
 
 
@@ -509,12 +509,10 @@ def kelvin_example():
 
 
 DOC_SWATCHES_ONLY = """
-Example: Swatch Widget
-----------------------
+Swatch Widget
+-------------
 
 Pass False in the 'sliders' option of your widget to create a swatch only widget.
-
-Swatch widgets only allow selection from colors defined in the 'swatches' option.
 
 
 .. code-block:: python
@@ -528,7 +526,10 @@ Swatch widgets only allow selection from colors defined in the 'swatches' option
             'swatches': [
                 '#ff0000',
                 '#aa2255',
-                '#4287f5'
+                '#4287f5',
+                '#06c7e5',
+                '#a096d4',
+                '#ecbd78'
             ],
             'user_swatches': False
         }
@@ -546,7 +547,15 @@ def swatches_only_example():
             'swatches': [
                 '#ff0000',
                 '#aa2255',
-                '#4287f5'
+                '#4287f5',
+                '#06c7e5',
+                '#a096d4',
+                '#ecbd78',
+                '#80dbad',
+                '#f18a1e',
+                '#9c171c',
+                '#37e3a4',
+                '#72d910'
             ],
             'user_swatches': False
         })
@@ -561,13 +570,13 @@ def get_example():
     return [
         default_example(),
         wheel_example(),
-        swatches_only_example(),
         layout_example(),
         dim_example(),
         length_example(),
         input_example(),
         preview_example(),
         swatches_example(),
+        swatches_only_example(),
         rgb_example(),
         hsv_example(),
         kelvin_example()

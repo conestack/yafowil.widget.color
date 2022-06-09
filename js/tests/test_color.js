@@ -20,6 +20,7 @@ QUnit.module('ColorWidget', hooks => {
             }
           }
         widget = null;
+        localStorage.removeItem("color-swatches");
     });
     hooks.after(() => {
         $('#container').empty().remove();
@@ -39,7 +40,8 @@ QUnit.module('ColorWidget', hooks => {
 
         // preview element
         assert.ok(widget.preview.elem.hasClass('yafowil-color-picker-color'));
-        assert.notOk(widget.swatches.length);
+        assert.notOk(widget.locked_swatches);
+        assert.notOk(widget.user_swatches);
         assert.strictEqual(widget.elem.val(), '#ffffff');
         // hex white gets transformed to rgb value
         assert.strictEqual(
@@ -50,22 +52,56 @@ QUnit.module('ColorWidget', hooks => {
         assert.ok(widget.picker);
     });
 
-    QUnit.test('parse json in constructor', assert => {
-        // mock json file
-        let swatches = [
-            {h: 0, s: 0, l: 80},
-            {h: 0, s: 100, l: 50}
-        ];
-        localStorage.setItem("color-swatches-0", JSON.stringify(swatches));
+    QUnit.test('switch between box and wheel', assert => {
+        let widget = new ColorWidget(elem, {sliders: ['box', 'wheel']});
 
-        // initialize
-        ColorWidget.initialize();
-        widget = elem.data('yafowil-color');
+        assert.strictEqual(
+            $('div.IroBox', widget.picker_container).css('display'),
+            'flex'
+        );
+        assert.strictEqual(
+            $('div.IroWheel', widget.picker_container).css('display'),
+            'none'
+        );
+        assert.ok(widget.switch_btn.is('div.iro-switch-toggle'));
+        assert.ok($('i.glyphicon.glyphicon-refresh', widget.switch_btn).length);
 
-        // assertions
-        assert.strictEqual(widget.swatches.length, 2);
-        assert.deepEqual(widget.active_swatch, widget.swatches[1]);
-        assert.ok(widget.swatches[1].elem.hasClass('selected'));
+        // trigger switch
+        widget.switch_btn.trigger('click');
+        assert.strictEqual(
+            $('div.IroBox', widget.picker_container).css('display'),
+            'none'
+        );
+        assert.strictEqual(
+            $('div.IroWheel', widget.picker_container).css('display'),
+            'flex'
+        );
+    });
+
+    QUnit.test('switch between wheel and box', assert => {
+        let widget = new ColorWidget(elem, {sliders: ['wheel', 'box']});
+
+        assert.strictEqual(
+            $('div.IroWheel', widget.picker_container).css('display'),
+            'flex'
+        );
+        assert.strictEqual(
+            $('div.IroBox', widget.picker_container).css('display'),
+            'none'
+        );
+        assert.ok(widget.switch_btn.is('div.iro-switch-toggle'));
+        assert.ok($('i.glyphicon.glyphicon-refresh', widget.switch_btn).length);
+
+        // trigger switch
+        widget.switch_btn.trigger('click');
+        assert.strictEqual(
+            $('div.IroWheel', widget.picker_container).css('display'),
+            'none'
+        );
+        assert.strictEqual(
+            $('div.IroBox', widget.picker_container).css('display'),
+            'flex'
+        );
     });
 
     QUnit.test('preview_elem', assert => {
@@ -209,115 +245,6 @@ QUnit.module('ColorWidget', hooks => {
         assert.false(widget.elem.is(':focus'));
     });
 
-    QUnit.test('create_swatch, remove_swatch, set_swatches', assert => {
-        // initialize
-        let widget = new ColorWidget(elem, {color: '#ffffff', swatches: true}, 0);
-        assert.strictEqual(widget.swatches_container.css('display'), 'none');
-
-        assert.strictEqual(widget.swatches.length, 0);
-        widget.picker.color.hexString = '#ff0000';
-        // click add color
-        widget.add_color_btn.trigger('click');
-        // assertions
-        assert.strictEqual(widget.swatches_container.css('display'), 'block');
-        assert.strictEqual(widget.swatches.length, 1);
-        assert.deepEqual(
-            widget.swatches[0].color.hsva,
-            widget.picker.color.hsva
-        );
-
-        // add same color again
-        widget.add_color_btn.trigger('click');
-        assert.strictEqual(widget.swatches.length, 1);
-
-        // add second color
-        widget.picker.color.hexString = '#cccccc';
-        widget.add_color_btn.trigger('click');
-        assert.strictEqual(widget.swatches.length, 2);
-        assert.strictEqual(
-            widget.preview.layer.css('background-color'),
-            'rgb(204, 204, 204)'
-        );
-        assert.ok(widget.swatches[1].elem.hasClass('selected'));
-
-        // click on first swatch
-        widget.swatches[0].elem.trigger('click');
-        assert.strictEqual(widget.color.hexString, '#ff0000');
-        assert.strictEqual(
-            widget.picker.color.hexString,
-            '#ff0000'
-        );
-        assert.strictEqual(
-            widget.preview.layer.css('background-color'),
-            'rgb(255, 0, 0)'
-        );
-        assert.false(widget.swatches[1].elem.hasClass('selected'));
-        assert.ok(widget.swatches[0].elem.hasClass('selected'));
-
-        // JSON localStorage
-        let swatches = [];
-        for (let swatch of widget.swatches) {
-            swatches.push(swatch.color.hsva);
-        }
-        assert.strictEqual(
-            localStorage.getItem('color-swatches-0'),
-            JSON.stringify(swatches)
-        );
-
-        // delete swatch with keypress
-        let delKey = $.Event('keydown', { key: 'Delete' });
-        $(window).trigger(delKey);
-        assert.strictEqual($('div.color-swatch').length, 2);
-        assert.strictEqual(
-            widget.picker.color.hexString,
-            '#ff0000'
-        );
-
-        // delete swatch with button
-        widget.remove_color_btn.trigger('click');
-        assert.strictEqual($('div.color-swatch').length, 1);
-        assert.notOk(localStorage.getItem('color-swatches'));
-
-        assert.strictEqual(widget.color.hexString, '#cccccc');
-        assert.strictEqual(widget.picker.color.hexString, '#cccccc');
-    });
-
-    QUnit.test('remove fixed swatch', assert => {
-        // initialize
-        let widget = new ColorWidget(elem, {
-            color: '#ffffff',
-            swatches: [{h:100, s:100, v:100}]
-        }, 0);
-        assert.strictEqual(widget.swatches_container.css('display'), 'block');
-        // click on fixed swatch
-        widget.fixed_swatches[0].elem.trigger('click');
-        widget.remove_color_btn.trigger('click');
-        // fixed swatch has not been deleted
-        assert.strictEqual($('div.color-swatch').length, 1);
-    });
-
-    QUnit.test('create over 12 swatches', assert => {
-        // initialize
-        let widget = new ColorWidget(elem, {color:'#ffffff', swatches: true});
-        assert.strictEqual(widget.swatches_container.css('display'), 'none');
-
-        // open menu by click
-        widget.preview.elem.trigger('click');
-        assert.strictEqual(widget.swatches.length, 0);
-
-        let colors = [
-            '#83ee01', '#05074b', '#ae47ed', '#eb6ef2', '#c2c9a1', '#8e84b4',
-            '#d8c576', '#add2b4', '#05013d', '#4edbb3', '#420c21', '#a23bf6',
-            '#fe9185'
-        ]
-        // add swatches
-        for (let i = 0; i <= 10; i++) {
-            widget.picker.color.set(colors[i]);
-            widget.add_color_btn.trigger('click');
-        }
-        assert.strictEqual(widget.swatches.length, 10);
-    });
-
     QUnit.test('custom dimensions', assert => {
         // initialize
         let widget = new ColorWidget(elem, {
@@ -330,14 +257,257 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual(widget.picker.state.boxHeight, 300);
     });
 
+    QUnit.test('LockedSwatchesContainer', assert => {
+        let locked_swatches = [
+            '#ff0000',
+            '#aa2255',
+            '#4287f5'
+        ];
+        // initialize
+        let widget = new ColorWidget(elem, {
+            color: '#ffffff',
+            locked_swatches: locked_swatches
+        });
+
+        assert.ok(widget.locked_swatches);
+        assert.ok(widget.locked_swatches.elem.is('div.color-picker-recent'));
+        for (let i=0; i<widget.locked_swatches.swatches.length; i++) {
+            let swatch = widget.locked_swatches.swatches[i];
+            assert.strictEqual(
+                swatch.color.hexString,
+                locked_swatches[i]
+            )
+            assert.true(swatch.locked);
+            assert.ok(swatch.elem.hasClass('locked'));
+            assert.ok($('div.swatch-mark', swatch.elem).length);
+        }
+    });
+
+    QUnit.test('LockedSwatchesContainer no swatches', assert => {
+        let locked_swatches = [];
+        // initialize
+        let widget = new ColorWidget(elem, {
+            color: '#ffffff',
+            locked_swatches: locked_swatches
+        });
+
+        assert.ok(widget.locked_swatches);
+        assert.ok(widget.locked_swatches.elem.is('div.color-picker-recent'));
+        assert.deepEqual(widget.locked_swatches.swatches, []);
+    });
+
+    QUnit.module('UserSwatchesContainer', hooks => {
+        hooks.afterEach(()=>{
+            localStorage.removeItem("color-swatches");
+        });
+
+        QUnit.test('init_swatches', assert => {
+            // mock json file
+            let swatches = [
+                {h: 0, s: 0, l: 80},
+                {h: 0, s: 100, l: 50}
+            ];
+            localStorage.setItem("color-swatches", JSON.stringify(swatches));
+
+           // initialize
+            let widget = new ColorWidget(elem, {
+                color: '#ffffff',
+                user_swatches: true
+            });
+
+            // assertions
+            assert.strictEqual(widget.user_swatches.swatches.length, 2);
+            assert.deepEqual(
+                widget.active_swatch,
+                widget.user_swatches.swatches[1]
+            );
+            assert.ok(
+                widget.user_swatches.swatches[1].elem.hasClass('selected')
+            );
+            assert.strictEqual(
+                widget.user_swatches.remove_color_btn.css('display'),
+                'block'
+            );
+            assert.strictEqual(
+                widget.user_swatches.elem.css('display'),
+                'block'
+            );
+        });
+
+        QUnit.test('create_swatch, remove_swatch, set_swatches', assert => {
+            // initialize
+            let widget = new ColorWidget(elem, {
+                color: '#ffffff',
+                locked_swatches: [
+                    '#3bab9a',
+                    '#50ad62'
+                ],
+                user_swatches: true
+            });
+            assert.strictEqual(widget.user_swatches.elem.css('display'), 'none');
+
+            assert.strictEqual(widget.user_swatches.swatches.length, 0);
+            widget.picker.color.hexString = '#ff0000';
+
+            widget.preview.elem.trigger('click');
+            // click add color
+            widget.user_swatches.add_color_btn.trigger('click');
+            // assertions
+            assert.strictEqual(widget.user_swatches.elem.css('display'), 'block');
+            assert.strictEqual(widget.user_swatches.swatches.length, 1);
+            assert.deepEqual(
+                widget.user_swatches.swatches[0].color.hsva,
+                widget.picker.color.hsva
+            );
+
+            // add same color again
+            widget.user_swatches.add_color_btn.trigger('click');
+            assert.strictEqual(widget.user_swatches.swatches.length, 1);
+
+            // add second color
+            widget.picker.color.hexString = '#cccccc';
+            widget.user_swatches.add_color_btn.trigger('click');
+            assert.strictEqual(widget.user_swatches.swatches.length, 2);
+            assert.strictEqual(
+                widget.preview.layer.css('background-color'),
+                'rgb(204, 204, 204)'
+            );
+            assert.ok(widget.user_swatches.swatches[1].elem.hasClass('selected'));
+
+            // attempt adding of color in locked swatches
+            widget.picker.color.hexString = '#3bab9a';
+            widget.user_swatches.add_color_btn.trigger('click');
+            assert.strictEqual(widget.user_swatches.swatches.length, 2);
+            assert.strictEqual(
+                widget.preview.layer.css('background-color'),
+                'rgb(59, 171, 154)'
+            );
+            assert.ok(widget.user_swatches.swatches[1].elem.hasClass('selected'));
+
+            // click on first swatch
+            widget.user_swatches.swatches[0].elem.trigger('click');
+            assert.strictEqual(widget.color.hexString, '#ff0000');
+            assert.strictEqual(
+                widget.picker.color.hexString,
+                '#ff0000'
+            );
+            assert.strictEqual(
+                widget.preview.layer.css('background-color'),
+                'rgb(255, 0, 0)'
+            );
+            assert.false(widget.user_swatches.swatches[1].elem.hasClass('selected'));
+            assert.ok(widget.user_swatches.swatches[0].elem.hasClass('selected'));
+
+            // JSON localStorage
+            let swatches = [];
+            for (let swatch of widget.user_swatches.swatches) {
+                swatches.push(swatch.color.hsva);
+            }
+            assert.strictEqual(
+                localStorage.getItem('color-swatches'),
+                JSON.stringify(swatches)
+            );
+
+            // delete swatch with keypress
+            widget.user_swatches.swatches[0].elem.trigger('click');
+            let delKey = new $.Event('keydown', { key: 'Delete' });
+            $(window).trigger(delKey);
+            assert.strictEqual($('div.color-swatch').length, 3);
+            assert.strictEqual(
+                widget.picker.color.hexString,
+                '#cccccc'
+            );
+
+            // delete swatch with button
+            widget.user_swatches.remove_color_btn.trigger('click');
+            assert.strictEqual($('div.color-swatch').length, 2);
+            assert.strictEqual(widget.user_swatches.swatches.length, 0);
+            assert.notOk(localStorage.getItem('color-swatches'));
+            assert.strictEqual(widget.color.hexString, '#ffffff');
+            assert.strictEqual(widget.picker.color.hexString, '#ffffff');
+        });
+
+
+        QUnit.test('no active swatch', assert => {
+            // initialize
+            let widget = new ColorWidget(elem, {
+                color: '#ffffff',
+                user_swatches: true
+            }, 0);
+
+            // add color
+            widget.picker.color.hexString = '#cccccc';
+            widget.user_swatches.add_color_btn.trigger('click');
+            assert.strictEqual(widget.user_swatches.swatches.length, 1);
+            assert.strictEqual(
+                widget.preview.layer.css('background-color'),
+                'rgb(204, 204, 204)'
+            );
+            assert.ok(widget.user_swatches.swatches[0].elem.hasClass('selected'));
+            assert.true(widget.active_swatch.selected);
+            widget.active_swatch = null;
+
+            widget.user_swatches.remove_color_btn.trigger('click');
+            assert.strictEqual(widget.user_swatches.swatches.length, 0);
+        });
+
+        QUnit.test('remove fixed swatch', assert => {
+            // initialize
+            let widget = new ColorWidget(elem, {
+                color: '#ffffff',
+                locked_swatches: [{h:100, s:100, v:100}],
+                user_swatches: true
+            }, 0);
+            assert.strictEqual(widget.user_swatches.elem.css('display'), 'none');
+            assert.strictEqual(widget.locked_swatches.elem.css('display'), 'block');
+            // click on fixed swatch
+            widget.locked_swatches.swatches[0].elem.trigger('click');
+            widget.user_swatches.remove_color_btn.trigger('click');
+            // fixed swatch has not been deleted
+            assert.strictEqual($('div.color-swatch').length, 1);
+        });
+
+        QUnit.test('create over 12 swatches', assert => {
+            // initialize
+            let widget = new ColorWidget(elem, {
+                color:'#ffffff',
+                user_swatches: true
+            });
+            assert.strictEqual(widget.user_swatches.elem.css('display'), 'none');
+
+            // open menu by click
+            widget.preview.elem.trigger('click');
+            assert.strictEqual(widget.user_swatches.swatches.length, 0);
+
+            let colors = [
+                '#83ee01', '#05074b', '#ae47ed', '#eb6ef2', '#c2c9a1', '#8e84b4',
+                '#d8c576', '#add2b4', '#05013d', '#4edbb3', '#420c21', '#a23bf6',
+                '#fe9185'
+            ]
+            // add swatches
+            for (let i = 0; i <= 10; i++) {
+                widget.picker.color.set(colors[i]);
+                widget.user_swatches.add_color_btn.trigger('click');
+            }
+            assert.strictEqual(widget.user_swatches.swatches.length, 10);
+        });
+    });
+
     QUnit.module('ColorSwatch', hooks => {
         hooks.beforeEach(() => {
-            widget = new ColorWidget(elem, {swatches: [{h:100, s:100, v:75, a:0.5}]});
+            localStorage.removeItem('color-swatches');
+            widget = new ColorWidget(elem, {
+                swatches: [{h:100, s:100, v:75, a:0.5}],
+                user_swatches: true
+            });
         });
 
         QUnit.test('constructor', assert => {
-            widget.create_swatch();
-            assert.deepEqual(widget.swatches[0].color.hsl, widget.picker.color.hsl);
+            widget.user_swatches.create_swatch();
+            assert.deepEqual(
+                widget.user_swatches.swatches[0].color.hsl,
+                widget.picker.color.hsl
+            );
         });
 
         QUnit.test('color_equals', assert => {
@@ -350,27 +520,27 @@ QUnit.module('ColorWidget', hooks => {
 
             // create first swatch
             widget.picker.color.hsva = color;
-            widget.create_swatch();
+            widget.user_swatches.create_swatch();
 
             // create other swatches
             for (let color of colors) {
                 widget.picker.color.hsva = color;
-                widget.create_swatch();
+                widget.user_swatches.create_swatch();
             }
-            assert.strictEqual(widget.swatches.length, 4);
+            assert.strictEqual(widget.user_swatches.swatches.length, 4);
 
             // attempt to create same swatches again
             for (let color of colors) {
                 widget.picker.color.hsva = color;
-                widget.create_swatch();
+                widget.user_swatches.create_swatch();
             }
-            assert.strictEqual(widget.swatches.length, 4);
+            assert.strictEqual(widget.user_swatches.swatches.length, 4);
 
             // attempt to create same as fixed swatch
-            widget.picker.color.hsva = {h:100, s:100, v:75, a:0.5};
-            widget.create_swatch();
+            widget.picker.color.hsva = {h:100, s:100, v:75, a:1};
+            widget.user_swatches.create_swatch();
 
-            assert.strictEqual(widget.swatches.length, 4);
+            assert.strictEqual(widget.user_swatches.swatches.length, 4);
         });
 
         QUnit.test('destroy swatch', assert => {
@@ -379,23 +549,23 @@ QUnit.module('ColorWidget', hooks => {
 
             // create swatch
             widget.picker.color.hsl = color1;
-            widget.create_swatch();
-            assert.strictEqual(widget.swatches.length, 1);
+            widget.user_swatches.create_swatch();
+            assert.strictEqual(widget.user_swatches.swatches.length, 1);
 
             // create second swatch
             widget.picker.color.hsl = color2;
-            widget.create_swatch();
-            assert.strictEqual(widget.swatches.length, 2);
+            widget.user_swatches.create_swatch();
+            assert.strictEqual(widget.user_swatches.swatches.length, 2);
 
             // delete swatch
-            widget.remove_swatch();
-            assert.strictEqual(widget.swatches.length, 1);
+            widget.user_swatches.remove_swatch();
+            assert.strictEqual(widget.user_swatches.swatches.length, 1);
 
             // delete second swatch
-            widget.remove_swatch();
-            assert.strictEqual(widget.swatches.length, 0);
+            widget.user_swatches.remove_swatch();
+            assert.strictEqual(widget.user_swatches.swatches.length, 0);
 
-            assert.strictEqual(widget.picker.color.hexString, '#40bf00');
+            assert.strictEqual(widget.picker.color.hexString, '#ffffff');
         });
 
         QUnit.test('select swatch', assert => {
@@ -406,21 +576,33 @@ QUnit.module('ColorWidget', hooks => {
             ];
             for (let color of colors) {
                 widget.picker.color.set(color);
-                widget.create_swatch();
+                widget.user_swatches.create_swatch();
             }
 
             // newest created element is active
-            assert.deepEqual(widget.active_swatch, widget.swatches[2]);
-            assert.deepEqual(widget.color.hsl, widget.swatches[2].color.hsl);
+            assert.deepEqual(
+                widget.active_swatch,
+                widget.user_swatches.swatches[2]
+            );
+            assert.deepEqual(
+                widget.color.hsl,
+                widget.user_swatches.swatches[2].color.hsl
+            );
 
             // click on first swatch
-            widget.swatches[0].elem.trigger('click');
-            assert.deepEqual(widget.active_swatch, widget.swatches[0]);
-            assert.deepEqual(widget.color.hsl, widget.swatches[0].color.hsl);
+            widget.user_swatches.swatches[0].elem.trigger('click');
+            assert.deepEqual(
+                widget.active_swatch,
+                widget.user_swatches.swatches[0]
+            );
+            assert.deepEqual(
+                widget.color.hsl,
+                widget.user_swatches.swatches[0].color.hsl
+            );
         });
     });
 
-    QUnit.test.todo('Opts', assert => {
+    QUnit.test('Opts', assert => {
         let opts = {
             color: '#f00',
             sliders: ['box', 'r', 'g', 'b', 'a', 'k', 'h', 's', 'v', 'x'],
@@ -450,12 +632,12 @@ QUnit.module('ColorWidget', hooks => {
         assert.ok(true);
     });
 
-    QUnit.test('fix_swatches', assert => {
+    QUnit.test('locked swatches', assert => {
         widget = new ColorWidget(elem, {
-            swatches: [[255, 0, 0], 'rgb(255,0,0)', {r:255, g:0, b:0}, 233]
+            locked_swatches: [[255, 0, 0], 'rgb(255,0,0)', {r:255, g:0, b:0}, 233]
         }, 0);
-        assert.strictEqual(widget.fixed_swatches.length, 3);
-        for (let swatch of widget.fixed_swatches) {
+        assert.strictEqual(widget.locked_swatches.swatches.length, 3);
+        for (let swatch of widget.locked_swatches.swatches) {
             assert.deepEqual(swatch.color.rgb, {r:255, g:0, b:0});
         }
     })
