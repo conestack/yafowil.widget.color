@@ -20,7 +20,7 @@ export class ColorWidget {
                 box_height: elem.data('box_height'),
                 slider_size: elem.data('slider_size'),
                 color: elem.data('color'),
-                locked_swatches: elem.data('swatches'),
+                locked_swatches: elem.data('locked_swatches'),
                 user_swatches: elem.data('user_swatches'),
                 temperature: elem.data('temperature'),
                 disabled: elem.data('disabled'),
@@ -60,16 +60,22 @@ export class ColorWidget {
             } else {
                 $('div.IroBox', this.picker_container).hide();
             }
-            this.switch_btn = $('<div />')
+            this.switch_btn = $('<button />')
                 .addClass('iro-switch-toggle')
                 .append($('<i class="glyphicon glyphicon-refresh" />'))
                 .appendTo(this.dropdown_elem);
-            this.switch_btn.on('click', () => {
+            this.switch_btn.on('click', (e) => {
+                e.preventDefault();
                 $('div.IroWheel', this.picker_container).toggle();
                 $('div.IroBox', this.picker_container).toggle();
             });
+        } else if (!sliders) {
+            this.picker_container.hide();
         }
 
+        if (!options.locked_swatches && !options.user_swatches) {
+            this.picker_container.css('margin-bottom', 0);
+        }
         if (options.locked_swatches) {
             this.locked_swatches = new LockedSwatchesContainer(
                 this,
@@ -185,6 +191,29 @@ export class ColorWidget {
             e.preventDefault();
             if (this.user_swatches) {
                 this.user_swatches.remove_swatch();
+            }
+        } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+            if (!this.locked_swatches && !this.user_swatches) {
+                return;
+            }
+            let swatch = this.active_swatch,
+                ctx = swatch.locked ? this.locked_swatches : this.user_swatches,
+                index = ctx.swatches.indexOf(swatch);
+            index = e.key === "ArrowLeft" ? index - 1 : index + 1;
+            if (index < 0) {
+                if (!swatch.locked && this.locked_swatches) {
+                    let swatches = this.locked_swatches.swatches;
+                    this.active_swatch = swatches[swatches.length -1];
+                }
+            } else if (index >= ctx.swatches.length) {
+                if (swatch.locked
+                    && this.user_swatches
+                    && this.user_swatches.swatches.length) {
+                        let swatches = this.user_swatches.swatches;
+                        this.active_swatch = swatches[0];
+                }
+            } else {
+                this.active_swatch = ctx.swatches[index];
             }
         }
     }

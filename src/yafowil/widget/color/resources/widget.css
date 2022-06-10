@@ -1,3 +1,17 @@
+input.color-picker {
+  display: inline-block;
+  width: auto;
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 div.color-picker-wrapper {
   display: none;
   position: absolute;
@@ -21,12 +35,25 @@ div.color-picker-wrapper button.close-button {
   border: none;
   opacity: 0.4;
 }
-div.color-picker-wrapper div.iro-switch-toggle {
+@media (max-width: 600px) {
+  div.color-picker-wrapper button.close-button {
+    font-size: 20px;
+  }
+}
+div.color-picker-wrapper button.iro-switch-toggle {
   position: absolute;
-  top: 5px;
+  top: 3px;
   left: 10px;
   opacity: 0.4;
   font-size: 12px;
+  background: none;
+  border: none;
+  padding: 5px;
+}
+@media (max-width: 600px) {
+  div.color-picker-wrapper button.iro-switch-toggle {
+    font-size: 16px;
+  }
 }
 div.color-picker-wrapper div.buttons {
   width: 100%;
@@ -89,8 +116,8 @@ div.color-picker-wrapper div.color-picker-recent div.color-swatch > .layer-color
 span.yafowil-color-picker-color {
   position: absolute;
   display: inline-block;
-  width: 28px;
-  height: 28px;
+  width: 33px;
+  height: 33px;
   margin-left: 5px;
   border: #ccc 3px solid;
   border-radius: 4px;

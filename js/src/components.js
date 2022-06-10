@@ -34,7 +34,8 @@ export class ColorSwatch {
 
     set selected(selected) {
         if (selected) {
-            $('div.color-swatch', this.widget.dropdown_elem).removeClass('selected');
+            $('div.color-swatch', this.widget.dropdown_elem)
+                .removeClass('selected');
             this.elem.addClass('selected');
             this.widget.picker.color.set(this.color);
         }
@@ -56,7 +57,6 @@ export class ColorSwatch {
     }
 }
 
-
 export class LockedSwatchesContainer {
 
     constructor (widget, swatches = []) {
@@ -71,9 +71,9 @@ export class LockedSwatchesContainer {
 
     init_swatches(swatches) {
         if (!swatches || !swatches.length) {
+            this.elem.hide();
             return;
-        }
-        if (swatches.length > 10) {
+        } else if (swatches.length > 10) {
             swatches = swatches.slice(0, 10);
         }
 
@@ -102,9 +102,9 @@ export class LockedSwatchesContainer {
                     true
                 )
             );
+            this.elem.show();
         }
         this.widget.active_swatch = this.swatches[0];
-        this.elem.show();
     }
 }
 
@@ -116,8 +116,8 @@ export class UserSwatchesContainer {
             .addClass('color-picker-recent')
             .appendTo(widget.dropdown_elem);
         this.add_color_btn = $(`<button />`)
-                .addClass('add_color')
-                .text('+ Add');
+            .addClass('add_color')
+            .text('+ Add');
         this.remove_color_btn = $(`<button />`)
             .addClass('remove_color')
             .text('- Remove')
@@ -145,9 +145,8 @@ export class UserSwatchesContainer {
         for (let swatch of this.swatches) {
             swatch.destroy();
         }
-
+        this.swatches = [];
         if (json_str) {
-            this.swatches = [];
             this.elem.show();
             this.remove_color_btn.show();
             let colors = JSON.parse(json_str);
@@ -215,7 +214,9 @@ export class UserSwatchesContainer {
                     this.widget.active_swatch = l_swatches[
                         l_swatches.length - 1
                     ];
-                    this.widget.picker.color.set(this.widget.active_swatch.color);
+                    this.widget.picker.color.set(
+                        this.widget.active_swatch.color
+                    );
             }
             this.elem.hide();
             this.remove_color_btn.hide();

@@ -7,6 +7,20 @@ $checkered-pattern: conic-gradient(
     rgb(255, 255, 255) 0deg)
     0% 0% / 8px 8px;
 
+input.color-picker {
+    display: inline-block;
+    width: auto;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
 div.color-picker-wrapper {
     display: none;
     position: absolute;
@@ -30,14 +44,25 @@ div.color-picker-wrapper {
         background: none;
         border: none;
         opacity: .4;
+
+        @media(max-width:600px) {
+            font-size:20px;
+        }
     }
 
-    div.iro-switch-toggle {
+    button.iro-switch-toggle {
         position: absolute;
-        top: 5px;
+        top: 3px;
         left: 10px;
         opacity: 0.4;
         font-size: 12px;
+        background: none;
+        border: none;
+        padding: 5px;
+
+        @media(max-width:600px) {
+            font-size:16px;
+        }
     }
 
     div.buttons {
@@ -107,8 +132,8 @@ div.color-picker-wrapper {
 span.yafowil-color-picker-color {
     position: absolute;
     display: inline-block;
-    width: 28px;
-    height: 28px;
+    width: 33px;
+    height: 33px;
     margin-left: 5px;
     border: #ccc 3px solid;
     border-radius: 4px;

@@ -170,7 +170,7 @@ by setting 'layout_direction' to 'horizontal'.
             'layout_direction': 'horizontal',
             'show_inputs': True,
             'show_labels': True,
-            'swatches': False
+            'locked_swatches': False
         }
     )
 """
@@ -186,7 +186,7 @@ def layout_example():
             'layout_direction': 'horizontal',
             'show_inputs': True,
             'show_labels': True,
-            'swatches': False
+            'locked_swatches': False
         })
     return {
         'widget': part,
@@ -244,7 +244,7 @@ Color swatches
 Initialize the widget with custom swatches by passing an array of elements
 in the 'swatches' option.
 
-Enable/Disable locked swatches by setting the "swatches" option to True/False.
+Enable/Disable locked swatches by setting the "locked_swatches" option to True/False.
 
 Enable/Disable user swatches by setting the "user_swatches" option to True/False.
 
@@ -268,7 +268,7 @@ Supported formats (locked swatches):
             'label': 'Picker with locked swatches',
             'sliders': ['h', 's', 'v', 'a'],
             'color': '#ff0000',
-            'swatches': [
+            'locked_swatches': [
                 [255, 0, 0],          # default interpretation as rgb
                 [255, 150, 0, 0.5],     # default interpretation as rgba
                 'rgb(255,255,0)',      # rgb string
@@ -299,7 +299,7 @@ def swatches_example():
             'label': 'Picker with locked swatches',
             'sliders': ['h', 's', 'v', 'a'],
             'color': '#ff0000',
-            'swatches': [
+            'locked_swatches': [
                 [255, 0, 0],          # default interpretation as rgb
                 [255, 150, 0, 0.5],     # default interpretation as rgba
                 'rgb(255,255,0)',      # rgb string
@@ -480,7 +480,7 @@ The possible kelvin temperature ranges from 1000 to 40000.
             'format': 'kelvin',
             'color': '#ffffff',
             'temperature': {'min': 4000, 'max': 8000},
-            'swatches': False,
+            'locked_swatches': False,
             'user_swatches': False
         }
     )
@@ -498,7 +498,7 @@ def kelvin_example():
             'format': 'kelvin',
             'color': '#ffffff',
             'temperature': {'min': 4000, 'max': 8000},
-            'swatches': False,
+            'locked_swatches': False,
             'user_swatches': False
         })
     return {
@@ -523,7 +523,7 @@ Pass False in the 'sliders' option of your widget to create a swatch only widget
         props={
             'label': 'Example: Swatch Widget',
             'sliders': False,
-            'swatches': [
+            'locked_swatches': [
                 '#ff0000',
                 '#aa2255',
                 '#4287f5',
@@ -544,7 +544,7 @@ def swatches_only_example():
         props={
             'label': 'Example: Swatch Widget',
             'sliders': False,
-            'swatches': [
+            'locked_swatches': [
                 '#ff0000',
                 '#aa2255',
                 '#4287f5',

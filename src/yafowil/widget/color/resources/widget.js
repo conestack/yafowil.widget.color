@@ -29,7 +29,8 @@ var yafowil_color = (function (exports, $) {
         }
         set selected(selected) {
             if (selected) {
-                $('div.color-swatch', this.widget.dropdown_elem).removeClass('selected');
+                $('div.color-swatch', this.widget.dropdown_elem)
+                    .removeClass('selected');
                 this.elem.addClass('selected');
                 this.widget.picker.color.set(this.color);
             }
@@ -59,9 +60,9 @@ var yafowil_color = (function (exports, $) {
         }
         init_swatches(swatches) {
             if (!swatches || !swatches.length) {
+                this.elem.hide();
                 return;
-            }
-            if (swatches.length > 10) {
+            } else if (swatches.length > 10) {
                 swatches = swatches.slice(0, 10);
             }
             for (let swatch of swatches) {
@@ -89,9 +90,9 @@ var yafowil_color = (function (exports, $) {
                         true
                     )
                 );
+                this.elem.show();
             }
             this.widget.active_swatch = this.swatches[0];
-            this.elem.show();
         }
     }
     class UserSwatchesContainer {
@@ -101,8 +102,8 @@ var yafowil_color = (function (exports, $) {
                 .addClass('color-picker-recent')
                 .appendTo(widget.dropdown_elem);
             this.add_color_btn = $(`<button />`)
-                    .addClass('add_color')
-                    .text('+ Add');
+                .addClass('add_color')
+                .text('+ Add');
             this.remove_color_btn = $(`<button />`)
                 .addClass('remove_color')
                 .text('- Remove')
@@ -126,8 +127,8 @@ var yafowil_color = (function (exports, $) {
             for (let swatch of this.swatches) {
                 swatch.destroy();
             }
+            this.swatches = [];
             if (json_str) {
-                this.swatches = [];
                 this.elem.show();
                 this.remove_color_btn.show();
                 let colors = JSON.parse(json_str);
@@ -192,7 +193,9 @@ var yafowil_color = (function (exports, $) {
                         this.widget.active_swatch = l_swatches[
                             l_swatches.length - 1
                         ];
-                        this.widget.picker.color.set(this.widget.active_swatch.color);
+                        this.widget.picker.color.set(
+                            this.widget.active_swatch.color
+                        );
                 }
                 this.elem.hide();
                 this.remove_color_btn.hide();
@@ -308,7 +311,7 @@ var yafowil_color = (function (exports, $) {
                     box_height: elem.data('box_height'),
                     slider_size: elem.data('slider_size'),
                     color: elem.data('color'),
-                    locked_swatches: elem.data('swatches'),
+                    locked_swatches: elem.data('locked_swatches'),
                     user_swatches: elem.data('user_swatches'),
                     temperature: elem.data('temperature'),
                     disabled: elem.data('disabled'),
@@ -345,14 +348,20 @@ var yafowil_color = (function (exports, $) {
                 } else {
                     $('div.IroBox', this.picker_container).hide();
                 }
-                this.switch_btn = $('<div />')
+                this.switch_btn = $('<button />')
                     .addClass('iro-switch-toggle')
                     .append($('<i class="glyphicon glyphicon-refresh" />'))
                     .appendTo(this.dropdown_elem);
-                this.switch_btn.on('click', () => {
+                this.switch_btn.on('click', (e) => {
+                    e.preventDefault();
                     $('div.IroWheel', this.picker_container).toggle();
                     $('div.IroBox', this.picker_container).toggle();
                 });
+            } else if (!sliders) {
+                this.picker_container.hide();
+            }
+            if (!options.locked_swatches && !options.user_swatches) {
+                this.picker_container.css('margin-bottom', 0);
             }
             if (options.locked_swatches) {
                 this.locked_swatches = new LockedSwatchesContainer(
@@ -458,6 +467,29 @@ var yafowil_color = (function (exports, $) {
                 e.preventDefault();
                 if (this.user_swatches) {
                     this.user_swatches.remove_swatch();
+                }
+            } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+                if (!this.locked_swatches && !this.user_swatches) {
+                    return;
+                }
+                let swatch = this.active_swatch,
+                    ctx = swatch.locked ? this.locked_swatches : this.user_swatches,
+                    index = ctx.swatches.indexOf(swatch);
+                index = e.key === "ArrowLeft" ? index - 1 : index + 1;
+                if (index < 0) {
+                    if (!swatch.locked && this.locked_swatches) {
+                        let swatches = this.locked_swatches.swatches;
+                        this.active_swatch = swatches[swatches.length -1];
+                    }
+                } else if (index >= ctx.swatches.length) {
+                    if (swatch.locked
+                        && this.user_swatches
+                        && this.user_swatches.swatches.length) {
+                            let swatches = this.user_swatches.swatches;
+                            this.active_swatch = swatches[0];
+                    }
+                } else {
+                    this.active_swatch = ctx.swatches[index];
                 }
             }
         }
