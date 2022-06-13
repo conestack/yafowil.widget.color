@@ -175,7 +175,6 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual(parseInt(widget.picker.color.kelvin), 3000);
     });
 
-
     QUnit.test('open', assert => {
         // initialize
         let widget = new ColorWidget(elem, {
@@ -298,6 +297,28 @@ QUnit.module('ColorWidget', hooks => {
             widget.active_swatch,
             user_swatches[1]
         );
+    });
+
+    QUnit.test('on_keydown - no swatches', assert => {
+        // initialize
+        let widget = new ColorWidget(elem, {
+            color: '#ffffff',
+            locked_swatches: false,
+            user_swatches: false
+        });
+        assert.strictEqual(widget.dropdown_elem.css('display'), 'none');
+
+        // trigger arrow keys
+        widget.elem.trigger('focus');
+        let arrow_left = $.Event('keydown', {key: 'ArrowLeft'}),
+            arrow_right = $.Event('keydown', {key: 'ArrowRight'});
+
+        // trigger left
+        $(window).trigger(arrow_left);
+        assert.strictEqual(widget.active_swatch, undefined);
+        // trigger right
+        $(window).trigger(arrow_right);
+        assert.strictEqual(widget.active_swatch, undefined);
     });
 
     QUnit.test('on_keydown - locked swatches', assert => {
@@ -655,6 +676,27 @@ QUnit.module('ColorWidget', hooks => {
             assert.notOk(localStorage.getItem('color-swatches'));
         });
 
+        QUnit.test('create_swatch - same as locked swatch color', assert => {
+            // initialize
+            let widget = new ColorWidget(elem, {
+                color: '#ffffff',
+                locked_swatches: ['#ff0000'],
+                user_swatches: true
+            });
+
+            assert.strictEqual(widget.user_swatches.swatches.length, 0);
+            widget.elem.trigger('focus');
+
+            // click add color
+            widget.picker.color.hexString = '#ff0000';
+            widget.user_swatches.add_color_btn.trigger('click');
+            // assertions
+            assert.strictEqual(
+                widget.user_swatches.elem.css('display'),
+                'none'
+            );
+            assert.strictEqual(widget.user_swatches.swatches.length, 0);
+        });
 
         QUnit.test('no active swatch', assert => {
             // initialize
@@ -681,7 +723,7 @@ QUnit.module('ColorWidget', hooks => {
             assert.strictEqual(widget.user_swatches.swatches.length, 0);
         });
 
-        QUnit.test('remove fixed swatch', assert => {
+        QUnit.test('remove locked swatch', assert => {
             // initialize
             let widget = new ColorWidget(elem, {
                 color: '#ffffff',
@@ -696,10 +738,10 @@ QUnit.module('ColorWidget', hooks => {
                 widget.locked_swatches.elem.css('display'),
                 'block'
             );
-            // click on fixed swatch
+            // click on locked swatch
             widget.locked_swatches.swatches[0].elem.trigger('click');
             widget.user_swatches.remove_color_btn.trigger('click');
-            // fixed swatch has not been deleted
+            // locked swatch has not been deleted
             assert.strictEqual($('div.color-swatch').length, 1);
         });
 
@@ -771,7 +813,7 @@ QUnit.module('ColorWidget', hooks => {
             }
             assert.strictEqual(widget.user_swatches.swatches.length, 4);
 
-            // attempt to create same as fixed swatch
+            // attempt to create same as locked swatch
             widget.picker.color.hsva = {h:100, s:100, v:75, a:1};
             widget.user_swatches.create_swatch();
 

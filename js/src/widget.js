@@ -35,6 +35,7 @@ export class ColorWidget {
 
     constructor(elem, options) {
         elem.data('yafowil-color', this);
+        elem.addClass('form-control');
         this.elem = elem;
         this.elem.attr('spellcheck', "false");
         this.dropdown_elem = $(`<div />`)
