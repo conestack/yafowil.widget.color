@@ -37,15 +37,15 @@ export class ColorWidget {
         elem.data('yafowil-color', this);
         elem.addClass('form-control');
         this.elem = elem;
-        this.elem.attr('spellcheck', "false");
-        this.dropdown_elem = $(`<div />`)
+        this.elem.attr('spellcheck', 'false');
+        this.dropdown_elem = $('<div />')
             .addClass('color-picker-wrapper')
             .css('top', this.elem.outerHeight())
             .insertAfter(this.elem);
         this.picker_container = $('<div />')
             .addClass('color-picker-container')
             .appendTo(this.dropdown_elem);
-        this.close_btn = $(`<button />`)
+        this.close_btn = $('<button />')
             .addClass('close-button')
             .text('✕')
             .appendTo(this.dropdown_elem);
@@ -98,7 +98,7 @@ export class ColorWidget {
             prev_elem = $(options.preview_elem)
                 .addClass('yafowil-color-picker-preview');
         } else {
-            prev_elem = $(`<span />`)
+            prev_elem = $('<span />')
                 .addClass('yafowil-color-picker-color layer-transparent');
         }
         this.preview = new PreviewElement(this, prev_elem, this.color);
@@ -142,10 +142,8 @@ export class ColorWidget {
                         sliderType: type,
                         sliderSize: opts.slider_size,
                         sliderLength: opts.slider_length,
-                        minTemperature: opts.temperature ?
-                            opts.temperature.min : undefined,
-                        maxTemperature: opts.temperature ?
-                            opts.temperature.max : undefined,
+                        minTemperature: opts.temperature.min || undefined,
+                        maxTemperature: opts.temperature.max || undefined,
                         disabled: opts.disabled,
                         showInput: opts.show_inputs,
                         showLabel: opts.show_labels
@@ -153,7 +151,6 @@ export class ColorWidget {
                 });
             }
         });
-
         return iro_opts;
     }
 
@@ -175,7 +172,7 @@ export class ColorWidget {
     }
 
     open(evt) {
-        if (this.dropdown_elem.css('display') === "none") {
+        if (this.dropdown_elem.css('display') === 'none') {
             this.dropdown_elem.show();
             $(window).on('keydown', this.on_keydown);
             $(window).on('mousedown', this.on_click);
@@ -185,22 +182,22 @@ export class ColorWidget {
     }
 
     on_keydown(e) {
-        if (e.key === "Enter" || e.key === "Escape") {
+        if (e.key === 'Enter' || e.key === 'Escape') {
             e.preventDefault();
             this.close();
-        } else if (e.key === "Delete") {
+        } else if (e.key === 'Delete') {
             e.preventDefault();
             if (this.user_swatches) {
                 this.user_swatches.remove_swatch();
             }
-        } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
             if (!this.locked_swatches && !this.user_swatches) {
                 return;
             }
             let swatch = this.active_swatch,
                 ctx = swatch.locked ? this.locked_swatches : this.user_swatches,
                 index = ctx.swatches.indexOf(swatch);
-            index = e.key === "ArrowLeft" ? index - 1 : index + 1;
+            index = e.key === 'ArrowLeft' ? index - 1 : index + 1;
             if (index < 0) {
                 if (!swatch.locked && this.locked_swatches) {
                     let swatches = this.locked_swatches.swatches;

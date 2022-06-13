@@ -15,12 +15,12 @@ QUnit.module('ColorWidget', hooks => {
     hooks.afterEach(() => {
         $('#container').empty();
         for (let key in localStorage) {
-            if (key.substring(0,14) == 'color-swatches') {
+            if (key.substring(0,14) == 'yafowil-color-swatches') {
               localStorage.removeItem(key);
             }
           }
         widget = null;
-        localStorage.removeItem("color-swatches");
+        localStorage.removeItem("yafowil-color-swatches");
     });
     hooks.after(() => {
         $('#container').empty().remove();
@@ -124,17 +124,17 @@ QUnit.module('ColorWidget', hooks => {
         // correct hex input
         widget.elem.val('#cccccc');
         widget.elem.trigger('input');
-        assert.strictEqual(widget.picker.color.hexString, "#cccccc");
+        assert.strictEqual(widget.picker.color.hexString, '#cccccc');
 
         // empty input
         widget.elem.val('');
         widget.elem.trigger('input');
-        assert.strictEqual(widget.elem.val(), "");
+        assert.strictEqual(widget.elem.val(), '');
 
         // correct hex input
         widget.elem.val('#213öasd');
         widget.elem.trigger('input');
-        assert.strictEqual(widget.picker.color.hexString, "#cccccc");
+        assert.strictEqual(widget.picker.color.hexString, '#cccccc');
     });
 
     QUnit.test('kelvin input', assert => {
@@ -503,32 +503,6 @@ QUnit.module('ColorWidget', hooks => {
         assert.ok(widget.picker_container.css('margin-bottom'), '0');
     });
 
-    QUnit.test('LockedSwatchesContainer over 10 swatches', assert => {
-        let locked_swatches = [
-            '#ff0000',
-            '#aa2255',
-            '#4287f5',
-            '#f3aaa4',
-            '#3bda3a',
-            '#408dbf',
-            '#8c40f5',
-            '#e8d26e',
-            '#603078',
-            '#4def93',
-            '#891276',
-            '#c94c84'
-        ];
-        // initialize
-        let widget = new ColorWidget(elem, {
-            color: '#ffffff',
-            locked_swatches: locked_swatches
-        });
-
-        assert.ok(widget.locked_swatches);
-        assert.ok(widget.locked_swatches.elem.is('div.color-picker-recent'));
-        assert.strictEqual(widget.locked_swatches.swatches.length, 10);
-    });
-
     QUnit.test('LockedSwatchesContainer - locked swatches', assert => {
         widget = new ColorWidget(elem, {
             locked_swatches: [
@@ -551,7 +525,7 @@ QUnit.module('ColorWidget', hooks => {
                 {h: 0, s: 0, l: 80},
                 {h: 0, s: 100, l: 50}
             ];
-            localStorage.setItem("color-swatches", JSON.stringify(swatches));
+            localStorage.setItem('yafowil-color-swatches', JSON.stringify(swatches));
 
            // initialize
             let widget = new ColorWidget(elem, {
@@ -647,7 +621,7 @@ QUnit.module('ColorWidget', hooks => {
                 swatches.push(swatch.color.hsva);
             }
             assert.strictEqual(
-                localStorage.getItem('color-swatches'),
+                localStorage.getItem('yafowil-color-swatches'),
                 JSON.stringify(swatches)
             );
 
@@ -673,7 +647,7 @@ QUnit.module('ColorWidget', hooks => {
                 widget.picker.color.hexString,
                 '#ffffff'
             );
-            assert.notOk(localStorage.getItem('color-swatches'));
+            assert.notOk(localStorage.getItem('yafowil-color-swatches'));
         });
 
         QUnit.test('create_swatch - same as locked swatch color', assert => {
@@ -745,7 +719,7 @@ QUnit.module('ColorWidget', hooks => {
             assert.strictEqual($('div.color-swatch').length, 1);
         });
 
-        QUnit.test('create over 12 swatches', assert => {
+        QUnit.test('create over 10 swatches', assert => {
             // initialize
             let widget = new ColorWidget(elem, {
                 color:'#ffffff',

@@ -61,10 +61,9 @@ export class LockedSwatchesContainer {
 
     constructor (widget, swatches = []) {
         this.widget = widget;
-        this.elem = $(`<div />`)
+        this.elem = $('<div />')
             .addClass('color-picker-recent')
             .appendTo(widget.dropdown_elem);
-
         this.swatches = [];
         this.init_swatches(swatches);
     }
@@ -73,18 +72,15 @@ export class LockedSwatchesContainer {
         if (!swatches || !swatches.length) {
             this.elem.hide();
             return;
-        } else if (swatches.length > 10) {
-            swatches = swatches.slice(0, 10);
         }
-
         for (let swatch of swatches) {
             let color;
             if (swatch instanceof Array) {
-                    color = {
-                        r: swatch[0],
-                        g: swatch[1],
-                        b: swatch[2],
-                        a: swatch[3] || 1
+                color = {
+                    r: swatch[0],
+                    g: swatch[1],
+                    b: swatch[2],
+                    a: swatch[3] || 1
                 }
             } else if (
                 typeof swatch === 'string' || typeof swatch === 'object'
@@ -112,13 +108,13 @@ export class UserSwatchesContainer {
 
     constructor (widget) {
         this.widget = widget;
-        this.elem = $(`<div />`)
+        this.elem = $('<div />')
             .addClass('color-picker-recent')
             .appendTo(widget.dropdown_elem);
-        this.add_color_btn = $(`<button />`)
+        this.add_color_btn = $('<button />')
             .addClass('add_color')
             .text('+ Add');
-        this.remove_color_btn = $(`<button />`)
+        this.remove_color_btn = $('<button />')
             .addClass('remove_color')
             .text('- Remove')
             .hide();
@@ -136,11 +132,11 @@ export class UserSwatchesContainer {
         this.remove_swatch = this.remove_swatch.bind(this);
         this.remove_color_btn.on('click', this.remove_swatch);
         this.init_swatches = this.init_swatches.bind(this);
-        widget.elem.on('yafowil-colors:changed', this.init_swatches);
+        widget.elem.on('yafowil-color-swatches:changed', this.init_swatches);
     }
 
     init_swatches(e) {
-        let json_str = localStorage.getItem("color-swatches");
+        let json_str = localStorage.getItem('yafowil-color-swatches');
 
         for (let swatch of this.swatches) {
             swatch.destroy();
@@ -228,7 +224,6 @@ export class UserSwatchesContainer {
             this.widget.picker.color.set(this.widget.active_swatch.color);
         }
         this.set_swatches();
-
     }
 
     set_swatches() {
@@ -237,11 +232,11 @@ export class UserSwatchesContainer {
             swatches.push(swatch.color.hsva);
         }
         if (swatches.length) {
-            localStorage.setItem(`color-swatches`, JSON.stringify(swatches));
+            localStorage.setItem('yafowil-color-swatches', JSON.stringify(swatches));
         } else {
-            localStorage.removeItem("color-swatches");
+            localStorage.removeItem('yafowil-color-swatches');
         }
-        let evt = new $.Event('yafowil-colors:changed', {origin: this});
+        let evt = new $.Event('yafowil-color-swatches:changed', {origin: this});
         $('input.color-picker').trigger(evt);
     }
 }

@@ -52,7 +52,7 @@ var yafowil_color = (function (exports, $) {
     class LockedSwatchesContainer {
         constructor (widget, swatches = []) {
             this.widget = widget;
-            this.elem = $(`<div />`)
+            this.elem = $('<div />')
                 .addClass('color-picker-recent')
                 .appendTo(widget.dropdown_elem);
             this.swatches = [];
@@ -62,17 +62,15 @@ var yafowil_color = (function (exports, $) {
             if (!swatches || !swatches.length) {
                 this.elem.hide();
                 return;
-            } else if (swatches.length > 10) {
-                swatches = swatches.slice(0, 10);
             }
             for (let swatch of swatches) {
                 let color;
                 if (swatch instanceof Array) {
-                        color = {
-                            r: swatch[0],
-                            g: swatch[1],
-                            b: swatch[2],
-                            a: swatch[3] || 1
+                    color = {
+                        r: swatch[0],
+                        g: swatch[1],
+                        b: swatch[2],
+                        a: swatch[3] || 1
                     };
                 } else if (
                     typeof swatch === 'string' || typeof swatch === 'object'
@@ -98,13 +96,13 @@ var yafowil_color = (function (exports, $) {
     class UserSwatchesContainer {
         constructor (widget) {
             this.widget = widget;
-            this.elem = $(`<div />`)
+            this.elem = $('<div />')
                 .addClass('color-picker-recent')
                 .appendTo(widget.dropdown_elem);
-            this.add_color_btn = $(`<button />`)
+            this.add_color_btn = $('<button />')
                 .addClass('add_color')
                 .text('+ Add');
-            this.remove_color_btn = $(`<button />`)
+            this.remove_color_btn = $('<button />')
                 .addClass('remove_color')
                 .text('- Remove')
                 .hide();
@@ -120,10 +118,10 @@ var yafowil_color = (function (exports, $) {
             this.remove_swatch = this.remove_swatch.bind(this);
             this.remove_color_btn.on('click', this.remove_swatch);
             this.init_swatches = this.init_swatches.bind(this);
-            widget.elem.on('yafowil-colors:changed', this.init_swatches);
+            widget.elem.on('yafowil-color-swatches:changed', this.init_swatches);
         }
         init_swatches(e) {
-            let json_str = localStorage.getItem("color-swatches");
+            let json_str = localStorage.getItem('yafowil-color-swatches');
             for (let swatch of this.swatches) {
                 swatch.destroy();
             }
@@ -214,11 +212,11 @@ var yafowil_color = (function (exports, $) {
                 swatches.push(swatch.color.hsva);
             }
             if (swatches.length) {
-                localStorage.setItem(`color-swatches`, JSON.stringify(swatches));
+                localStorage.setItem('yafowil-color-swatches', JSON.stringify(swatches));
             } else {
-                localStorage.removeItem("color-swatches");
+                localStorage.removeItem('yafowil-color-swatches');
             }
-            let evt = new $.Event('yafowil-colors:changed', {origin: this});
+            let evt = new $.Event('yafowil-color-swatches:changed', {origin: this});
             $('input.color-picker').trigger(evt);
         }
     }
@@ -327,15 +325,15 @@ var yafowil_color = (function (exports, $) {
             elem.data('yafowil-color', this);
             elem.addClass('form-control');
             this.elem = elem;
-            this.elem.attr('spellcheck', "false");
-            this.dropdown_elem = $(`<div />`)
+            this.elem.attr('spellcheck', 'false');
+            this.dropdown_elem = $('<div />')
                 .addClass('color-picker-wrapper')
                 .css('top', this.elem.outerHeight())
                 .insertAfter(this.elem);
             this.picker_container = $('<div />')
                 .addClass('color-picker-container')
                 .appendTo(this.dropdown_elem);
-            this.close_btn = $(`<button />`)
+            this.close_btn = $('<button />')
                 .addClass('close-button')
                 .text('✕')
                 .appendTo(this.dropdown_elem);
@@ -383,7 +381,7 @@ var yafowil_color = (function (exports, $) {
                 prev_elem = $(options.preview_elem)
                     .addClass('yafowil-color-picker-preview');
             } else {
-                prev_elem = $(`<span />`)
+                prev_elem = $('<span />')
                     .addClass('yafowil-color-picker-color layer-transparent');
             }
             this.preview = new PreviewElement(this, prev_elem, this.color);
@@ -424,10 +422,8 @@ var yafowil_color = (function (exports, $) {
                             sliderType: type,
                             sliderSize: opts.slider_size,
                             sliderLength: opts.slider_length,
-                            minTemperature: opts.temperature ?
-                                opts.temperature.min : undefined,
-                            maxTemperature: opts.temperature ?
-                                opts.temperature.max : undefined,
+                            minTemperature: opts.temperature.min || undefined,
+                            maxTemperature: opts.temperature.max || undefined,
                             disabled: opts.disabled,
                             showInput: opts.show_inputs,
                             showLabel: opts.show_labels
@@ -452,7 +448,7 @@ var yafowil_color = (function (exports, $) {
             this.input_elem.update_color(this.color);
         }
         open(evt) {
-            if (this.dropdown_elem.css('display') === "none") {
+            if (this.dropdown_elem.css('display') === 'none') {
                 this.dropdown_elem.show();
                 $(window).on('keydown', this.on_keydown);
                 $(window).on('mousedown', this.on_click);
@@ -461,22 +457,22 @@ var yafowil_color = (function (exports, $) {
             }
         }
         on_keydown(e) {
-            if (e.key === "Enter" || e.key === "Escape") {
+            if (e.key === 'Enter' || e.key === 'Escape') {
                 e.preventDefault();
                 this.close();
-            } else if (e.key === "Delete") {
+            } else if (e.key === 'Delete') {
                 e.preventDefault();
                 if (this.user_swatches) {
                     this.user_swatches.remove_swatch();
                 }
-            } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
                 if (!this.locked_swatches && !this.user_swatches) {
                     return;
                 }
                 let swatch = this.active_swatch,
                     ctx = swatch.locked ? this.locked_swatches : this.user_swatches,
                     index = ctx.swatches.indexOf(swatch);
-                index = e.key === "ArrowLeft" ? index - 1 : index + 1;
+                index = e.key === 'ArrowLeft' ? index - 1 : index + 1;
                 if (index < 0) {
                     if (!swatch.locked && this.locked_swatches) {
                         let swatches = this.locked_swatches.swatches;
