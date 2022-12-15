@@ -109,6 +109,10 @@ var yafowil_color = (function (exports, $) {
         static initialize(context) {
             $('input.color-picker', context).each(function(index) {
                 let elem = $(this);
+                let id = elem.attr('id');
+                if (id && id.includes('TEMPLATE')) {
+                    return;
+                }
                 let options = {
                     format: elem.data('format'),
                     preview_elem: elem.data('preview_elem'),
@@ -376,6 +380,15 @@ var yafowil_color = (function (exports, $) {
             localStorage.setItem(`color-swatches-${this.index}`, JSON.stringify(swatches));
         }
     }
+    function color_on_array_add(inst, context) {
+        ColorWidget.initialize(context);
+    }
+    $(function() {
+        if (yafowil_array === undefined) {
+            return;
+        }
+        yafowil_array.on_array_event('on_add', color_on_array_add);
+    });
 
     $(function() {
         if (window.ts !== undefined) {

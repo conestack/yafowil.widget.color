@@ -11,6 +11,10 @@ export class ColorWidget {
     static initialize(context) {
         $('input.color-picker', context).each(function(index) {
             let elem = $(this);
+            let id = elem.attr('id')
+            if (id && id.includes('TEMPLATE')) {
+                return;
+            }
             let options = {
                 format: elem.data('format'),
                 preview_elem: elem.data('preview_elem'),
@@ -308,3 +312,18 @@ export class ColorWidget {
         localStorage.setItem(`color-swatches-${this.index}`, JSON.stringify(swatches));
     }
 }
+
+//////////////////////////////////////////////////////////////////////////////
+// yafowil.widget.array integration
+//////////////////////////////////////////////////////////////////////////////
+
+function color_on_array_add(inst, context) {
+    ColorWidget.initialize(context);
+}
+
+$(function() {
+    if (yafowil_array === undefined) {
+        return;
+    }
+    yafowil_array.on_array_event('on_add', color_on_array_add);
+});

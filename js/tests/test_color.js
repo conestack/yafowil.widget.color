@@ -4,6 +4,8 @@ import $ from 'jquery'
 let elem = $('<input class="color-picker"/>');
 let widget;
 
+window.yafowil_array = undefined;
+
 QUnit.module('ColorWidget', hooks => {
 
     hooks.before(() => {
