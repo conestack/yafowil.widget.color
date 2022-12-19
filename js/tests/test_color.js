@@ -34,6 +34,14 @@ QUnit.module('ColorWidget', hooks => {
         assert.deepEqual(widget.elem, elem);
     });
 
+    QUnit.test('initialize in array', assert => {
+        // in array template
+        elem.attr('id', 'yafowil-TEMPLATE-array');
+        ColorWidget.initialize();
+        assert.notOk(elem.data('yafowil-color'));
+        elem.attr('id', null);
+    })
+
     QUnit.test('default constructor', assert => {
         ColorWidget.initialize();
         widget = elem.data('yafowil-color');
