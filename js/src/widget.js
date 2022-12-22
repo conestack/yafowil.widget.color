@@ -12,8 +12,7 @@ export class ColorWidget {
     static initialize(context) {
         $('input.color-picker', context).each(function() {
             let elem = $(this);
-            let id = elem.attr('id')
-            if (id && id.includes('TEMPLATE')) {
+            if (elem.parents('.arraytemplate').length) {
                 return;
             }
             let options = {

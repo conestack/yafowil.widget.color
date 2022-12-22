@@ -59,7 +59,7 @@ QUnit.module('ColorWidget', hooks => {
             .append($('<td />'))
             .appendTo('body');
 
-        elem.attr('id', 'yafowil-TEMPLATE-array');
+        $('td', table).addClass('arraytemplate');
         elem.appendTo($('td', table));
 
         // invoke array on_add - returns
@@ -67,6 +67,7 @@ QUnit.module('ColorWidget', hooks => {
         _array_subscribers['on_add'].apply(null, context);
         widget = elem.data('yafowil-color');
         assert.notOk(widget);
+        $('td', table).removeClass('arraytemplate');
 
         // invoke array on_add
         elem.attr('id', '');
