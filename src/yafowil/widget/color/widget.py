@@ -19,7 +19,8 @@ color_options = [
     'box_height',
     'slider_size',
     'color',
-    'swatches',
+    'locked_swatches',
+    'user_swatches',
     'temperature',
     'format',
     'disabled',
@@ -147,10 +148,16 @@ rgbString, rgbaString or kelvin number.
 Values: [String()].
 """
 
-factory.defaults['color.swatches'] = True
-factory.doc['props']['color.swatches'] = """\
-Set swatches to be initialized.
+factory.defaults['color.locked_swatches'] = None
+factory.doc['props']['color.locked_swatches'] = """\
+Swatches to be initialized.
 Given swatches can't be deleted in the widget.
+Values: [Array(Dict)].
+"""
+
+factory.defaults['color.user_swatches'] = True
+factory.doc['props']['color.user_swatches'] = """\
+Flag whether the user can add and remove swatches.
 Values: [Array(Dict)].
 """
 

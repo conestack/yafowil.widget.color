@@ -28,12 +28,13 @@ def default_example():
     }
 
 
-
 DOC_WHEEL = """
 Color Wheel
 -----------
 
 Instead of a box, the color widget can also be initialized with a color wheel.
+
+Passing both 'box' and 'wheel' allows the user to switch between components.
 
 
 .. code-block:: python
@@ -43,7 +44,7 @@ Instead of a box, the color widget can also be initialized with a color wheel.
         name='colorwidget',
         props={
             'label': 'Picker with wheel',
-            'sliders': ['wheel', 'v']
+            'sliders': ['wheel', 'box', 'v']
         }
     )
 """
@@ -55,14 +56,13 @@ def wheel_example():
         '#field:color',
         props={
             'label': 'Picker with wheel',
-            'sliders': ['wheel', 'v']
+            'sliders': ['wheel', 'box', 'v']
         })
     return {
         'widget': part,
         'doc': DOC_WHEEL,
         'title': 'Color wheel'
     }
-
 
 
 DOC_DIM = """
@@ -151,7 +151,6 @@ def length_example():
     }
 
 
-
 DOC_LAYOUT = """
 Horizontal Layout
 -----------------
@@ -171,7 +170,7 @@ by setting 'layout_direction' to 'horizontal'.
             'layout_direction': 'horizontal',
             'show_inputs': True,
             'show_labels': True,
-            'swatches': False
+            'locked_swatches': False
         }
     )
 """
@@ -187,14 +186,13 @@ def layout_example():
             'layout_direction': 'horizontal',
             'show_inputs': True,
             'show_labels': True,
-            'swatches': False
+            'locked_swatches': False
         })
     return {
         'widget': part,
         'doc': DOC_LAYOUT,
         'title': 'Horizontal Layout'
     }
-
 
 
 DOC_PREVIEW = """
@@ -239,20 +237,18 @@ def preview_example():
     }
 
 
-
 DOC_SWATCHES = """
-Fixed color swatches
---------------------
+Color swatches
+--------------
 
 Initialize the widget with custom swatches by passing an array of elements
 in the 'swatches' option.
 
-Disable swatch functionality by passing False.
-Enable swatches without fixed swatches by passing True.
+Enable/Disable locked swatches by setting the "locked_swatches" option to True/False.
 
-Swatches passed in this option are not removable by the user.
+Enable/Disable user swatches by setting the "user_swatches" option to True/False.
 
-Supported formats:
+Supported formats (locked swatches):
 
 - Number Array (will default to rgb / rgba value)
 - rgb string
@@ -269,10 +265,10 @@ Supported formats:
         'color',
         name='colorwidget',
         props={
-            'label': 'Picker with fixed swatches',
+            'label': 'Picker with locked swatches',
             'sliders': ['h', 's', 'v', 'a'],
             'color': '#ff0000',
-            'swatches': [
+            'locked_swatches': [
                 [255, 0, 0],          # default interpretation as rgb
                 [255, 150, 0, 0.5],     # default interpretation as rgba
                 'rgb(255,255,0)',      # rgb string
@@ -288,7 +284,8 @@ Supported formats:
                     'g': 0,
                     'b': 255
                 }
-            ]
+            ],
+            'user_swatches': True
         }
     )
 """
@@ -299,10 +296,10 @@ def swatches_example():
     part['color'] = factory(
         '#field:color',
         props={
-            'label': 'Picker with fixed swatches',
+            'label': 'Picker with locked swatches',
             'sliders': ['h', 's', 'v', 'a'],
             'color': '#ff0000',
-            'swatches': [
+            'locked_swatches': [
                 [255, 0, 0],          # default interpretation as rgb
                 [255, 150, 0, 0.5],     # default interpretation as rgba
                 'rgb(255,255,0)',      # rgb string
@@ -323,9 +320,8 @@ def swatches_example():
     return {
         'widget': part,
         'doc': DOC_SWATCHES,
-        'title': 'Fixed swatches'
+        'title': 'Locked swatches'
     }
-
 
 
 DOC_INPUT = """
@@ -371,7 +367,6 @@ def input_example():
         'doc': DOC_INPUT,
         'title': 'Input Fields'
     }
-
 
 
 DOC_RGB = """
@@ -421,7 +416,6 @@ def rgb_example():
     }
 
 
-
 DOC_HSV = """
 Example: HSV color picker
 -------------------------
@@ -461,8 +455,6 @@ def hsv_example():
     }
 
 
-
-
 DOC_KELVIN = """
 Example: Temperature
 --------------------
@@ -487,7 +479,9 @@ The possible kelvin temperature ranges from 1000 to 40000.
             'slider_size': 30,
             'format': 'kelvin',
             'color': '#ffffff',
-            'temperature': {'min': 4000, 'max': 8000}
+            'temperature': {'min': 4000, 'max': 8000},
+            'locked_swatches': False,
+            'user_swatches': False
         }
     )
 """
@@ -504,7 +498,8 @@ def kelvin_example():
             'format': 'kelvin',
             'color': '#ffffff',
             'temperature': {'min': 4000, 'max': 8000},
-            'swatches': False
+            'locked_swatches': False,
+            'user_swatches': False
         })
     return {
         'widget': part,
@@ -512,6 +507,63 @@ def kelvin_example():
         'title': 'Example: Temperature'
     }
 
+
+DOC_SWATCHES_ONLY = """
+Swatch Widget
+-------------
+
+Pass False in the 'sliders' option of your widget to create a swatch only widget.
+
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='colorwidget',
+        props={
+            'label': 'Example: Swatch Widget',
+            'sliders': False,
+            'locked_swatches': [
+                '#ff0000',
+                '#aa2255',
+                '#4287f5',
+                '#06c7e5',
+                '#a096d4',
+                '#ecbd78'
+            ],
+            'user_swatches': False
+        }
+    )
+"""
+
+
+def swatches_only_example():
+    part = factory(u'fieldset', name='yafowil.widget.color.test')
+    part['color'] = factory(
+        '#field:color',
+        props={
+            'label': 'Example: Swatch Widget',
+            'sliders': False,
+            'locked_swatches': [
+                '#ff0000',
+                '#aa2255',
+                '#4287f5',
+                '#06c7e5',
+                '#a096d4',
+                '#ecbd78',
+                '#80dbad',
+                '#f18a1e',
+                '#9c171c',
+                '#37e3a4',
+                '#72d910'
+            ],
+            'user_swatches': False
+        })
+    return {
+        'widget': part,
+        'doc': DOC_SWATCHES_ONLY,
+        'title': 'Example: Temperature'
+    }
 
 
 def get_example():
@@ -524,6 +576,7 @@ def get_example():
         input_example(),
         preview_example(),
         swatches_example(),
+        swatches_only_example(),
         rgb_example(),
         hsv_example(),
         kelvin_example()

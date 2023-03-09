@@ -16,16 +16,14 @@ module.exports = function(config) {
         }, {
             pattern: '../../src/yafowil/widget/color/resources/iro/iro.js',
             included: true
-        },
-        {
+        }, {
             pattern: '../src/*.js',
             type: 'module',
             included: false
         }, {
             pattern: '../tests/test_*.js',
             type: 'module'
-        },
-        {
+        }, {
             pattern: '../../src/yafowil/widget/color/resources/widget.css',
             included: true
         }],
