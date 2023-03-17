@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from yafowil.base import factory
+from yafowil.common import generic_emptyvalue_extractor
+from yafowil.common import generic_extractor
 from yafowil.common import generic_required_extractor
 from yafowil.tsf import TSF
 from yafowil.utils import as_data_attrs
@@ -31,10 +33,6 @@ color_options = [
 ]
 
 
-def color_extractor(widget, data):
-    pass
-
-
 @managedprops(*color_options)
 def color_edit_renderer(widget, data):
     input_attrs = {
@@ -58,8 +56,9 @@ def color_display_renderer(widget, data):
 factory.register(
     'color',
     extractors=[
-        color_extractor,
-        generic_required_extractor
+        generic_extractor,
+        generic_required_extractor,
+        generic_emptyvalue_extractor
     ],
     edit_renderers=[
         color_edit_renderer
@@ -140,9 +139,9 @@ Set the height of slider elements (in pixels).
 Values: [px].
 """
 
-factory.defaults['color.color'] = '#fff'
+factory.defaults['color.color'] = ''
 factory.doc['props']['color.color'] = """\
-Set the inital picker color if no swatches are specified.
+Set the inital picker color.
 The color can be passed as hexString, hslString, hslaString,
 rgbString, rgbaString or kelvin number.
 Values: [String()].

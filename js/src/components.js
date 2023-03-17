@@ -157,11 +157,6 @@ export class UserSwatchesContainer {
                 this.swatches[0].destroy();
                 this.swatches.shift();
             }
-            if (this.swatches.length && e && e.origin === this
-                || this.swatches.length && !e) {
-                    let active_swatch = this.swatches[this.swatches.length -1];
-                    this.widget.active_swatch = active_swatch;
-            }
         } else {
             this.remove_color_btn.hide();
         }
@@ -203,26 +198,9 @@ export class UserSwatchesContainer {
         let index = this.swatches.indexOf(this.widget.active_swatch);
         this.swatches.splice(index, 1);
 
-        if (!this.swatches.length) {
-            if (this.widget.locked_swatches
-                && this.widget.locked_swatches.swatches.length) {
-                    let l_swatches = this.widget.locked_swatches.swatches;
-                    this.widget.active_swatch = l_swatches[
-                        l_swatches.length - 1
-                    ];
-                    this.widget.picker.color.set(
-                        this.widget.active_swatch.color
-                    );
-            }
-            this.elem.hide();
-            this.remove_color_btn.hide();
-            this.widget.picker.color.reset();
-        } else {
-            this.widget.active_swatch = this.swatches[
-                this.swatches.length - 1
-            ];
-            this.widget.picker.color.set(this.widget.active_swatch.color);
-        }
+        this.elem.hide();
+        this.remove_color_btn.hide();
+        this.widget.picker.color.reset();
         this.set_swatches();
     }
 
@@ -252,7 +230,9 @@ export class InputElement {
         }
         this.temperature = temperature;
         this.color = color;
-        this.update_color(color);
+        if (this.color) {
+            this.update_color(color);
+        }
 
         this.on_input = this.on_input.bind(this);
         this.elem.on('input', this.on_input);
@@ -296,7 +276,7 @@ export class PreviewElement {
             .addClass('layer-transparent')
             .append(this.layer)
             .insertAfter(this.widget.elem);
-        this.color = color.rgbaString;
+        this.color = color ? color.rgbaString : undefined;
         this.on_click = this.on_click.bind(this);
         this.elem.on('click', this.on_click);
     }

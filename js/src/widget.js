@@ -90,8 +90,11 @@ export class ColorWidget {
         if (options.user_swatches) {
             this.user_swatches = new UserSwatchesContainer(this);
         }
-
-        this.color = this.picker.color.clone();
+        if (options.color) {
+            this.color = this.picker.color.clone();
+        } else {
+            this.color = null;
+        }
         let temp = options.temperature || {min: 2000, max: 11000};
         this.input_elem = new InputElement(
             this, this.elem, this.color, options.format, temp
@@ -119,7 +122,7 @@ export class ColorWidget {
 
     init_opts(opts) {
         let iro_opts = {
-            color: opts.color,
+            color: opts.color ? opts.color : '#fff',
             width: opts.box_width,
             boxHeight: opts.box_height || opts.box_width,
             layoutDirection: opts.layout_direction || 'vertical',
