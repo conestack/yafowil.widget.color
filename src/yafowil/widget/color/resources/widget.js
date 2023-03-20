@@ -2,12 +2,13 @@ var yafowil_color = (function (exports, $) {
     'use strict';
 
     class ColorSwatch {
-        constructor(widget, container, color, locked = false) {
+        constructor(widget, container, color, kelvin = false, locked = false) {
             this.widget = widget;
             this.container = container;
             this.color = color;
             this.locked = locked;
             this.selected = false;
+            this.kelvin = kelvin;
             this.elem = $('<div />')
                 .addClass('color-swatch layer-transparent')
                 .appendTo(this.container);
@@ -64,7 +65,7 @@ var yafowil_color = (function (exports, $) {
                 return;
             }
             for (let swatch of swatches) {
-                let color;
+                let color, kelvin;
                 if (swatch instanceof Array) {
                     color = {
                         r: swatch[0],
@@ -75,16 +76,27 @@ var yafowil_color = (function (exports, $) {
                 } else if (
                     typeof swatch === 'string' || typeof swatch === 'object'
                 ) {
+                    if (typeof swatch === 'string' && !swatch.startsWith('#')) {
+                        swatch = iro.Color.kelvinToRgb(swatch);
+                        kelvin = true;
+                    }
                     color = swatch;
                 } else {
                     console.log(`ERROR: not supported color format at ${swatch}`);
                     return;
                 }
+                let iro_color = new iro.Color(color);
+                if (kelvin && !this.widget.type_kelvin ||
+                    this.widget.type_kelvin && !kelvin ||
+                    !this.widget.type_alpha && iro_color.alpha < 1) {
+                    continue;
+                }
                 this.swatches.push(
                     new ColorSwatch(
                         this.widget,
                         this.elem,
-                        new iro.Color(color),
+                        iro_color,
+                        kelvin,
                         true
                     )
                 );
@@ -130,11 +142,18 @@ var yafowil_color = (function (exports, $) {
                 this.elem.show();
                 this.remove_color_btn.show();
                 let colors = JSON.parse(json_str);
-                for (let color of colors) {
+                for (let color_elem of colors) {
+                    let iro_color = new iro.Color(color_elem.color);
+                    if (color_elem.kelvin && !this.widget.type_kelvin ||
+                        this.widget.type_kelvin && !color_elem.kelvin ||
+                        !this.widget.type_alpha && iro_color.alpha < 1) {
+                        continue;
+                    }
                     this.swatches.push(new ColorSwatch(
                         this.widget,
                         this.elem,
-                        new iro.Color(color)
+                        iro_color,
+                        color_elem.kelvin
                     ));
                 }
                 if (this.swatches.length > 10) {
@@ -164,7 +183,8 @@ var yafowil_color = (function (exports, $) {
             let swatch = new ColorSwatch(
                 this.widget,
                 this.elem,
-                this.widget.picker.color.clone()
+                this.widget.picker.color.clone(),
+                this.widget.type_kelvin
             );
             this.swatches.push(swatch);
             this.set_swatches();
@@ -187,7 +207,7 @@ var yafowil_color = (function (exports, $) {
         set_swatches() {
             let swatches = [];
             for (let swatch of this.swatches) {
-                swatches.push(swatch.color.hsva);
+                swatches.push({color: swatch.color.hsva, kelvin: swatch.kelvin});
             }
             if (swatches.length) {
                 localStorage.setItem('yafowil-color-swatches', JSON.stringify(swatches));
@@ -343,6 +363,8 @@ var yafowil_color = (function (exports, $) {
             } else if (!sliders) {
                 this.picker_container.hide();
             }
+            this.type_kelvin = sliders.includes('k') || options.format === 'kelvin';
+            this.type_alpha = sliders.includes('a');
             if (!options.locked_swatches && !options.user_swatches) {
                 this.picker_container.css('margin-bottom', 0);
             }
@@ -360,9 +382,9 @@ var yafowil_color = (function (exports, $) {
             } else {
                 this.color = null;
             }
-            let temp = options.temperature || {min: 2000, max: 11000};
+            this.temp = options.temperature || {min: 2000, max: 11000};
             this.input_elem = new InputElement(
-                this, this.elem, this.color, options.format, temp
+                this, this.elem, this.color, options.format, this.temp
             );
             let prev_elem;
             if (options.preview_elem) {
