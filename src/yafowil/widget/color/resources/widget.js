@@ -43,6 +43,7 @@ var yafowil_color = (function (exports, $) {
             }
             this.elem.off('click', this.select);
             this.elem.remove();
+            this.widget.active_swatch = null;
         }
         select(e) {
             if (this.widget.active_swatch !== this) {
@@ -102,7 +103,6 @@ var yafowil_color = (function (exports, $) {
                 );
                 this.elem.show();
             }
-            this.widget.active_swatch = this.swatches[0];
         }
     }
     class UserSwatchesContainer {
@@ -190,15 +190,21 @@ var yafowil_color = (function (exports, $) {
             this.set_swatches();
         }
         remove_swatch(e) {
+            console.log('remove_swatch');
             if (e && e.type === 'click') {
                 e.preventDefault();
             }
-            if (!this.widget.active_swatch) {
-                this.widget.active_swatch = this.swatches[this.swatches.length -1];
+            if (!this.widget.active_swatch || this.widget.active_swatch.locked) {
+                return;
             }
             this.widget.active_swatch.destroy();
             let index = this.swatches.indexOf(this.widget.active_swatch);
             this.swatches.splice(index, 1);
+            if (!this.swatches.length) {
+                this.elem.hide();
+                this.remove_color_btn.hide();
+                this.widget.picker.color.reset();
+            }
             this.elem.hide();
             this.remove_color_btn.hide();
             this.widget.picker.color.reset();
