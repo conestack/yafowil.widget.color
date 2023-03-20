@@ -172,16 +172,19 @@ QUnit.module('ColorWidget', hooks => {
         // correct hex input
         widget.elem.val('#cccccc');
         widget.elem.trigger('input');
+        widget.elem.trigger('focusout');
         assert.strictEqual(widget.picker.color.hexString, '#cccccc');
 
         // empty input
         widget.elem.val('');
         widget.elem.trigger('input');
+        widget.elem.trigger('focusout');
         assert.strictEqual(widget.elem.val(), '');
 
         // correct hex input
         widget.elem.val('#213öasd');
         widget.elem.trigger('input');
+        widget.elem.trigger('focusout');
         assert.strictEqual(widget.picker.color.hexString, '#cccccc');
     });
 
@@ -195,6 +198,7 @@ QUnit.module('ColorWidget', hooks => {
 
         widget.elem.val(6000);
         widget.elem.trigger('input');
+        widget.elem.trigger('focusout');
         // issue with kelvin conversion in original iro.js
         // this test utilizes a modified fork.
         assert.strictEqual(parseInt(widget.picker.color.kelvin), 6000);
@@ -202,24 +206,30 @@ QUnit.module('ColorWidget', hooks => {
         // input events under minimum character length
         widget.elem.val(5);
         widget.elem.trigger('input');
-        assert.strictEqual(parseInt(widget.picker.color.kelvin), 6000);
+        widget.elem.trigger('focusout');
+        assert.strictEqual(parseInt(widget.picker.color.kelvin), 3000);
         widget.elem.val(58);
         widget.elem.trigger('input');
-        assert.strictEqual(parseInt(widget.picker.color.kelvin), 6000);
+        widget.elem.trigger('focusout');
+        assert.strictEqual(parseInt(widget.picker.color.kelvin), 3000);
         widget.elem.val(582);
         widget.elem.trigger('input');
-        assert.strictEqual(parseInt(widget.picker.color.kelvin), 6000);
+        widget.elem.trigger('focusout');
+        assert.strictEqual(parseInt(widget.picker.color.kelvin), 3000);
         // value changes if over minimum value
         widget.elem.val(5823);
         widget.elem.trigger('input');
+        widget.elem.trigger('focusout');
         assert.strictEqual(parseInt(widget.picker.color.kelvin), 5823);
         // value caps if over maximum value
         widget.elem.val(58234);
         widget.elem.trigger('input');
+        widget.elem.trigger('focusout');
         assert.strictEqual(parseInt(widget.picker.color.kelvin), 8000);
         // value caps if under minimum value
         widget.elem.val(1234);
         widget.elem.trigger('input');
+        widget.elem.trigger('focusout');
         assert.strictEqual(parseInt(widget.picker.color.kelvin), 3000);
     });
 
