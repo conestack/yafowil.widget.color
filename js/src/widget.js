@@ -78,8 +78,9 @@ export class ColorWidget {
             this.picker_container.hide();
         }
 
-        this.type_kelvin = sliders.includes('k') || options.format === 'kelvin';
-        this.type_alpha = sliders.includes('a');
+        this.type_kelvin = options.format === 'kelvin';
+        let alpha_types = ['rgbaString', 'hex8String', 'hslaString'];
+        this.type_alpha = alpha_types.includes(options.format);
 
         if (!options.locked_swatches && !options.user_swatches) {
             this.picker_container.css('margin-bottom', 0);

@@ -250,6 +250,8 @@ export class InputElement {
         this.format = format || 'hexString';
         if (this.format === 'hexString') {
             this.elem.attr('maxlength', 7);
+        } else if (this.format === 'hex8String') {
+            this.elem.attr('maxlength', 9);
         }
         this.temperature = temperature;
         this.color = color;
