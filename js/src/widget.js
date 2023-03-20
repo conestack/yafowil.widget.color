@@ -205,7 +205,8 @@ export class ColorWidget {
                 this.user_swatches.remove_swatch();
             }
         } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-            if (!this.locked_swatches && !this.user_swatches) {
+            if ((!this.locked_swatches && !this.user_swatches ) ||
+                !this.active_swatch) {
                 return;
             }
             let swatch = this.active_swatch,
