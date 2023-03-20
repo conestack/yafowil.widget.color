@@ -91,6 +91,7 @@ Values: [Str].
 
 Available options:
 - hexString
+- hex8String
 - hslString
 - hslaString
 - rgbString
