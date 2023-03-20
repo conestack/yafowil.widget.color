@@ -79,13 +79,16 @@ var yafowil_color = (function (exports, $) {
                     color = {
                         r: swatch[0],
                         g: swatch[1],
-                        b: swatch[2],
-                        a: swatch[3] || 1
+                        b: swatch[2]
                     };
+                    if (swatch[3]) {
+                        color.a = swatch[3];
+                    }
                 } else if (
                     typeof swatch === 'string' || typeof swatch === 'object'
                 ) {
-                    if (typeof swatch === 'string' && !swatch.startsWith('#')) {
+                    if (typeof swatch === 'string' && !swatch.startsWith('#') &&
+                        parseInt(swatch) == swatch) {
                         swatch = iro.Color.kelvinToRgb(swatch);
                         kelvin = true;
                     }
@@ -98,7 +101,7 @@ var yafowil_color = (function (exports, $) {
                 if (kelvin && !this.widget.type_kelvin ||
                     this.widget.type_kelvin && !kelvin ||
                     !this.widget.type_alpha && iro_color.alpha < 1) {
-                    continue;
+                        continue;
                 }
                 this.swatches.push(
                     new ColorSwatch(
@@ -495,7 +498,8 @@ var yafowil_color = (function (exports, $) {
                     this.user_swatches.remove_swatch();
                 }
             } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-                if (!this.locked_swatches && !this.user_swatches) {
+                if ((!this.locked_swatches && !this.user_swatches ) ||
+                    !this.active_swatch) {
                     return;
                 }
                 let swatch = this.active_swatch,
