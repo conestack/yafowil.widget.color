@@ -31,7 +31,8 @@ export class ColorWidget {
                 show_inputs: elem.data('show_inputs'),
                 show_labels: elem.data('show_labels'),
                 slider_length: elem.data('slider_length'),
-                layout_direction: elem.data('layout_direction')
+                layout_direction: elem.data('layout_direction'),
+                open_on_focus: elem.data('open_on_focus')
             };
             new ColorWidget(elem, options);
         });
@@ -115,7 +116,9 @@ export class ColorWidget {
         this.preview = new PreviewElement(this, prev_elem, this.color);
 
         this.open = this.open.bind(this);
-        this.elem.on('focus', this.open);
+        if (options.open_on_focus) {
+            this.elem.on('focus', this.open);
+        }
         this.update_color = this.update_color.bind(this);
         this.picker.on('color:change', this.update_color);
         this.close = this.close.bind(this);

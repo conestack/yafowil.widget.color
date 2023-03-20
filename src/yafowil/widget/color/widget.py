@@ -29,7 +29,8 @@ color_options = [
     'show_inputs',
     'show_labels',
     'slider_length',
-    'layout_direction'
+    'layout_direction',
+    'open_on_focus'
 ]
 
 
@@ -195,4 +196,10 @@ factory.defaults['color.layout_direction'] = 'vertical'
 factory.doc['props']['color.layout_direction'] = """\
 Direction of the entire layout.
 Values: ['vertical'|'horizontal'].
+"""
+
+factory.defaults['color.open_on_focus'] = True
+factory.doc['props']['color.open_on_focus'] = """\
+Flag whether the picker dropdown opens on input focus.
+Values: [True | False].
 """
