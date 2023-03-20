@@ -204,8 +204,8 @@ var yafowil_color = (function (exports, $) {
             if (!this.widget.active_swatch || this.widget.active_swatch.locked) {
                 return;
             }
-            this.widget.active_swatch.destroy();
             let index = this.swatches.indexOf(this.widget.active_swatch);
+            this.widget.active_swatch.destroy();
             this.swatches.splice(index, 1);
             if (!this.swatches.length) {
                 this.elem.hide();
