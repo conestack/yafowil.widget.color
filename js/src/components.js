@@ -49,6 +49,7 @@ export class ColorSwatch {
         }
         this.elem.off('click', this.select);
         this.elem.remove();
+        this.widget.active_swatch = null;
     }
 
     select(e) {
@@ -113,7 +114,6 @@ export class LockedSwatchesContainer {
             );
             this.elem.show();
         }
-        this.widget.active_swatch = this.swatches[0];
     }
 }
 
@@ -211,15 +211,22 @@ export class UserSwatchesContainer {
     }
 
     remove_swatch(e) {
+        console.log('remove_swatch')
         if (e && e.type === 'click') {
             e.preventDefault();
         }
-        if (!this.widget.active_swatch) {
-            this.widget.active_swatch = this.swatches[this.swatches.length -1];
+        if (!this.widget.active_swatch || this.widget.active_swatch.locked) {
+            return;
         }
         this.widget.active_swatch.destroy();
         let index = this.swatches.indexOf(this.widget.active_swatch);
         this.swatches.splice(index, 1);
+
+        if (!this.swatches.length) {
+            this.elem.hide();
+            this.remove_color_btn.hide();
+            this.widget.picker.color.reset();
+        }
 
         this.elem.hide();
         this.remove_color_btn.hide();
