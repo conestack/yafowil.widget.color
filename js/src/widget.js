@@ -78,6 +78,9 @@ export class ColorWidget {
             this.picker_container.hide();
         }
 
+        this.type_kelvin = sliders.includes('k') || options.format === 'kelvin';
+        this.type_alpha = sliders.includes('a');
+
         if (!options.locked_swatches && !options.user_swatches) {
             this.picker_container.css('margin-bottom', 0);
         }
@@ -95,9 +98,9 @@ export class ColorWidget {
         } else {
             this.color = null;
         }
-        let temp = options.temperature || {min: 2000, max: 11000};
+        this.temp = options.temperature || {min: 2000, max: 11000};
         this.input_elem = new InputElement(
-            this, this.elem, this.color, options.format, temp
+            this, this.elem, this.color, options.format, this.temp
         );
 
         let prev_elem;

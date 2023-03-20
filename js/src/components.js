@@ -2,12 +2,13 @@ import $ from 'jquery';
 
 export class ColorSwatch {
 
-    constructor(widget, container, color, locked = false) {
+    constructor(widget, container, color, kelvin = false, locked = false) {
         this.widget = widget;
         this.container = container;
         this.color = color;
         this.locked = locked;
         this.selected = false;
+        this.kelvin = kelvin;
 
         this.elem = $('<div />')
             .addClass('color-swatch layer-transparent')
@@ -74,7 +75,7 @@ export class LockedSwatchesContainer {
             return;
         }
         for (let swatch of swatches) {
-            let color;
+            let color, kelvin;
             if (swatch instanceof Array) {
                 color = {
                     r: swatch[0],
@@ -85,16 +86,28 @@ export class LockedSwatchesContainer {
             } else if (
                 typeof swatch === 'string' || typeof swatch === 'object'
             ) {
+                if (typeof swatch === 'string' && !swatch.startsWith('#')) {
+                    // convert to rgb if swatch is kelvin
+                    swatch = iro.Color.kelvinToRgb(swatch);
+                    kelvin = true;
+                }
                 color = swatch;
             } else {
                 console.log(`ERROR: not supported color format at ${swatch}`);
                 return;
             }
+            let iro_color = new iro.Color(color);
+            if (kelvin && !this.widget.type_kelvin || 
+                this.widget.type_kelvin && !kelvin || 
+                !this.widget.type_alpha && iro_color.alpha < 1) {
+                continue;
+            }
             this.swatches.push(
                 new ColorSwatch(
                     this.widget,
                     this.elem,
-                    new iro.Color(color),
+                    iro_color,
+                    kelvin,
                     true
                 )
             );
@@ -146,11 +159,20 @@ export class UserSwatchesContainer {
             this.elem.show();
             this.remove_color_btn.show();
             let colors = JSON.parse(json_str);
-            for (let color of colors) {
+
+            for (let color_elem of colors) {
+                let iro_color = new iro.Color(color_elem.color);
+                if (color_elem.kelvin && !this.widget.type_kelvin || 
+                    this.widget.type_kelvin && !color_elem.kelvin ||
+                    !this.widget.type_alpha && iro_color.alpha < 1) {
+                    continue;
+                }
+
                 this.swatches.push(new ColorSwatch(
                     this.widget,
                     this.elem,
-                    new iro.Color(color)
+                    iro_color,
+                    color_elem.kelvin
                 ));
             }
             if (this.swatches.length > 10) {
@@ -181,7 +203,8 @@ export class UserSwatchesContainer {
         let swatch = new ColorSwatch(
             this.widget,
             this.elem,
-            this.widget.picker.color.clone()
+            this.widget.picker.color.clone(),
+            this.widget.type_kelvin
         );
         this.swatches.push(swatch);
         this.set_swatches();
@@ -207,7 +230,7 @@ export class UserSwatchesContainer {
     set_swatches() {
         let swatches = [];
         for (let swatch of this.swatches) {
-            swatches.push(swatch.color.hsva);
+            swatches.push({color: swatch.color.hsva, kelvin: swatch.kelvin});
         }
         if (swatches.length) {
             localStorage.setItem('yafowil-color-swatches', JSON.stringify(swatches));
