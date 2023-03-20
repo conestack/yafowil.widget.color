@@ -278,25 +278,32 @@ export class InputElement {
 
         this.on_input = this.on_input.bind(this);
         this.elem.on('input', this.on_input);
+        this.on_focusout = this.on_focusout.bind(this);
+        this.elem.on('focusout', this.on_focusout);
         this.update_color = this.update_color.bind(this);
     }
 
     on_input(e) {
         let val = this.elem.val();
-        if (this.format === 'kelvin') {
-            let str = val.toString();
-            if (str.length < 4) {
-                return;
-            } else if (val < this.temperature.min) {
-                val = this.temperature.min;
-            } else if (val > this.temperature.max) {
-                val = this.temperature.max;
-            }
-            this.widget.picker.color.kelvin = val;
-        } else {
-            this.widget.picker.color.set(val);
-        }
+        this._color = val;
         this.elem.val(val);
+    }
+
+    on_focusout() {
+        let color = this._color;
+        if (color) {
+            if (this.format === 'kelvin') {
+                if (parseInt(color) < this.temperature.min) {
+                    color = this.temperature.min;
+                } else if (parseInt(color) > this.temperature.max) {
+                    color = this.temperature.max;
+                }
+                this.widget.picker.color.kelvin = color;
+            } else {
+                this.widget.picker.color.set(color);
+            }
+            this._color = null;
+        }
     }
 
     update_color(color) {
