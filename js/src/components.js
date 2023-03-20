@@ -89,13 +89,16 @@ export class LockedSwatchesContainer {
                 color = {
                     r: swatch[0],
                     g: swatch[1],
-                    b: swatch[2],
-                    a: swatch[3] || 1
+                    b: swatch[2]
+                }
+                if (swatch[3]) {
+                    color.a = swatch[3];
                 }
             } else if (
                 typeof swatch === 'string' || typeof swatch === 'object'
             ) {
-                if (typeof swatch === 'string' && !swatch.startsWith('#')) {
+                if (typeof swatch === 'string' && !swatch.startsWith('#') &&
+                    parseInt(swatch) == swatch) {
                     // convert to rgb if swatch is kelvin
                     swatch = iro.Color.kelvinToRgb(swatch);
                     kelvin = true;
@@ -109,7 +112,7 @@ export class LockedSwatchesContainer {
             if (kelvin && !this.widget.type_kelvin || 
                 this.widget.type_kelvin && !kelvin || 
                 !this.widget.type_alpha && iro_color.alpha < 1) {
-                continue;
+                    continue;
             }
             this.swatches.push(
                 new ColorSwatch(
