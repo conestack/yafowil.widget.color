@@ -31,9 +31,11 @@ var yafowil_color = (function (exports, $) {
         set selected(selected) {
             if (selected) {
                 $('div.color-swatch', this.widget.dropdown_elem)
-                    .removeClass('selected');
+                .removeClass('selected');
                 this.elem.addClass('selected');
                 this.widget.picker.color.set(this.color);
+            } else if (this.elem) {
+                this.elem.removeClass('selected');
             }
             this._selected = selected;
         }
@@ -47,7 +49,13 @@ var yafowil_color = (function (exports, $) {
         }
         select(e) {
             if (this.widget.active_swatch !== this) {
+                let previous = this.widget.picker.color.clone();
+                this.previous_color = previous.rgbaString;
                 this.widget.active_swatch = this;
+            } else if (this.widget.active_swatch == this) {
+                this.widget.active_swatch = null;
+                this.selected = false;
+                this.widget.picker.color.set(this.previous_color);
             }
         }
     }
@@ -190,7 +198,6 @@ var yafowil_color = (function (exports, $) {
             this.set_swatches();
         }
         remove_swatch(e) {
-            console.log('remove_swatch');
             if (e && e.type === 'click') {
                 e.preventDefault();
             }
