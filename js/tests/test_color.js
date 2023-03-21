@@ -1,6 +1,7 @@
 import {ColorWidget} from '../src/widget.js';
 import {register_array_subscribers} from '../src/widget.js';
 import $ from 'jquery';
+import { LockedSwatchesContainer } from '../src/components.js';
 
 let elem = $('<input class="color-picker"/>');
 let widget;
@@ -555,6 +556,47 @@ QUnit.module('ColorWidget', hooks => {
         assert.deepEqual(widget.locked_swatches.swatches, []);
     });
 
+    QUnit.test('LockedSwatchesContainer parse_swatch', assert => {
+        let locked_swatches = [
+            '#ff0000',                      // hex
+            '#baeeee61',                    // hex8
+            [255, 255, 255, 0.5],           // rgba array
+            6000,                           // kelvin int
+            '7000',                         // kelvin str
+            {'r': 0, 'g': 255, 'b': 0},     // rgb obj
+            true                            // invalid value (bool)
+        ];
+        let dd_elem = $('<div id="dd" />').appendTo('body');
+        let widget = {
+            dropdown_elem: dd_elem
+        }
+        // initialize
+        let l_widget = new LockedSwatchesContainer(widget);
+
+        let color1 = l_widget.parse_swatch(locked_swatches[0]);
+        assert.strictEqual(color1.kelvin, false);
+        assert.strictEqual(color1.color.hexString, '#ff0000');
+        let color2 = l_widget.parse_swatch(locked_swatches[1]);
+        assert.strictEqual(color2.kelvin, false);
+        assert.strictEqual(color2.color.hex8String, '#baeeee61');
+        let color3 = l_widget.parse_swatch(locked_swatches[2]);
+        assert.strictEqual(color3.kelvin, false);
+        assert.strictEqual(color3.color.rgbaString, 'rgba(255, 255, 255, 0.5)');
+        let color4 = l_widget.parse_swatch(locked_swatches[3]);
+        assert.strictEqual(color4.kelvin, true);
+        assert.strictEqual(color4.color.kelvin, 6000);
+        let color5 = l_widget.parse_swatch(locked_swatches[4]);
+        assert.strictEqual(color5.kelvin, true);
+        assert.strictEqual(color5.color.kelvin, 7000);
+        let color6 = l_widget.parse_swatch(locked_swatches[5]);
+        assert.strictEqual(color6.kelvin, false);
+        assert.strictEqual(color6.color.rgbString, 'rgb(0, 255, 0)');
+        let color7 = l_widget.parse_swatch(locked_swatches[6]);
+        assert.notOk(color7);
+
+        dd_elem.remove();
+    });
+
     QUnit.test('no locked|user swatches', assert => {
         // initialize
         let widget = new ColorWidget(elem, {
@@ -800,10 +842,12 @@ QUnit.module('ColorWidget', hooks => {
     });
 
     QUnit.module('ColorSwatch', hooks => {
+
         hooks.beforeEach(() => {
             widget = new ColorWidget(elem, {
                 swatches: [{h:100, s:100, v:75, a:0.5}],
-                user_swatches: true
+                user_swatches: true,
+                locked_swatches: true
             });
         });
 
@@ -849,8 +893,10 @@ QUnit.module('ColorWidget', hooks => {
         });
 
         QUnit.test('destroy swatch', assert => {
-            let color1 = { h: 100, s: 100, l: 75 };
-            let color2 = { h: 200, s: 100, l: 75 };
+            let color1 = { h: 100, s: 100, l: 75 },
+                color2 = { h: 200, s: 100, l: 75 },
+                color3 = { h: 150, s: 100, l: 75 },
+                color4 = { h: 120, s: 100, l: 75 };
 
             // create swatch
             widget.picker.color.hsl = color1;
@@ -873,6 +919,20 @@ QUnit.module('ColorWidget', hooks => {
             assert.strictEqual(widget.user_swatches.swatches.length, 0);
 
             assert.strictEqual(widget.picker.color.hexString, '#ffffff');
+
+            // create invalid swatch
+            widget.picker.color.hsl = color3;
+            widget.user_swatches.create_swatch();
+            assert.strictEqual(widget.user_swatches.swatches.length, 1);
+            widget.user_swatches.swatches[0].invalid = true;
+            widget.user_swatches.swatches[0].destroy();
+            assert.notOk(widget.active_swatch);
+
+            // create locked swatch
+            widget.locked_swatches.init_swatches([color3]);
+            assert.strictEqual(widget.locked_swatches.swatches.length, 1);
+            widget.locked_swatches.swatches[0].destroy();
+            assert.notOk(widget.active_swatch);
         });
 
         QUnit.test('select swatch', assert => {
@@ -888,6 +948,7 @@ QUnit.module('ColorWidget', hooks => {
 
             // click on first swatch
             widget.user_swatches.swatches[0].elem.trigger('click');
+            assert.true(widget.user_swatches.swatches[0].elem.hasClass('selected'));
             assert.deepEqual(
                 widget.active_swatch,
                 widget.user_swatches.swatches[0]
@@ -895,6 +956,16 @@ QUnit.module('ColorWidget', hooks => {
             assert.deepEqual(
                 widget.color.hsl,
                 widget.user_swatches.swatches[0].color.hsl
+            );
+
+            // unclick first swatch
+            widget.user_swatches.swatches[0].elem.trigger('click');
+            assert.false(widget.user_swatches.swatches[0].elem.hasClass('selected'));
+            assert.notOk(widget.active_swatch);
+            // deselecting resets color to last color before swatch was clicked
+            assert.deepEqual(
+                widget.color.hsl,
+                widget.user_swatches.swatches[2].color.hsl
             );
         });
     });
@@ -926,5 +997,17 @@ QUnit.module('ColorWidget', hooks => {
            opts.temperature.max
         );
         assert.strictEqual(widget.picker.color.rgbaString, elem.val());
+    });
+
+    QUnit.test('hex8String', assert => {
+        let opts = {
+            color: '#f00',
+            sliders: ['h', 'a'],
+            format: 'hex8String',
+            temperature: {min: 4000, max: 10000},
+        }
+        widget = new ColorWidget(elem, opts, 0);
+        assert.strictEqual(widget.elem.attr('maxlength'), "9");
+        assert.true(widget.type_alpha);
     });
 });
