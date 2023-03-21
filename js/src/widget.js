@@ -179,8 +179,10 @@ export class ColorWidget {
     set active_swatch(swatch) {
         if (swatch) {
             swatch.selected = true;
+            this._active_swatch = swatch;
+        } else {
+            this._active_swatch = null;
         }
-        this._active_swatch = swatch;
     }
 
     update_color() {
@@ -214,23 +216,39 @@ export class ColorWidget {
                 return;
             }
             let swatch = this.active_swatch,
-                ctx = swatch.locked ? this.locked_swatches : this.user_swatches,
-                index = ctx.swatches.indexOf(swatch);
+                user_swatches = Boolean(this.user_swatches),
+                locked_swatches = Boolean(this.locked_swatches),
+                valid_user_swatches,
+                valid_locked_swatches;
+
+            if (user_swatches) {
+                valid_user_swatches = this.user_swatches.swatches.filter(el => {
+                    return !el.invalid;
+                });
+            }
+            if (locked_swatches) {
+                valid_locked_swatches = this.locked_swatches.swatches.filter(el => {
+                    return !el.invalid;
+                });
+            }
+
+            const ctx = swatch.locked ? valid_locked_swatches : valid_user_swatches;
+            let index = ctx.indexOf(swatch);
             index = e.key === 'ArrowLeft' ? index - 1 : index + 1;
             if (index < 0) {
-                if (!swatch.locked && this.locked_swatches) {
-                    let swatches = this.locked_swatches.swatches;
-                    this.active_swatch = swatches[swatches.length -1];
+                if (!swatch.locked
+                    && locked_swatches
+                    && valid_locked_swatches.length) {
+                    this.active_swatch = valid_locked_swatches[valid_locked_swatches.length -1];
                 }
-            } else if (index >= ctx.swatches.length) {
+            } else if (index >= ctx.length) {
                 if (swatch.locked
-                    && this.user_swatches
-                    && this.user_swatches.swatches.length) {
-                        let swatches = this.user_swatches.swatches;
-                        this.active_swatch = swatches[0];
+                    && user_swatches
+                    && valid_user_swatches.length) {
+                        this.active_swatch = valid_user_swatches[0];
                 }
             } else {
-                this.active_swatch = ctx.swatches[index];
+                this.active_swatch = ctx[index];
             }
         }
     }
