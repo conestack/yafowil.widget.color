@@ -9,6 +9,14 @@ export class ColorSwatch {
         this.locked = locked;
         this.selected = false;
         this.kelvin = kelvin;
+        this.destroy = this.destroy.bind(this);
+
+        if (kelvin && !this.widget.type_kelvin || 
+            this.widget.type_kelvin && !kelvin || 
+            !this.widget.type_alpha && color.alpha < 1) {
+                this.invalid = true;
+                return;
+        }
 
         this.elem = $('<div />')
             .addClass('color-swatch layer-transparent')
@@ -24,7 +32,6 @@ export class ColorSwatch {
                 .addClass('locked')
                 .append($('<div class="swatch-mark" />'));
         }
-        this.destroy = this.destroy.bind(this);
         this.select = this.select.bind(this);
         this.elem.on('click', this.select);
     }
@@ -46,12 +53,12 @@ export class ColorSwatch {
     }
 
     destroy() {
-        if (this.locked) {
+        this.widget.active_swatch = null;
+        if (this.locked || this.invalid) {
             return;
         }
         this.elem.off('click', this.select);
         this.elem.remove();
-        this.widget.active_swatch = null;
     }
 
     select(e) {
@@ -78,48 +85,45 @@ export class LockedSwatchesContainer {
         this.init_swatches(swatches);
     }
 
+    parse_swatch(swatch) {
+        let color,
+            kelvin = false,
+            valid_type = typeof swatch === 'string' || typeof swatch === 'object';
+
+        if (swatch instanceof Array) {
+            color = {
+                r: swatch[0],
+                g: swatch[1],
+                b: swatch[2]
+            }
+            if (swatch[3]) {
+                color.a = swatch[3];
+            }
+        } else if (is_kelvin(swatch)) {
+            color = iro.Color.kelvinToRgb(swatch.toString());
+            kelvin = true;
+        } else if (valid_type) {
+            color = swatch;
+        } else {
+            console.log(`ERROR: not supported color format at ${swatch}`);
+            return;
+        }
+        return {'color': new iro.Color(color), 'kelvin': kelvin};
+    }
+
     init_swatches(swatches) {
         if (!swatches || !swatches.length) {
             this.elem.hide();
             return;
         }
         for (let swatch of swatches) {
-            let color, kelvin;
-            if (swatch instanceof Array) {
-                color = {
-                    r: swatch[0],
-                    g: swatch[1],
-                    b: swatch[2]
-                }
-                if (swatch[3]) {
-                    color.a = swatch[3];
-                }
-            } else if (
-                typeof swatch === 'string' || typeof swatch === 'object'
-            ) {
-                if (typeof swatch === 'string' && !swatch.startsWith('#') &&
-                    parseInt(swatch) == swatch) {
-                    // convert to rgb if swatch is kelvin
-                    swatch = iro.Color.kelvinToRgb(swatch);
-                    kelvin = true;
-                }
-                color = swatch;
-            } else {
-                console.log(`ERROR: not supported color format at ${swatch}`);
-                return;
-            }
-            let iro_color = new iro.Color(color);
-            if (kelvin && !this.widget.type_kelvin || 
-                this.widget.type_kelvin && !kelvin || 
-                !this.widget.type_alpha && iro_color.alpha < 1) {
-                    continue;
-            }
+            let swatch_color = this.parse_swatch(swatch);
             this.swatches.push(
                 new ColorSwatch(
                     this.widget,
                     this.elem,
-                    iro_color,
-                    kelvin,
+                    swatch_color.color,
+                    swatch_color.kelvin,
                     true
                 )
             );
@@ -173,12 +177,6 @@ export class UserSwatchesContainer {
 
             for (let color_elem of colors) {
                 let iro_color = new iro.Color(color_elem.color);
-                if (color_elem.kelvin && !this.widget.type_kelvin || 
-                    this.widget.type_kelvin && !color_elem.kelvin ||
-                    !this.widget.type_alpha && iro_color.alpha < 1) {
-                    continue;
-                }
-
                 this.swatches.push(new ColorSwatch(
                     this.widget,
                     this.elem,
@@ -355,4 +353,9 @@ export const slider_components = {
     s: 'saturation',
     v: 'value',
     k: 'kelvin'
+}
+
+export function is_kelvin(value) {
+    return ((typeof value === 'string' && !value.startsWith('#') &&
+            parseInt(value) == value) || (typeof value == 'number'));
 }
