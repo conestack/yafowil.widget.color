@@ -255,7 +255,6 @@ var yafowil_color = (function (exports, $) {
         on_input(e) {
             let val = this.elem.val();
             this._color = val;
-            this.elem.val(val);
         }
         on_focusout() {
             let color = this._color;
@@ -267,6 +266,7 @@ var yafowil_color = (function (exports, $) {
                         color = this.temperature.max;
                     }
                     this.widget.picker.color.kelvin = color;
+                    this.elem.val(color);
                 } else {
                     this.widget.picker.color.set(color);
                 }
