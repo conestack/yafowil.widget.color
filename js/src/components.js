@@ -284,7 +284,6 @@ export class InputElement {
     on_input(e) {
         let val = this.elem.val();
         this._color = val;
-        this.elem.val(val);
     }
 
     on_focusout() {
@@ -297,6 +296,7 @@ export class InputElement {
                     color = this.temperature.max;
                 }
                 this.widget.picker.color.kelvin = color;
+                this.elem.val(color);
             } else {
                 this.widget.picker.color.set(color);
             }
