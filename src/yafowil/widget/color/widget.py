@@ -10,6 +10,7 @@ from yafowil.utils import cssclasses
 from yafowil.utils import cssid
 from yafowil.utils import data_attrs_helper
 from yafowil.utils import managedprops
+from node.utils import UNSET
 
 
 _ = TSF('yafowil.widget.color')
@@ -21,22 +22,119 @@ def color_extractor(widget, data):
     if not extracted:
         return extracted
     format = attr_value('format', widget, data)
+
     if format == 'hexString':
-        ...
+        if not extracted.startswith('#') or len(extracted) != 7:
+            raise ExtractionError('Unknown Format')
+        color = extracted[1:]
+        r = color[0:2]
+        g = color[2:4]
+        b = color[4:6]
+        try:
+            r = int(r, 16)
+            g = int(g, 16)
+            b = int(b, 16)
+        except ValueError:
+            raise ExtractionError('Incorrect Hex Value')
     elif format == 'hex8String':
-        ...
+        if not extracted.startswith('#') or len(extracted) != 9:
+            raise ExtractionError('Unknown Format')
+        color = extracted[1:]
+        r = color[0:2]
+        g = color[2:4]
+        b = color[4:6]
+        a = color[6:8]
+        try:
+            r = int(r, 16)
+            g = int(g, 16)
+            b = int(b, 16)
+            a = int(a, 16)
+        except ValueError:
+            raise ExtractionError('Incorrect Hex Value')
     elif format == 'hslString':
-        ...
+        # h: 0-360, s: 0-100%, l: 0-100%
+        if not extracted.startswith('hsl(') or not extracted.endswith(')'):
+            raise ExtractionError('Unknown Format')
+        color = extracted[4:-1]
+        color = [channel.strip() for channel in color.split(',')]
+        if len(color) != 3:
+            raise ExtractionError('HSLA String')
+        h = color[0]
+        s = color[1]
+        l = color[2]
+
+        if int(h) not in range(0, 361):
+            raise ExtractionError('Incorrect Hue Value')
+        elif not s.endswith('%') or int(s[0:-1]) not in range(0, 101):
+            raise ExtractionError('Incorrect Saturation Value')
+        elif not l.endswith('%') or int(l[0:-1]) not in range(0, 101):
+            raise ExtractionError('Incorrect Brightness Value')
     elif format == 'hslaString':
-        ...
+        # h: 0-360, s: 0-100%, l: 0-100%, a: 0-1
+        if not extracted.startswith('hsla(') or not extracted.endswith(')'):
+            raise ExtractionError('Unknown Format')
+        color = extracted[5:-1]
+        color = [channel.strip() for channel in color.split(',')]
+        if len(color) != 4:
+            raise ExtractionError('HSL String')
+        h = color[0]
+        s = color[1]
+        l = color[2]
+        a = color[3]
+
+        if int(h) not in range(0, 361):
+            raise ExtractionError('Incorrect Hue Value')
+        elif not s.endswith('%') or int(s[0:-1]) not in range(0, 101):
+            raise ExtractionError('Incorrect Saturation Value')
+        elif not l.endswith('%') or int(l[0:-1]) not in range(0, 101):
+            raise ExtractionError('Incorrect Brightness Value')
+        elif float(a) < 0 or float(a) > 1:
+            raise ExtractionError('Incorrect Alpha Value')
     elif format == 'rgbString':
-        ...
+        if not extracted.startswith('rgb(') or not extracted.endswith(')'):
+            raise ExtractionError('Unknown Format')
+        color = extracted[4:-1]
+        color = [channel.strip() for channel in color.split(',')]
+        if len(color) != 3:
+            raise ExtractionError('RGBA String')
+        r = color[0]
+        g = color[1]
+        b = color[2]
+
+        if (
+            int(r) not in range(0, 256) or
+            int(g) not in range(0, 256) or
+            int(b) not in range(0, 256)
+        ):
+            raise ExtractionError('Incorrect RGB Value')
     elif format == 'rgbaString':
-        ...
+        if not extracted.startswith('rgba(') or not extracted.endswith(')'):
+            raise ExtractionError('Unknown Format')
+        color = extracted[5:-1]
+        color = [channel.strip() for channel in color.split(',')]
+        if len(color) != 4:
+            raise ExtractionError('RGB String')
+        r = color[0]
+        g = color[1]
+        b = color[2]
+        a = color[3]
+
+        if (
+            int(r) not in range(0, 256) or
+            int(g) not in range(0, 256) or
+            int(b) not in range(0, 256) or
+            float(a) < 0 or float(a) > 1
+        ):
+            raise ExtractionError('Incorrect RGB Value')
     elif format == 'kelvin':
-        ...
+        try:
+            color = int(extracted)
+        except ValueError:
+            raise ExtractionError('Unknown Format')
+        if color < 1000 or color > 40000:
+            raise ExtractionError('Kelvin Temperature not in possible Range')
     else:
-        ...
+        pass
     return extracted
 
 
@@ -77,7 +175,7 @@ def color_edit_renderer(widget, data):
 
 
 def color_display_renderer(widget, data):
-    ...
+    pass
 
 
 factory.register(
