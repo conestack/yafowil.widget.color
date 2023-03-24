@@ -23,34 +23,58 @@ def color_extractor(widget, data):
         return extracted
     format = attr_value('format', widget, data)
 
-    if format == 'hexString':
-        if not extracted.startswith('#') or len(extracted) != 7:
+    if format == 'hexString' or format == 'hex8String':
+        if not extracted.startswith('#'):
             raise ExtractionError('Unknown Format')
+        if (
+            format == 'hexString' and len(extracted) != 7 or
+            format == 'hex8String' and len(extracted) != 9
+        ):
+            raise ExtractionError('Unknown Format')
+
         color = extracted[1:]
         r = color[0:2]
         g = color[2:4]
         b = color[4:6]
+        if format == 'hex8String':
+                a = color[6:8]
         try:
             r = int(r, 16)
             g = int(g, 16)
             b = int(b, 16)
+            if format == 'hex8String':
+                a = int(a, 16)
         except ValueError:
             raise ExtractionError('Incorrect Hex Value')
-    elif format == 'hex8String':
-        if not extracted.startswith('#') or len(extracted) != 9:
-            raise ExtractionError('Unknown Format')
-        color = extracted[1:]
-        r = color[0:2]
-        g = color[2:4]
-        b = color[4:6]
-        a = color[6:8]
-        try:
-            r = int(r, 16)
-            g = int(g, 16)
-            b = int(b, 16)
-            a = int(a, 16)
-        except ValueError:
-            raise ExtractionError('Incorrect Hex Value')
+
+    # if format == 'hexString':
+    #     if not extracted.startswith('#') or len(extracted) != 7:
+    #         raise ExtractionError('Unknown Format')
+    #     color = extracted[1:]
+    #     r = color[0:2]
+    #     g = color[2:4]
+    #     b = color[4:6]
+    #     try:
+    #         r = int(r, 16)
+    #         g = int(g, 16)
+    #         b = int(b, 16)
+    #     except ValueError:
+    #         raise ExtractionError('Incorrect Hex Value')
+    # elif format == 'hex8String':
+    #     if not extracted.startswith('#') or len(extracted) != 9:
+    #         raise ExtractionError('Unknown Format')
+    #     color = extracted[1:]
+    #     r = color[0:2]
+    #     g = color[2:4]
+    #     b = color[4:6]
+    #     a = color[6:8]
+    #     try:
+    #         r = int(r, 16)
+    #         g = int(g, 16)
+    #         b = int(b, 16)
+    #         a = int(a, 16)
+    #     except ValueError:
+    #         raise ExtractionError('Incorrect Hex Value')
     elif format == 'hslString':
         # h: 0-360, s: 0-100%, l: 0-100%
         if not extracted.startswith('hsl(') or not extracted.endswith(')'):
