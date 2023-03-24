@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.common import generic_emptyvalue_extractor
 from yafowil.common import generic_extractor
 from yafowil.common import generic_required_extractor
 from yafowil.tsf import TSF
-from yafowil.utils import as_data_attrs
+from yafowil.utils import attr_value
 from yafowil.utils import cssclasses
 from yafowil.utils import cssid
 from yafowil.utils import data_attrs_helper
@@ -12,6 +13,31 @@ from yafowil.utils import managedprops
 
 
 _ = TSF('yafowil.widget.color')
+
+
+@managedprops('format')
+def color_extractor(widget, data):
+    extracted = data.extracted
+    if not extracted:
+        return extracted
+    format = attr_value('format', widget, data)
+    if format == 'hexString':
+        ...
+    elif format == 'hex8String':
+        ...
+    elif format == 'hslString':
+        ...
+    elif format == 'hslaString':
+        ...
+    elif format == 'rgbString':
+        ...
+    elif format == 'rgbaString':
+        ...
+    elif format == 'kelvin':
+        ...
+    else:
+        ...
+    return extracted
 
 
 color_options = [
@@ -51,7 +77,7 @@ def color_edit_renderer(widget, data):
 
 
 def color_display_renderer(widget, data):
-    pass
+    ...
 
 
 factory.register(
@@ -59,6 +85,7 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
+        color_extractor,
         generic_emptyvalue_extractor
     ],
     edit_renderers=[
@@ -82,8 +109,6 @@ CSS classes for color widget wrapper DOM element.
 factory.doc['props']['color.emptyvalue'] = """\
 If color value empty, return as extracted value.
 """
-
-# Additional Options
 
 factory.defaults['color.format'] = 'hexString'
 factory.doc['props']['color.format'] = """\

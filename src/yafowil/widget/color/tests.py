@@ -28,6 +28,9 @@ class TestColorWidget(YafowilTestCase):
     def test_display_renderer(self):
         pass
 
+    def test_color_extractor(self):
+        pass
+
     def test_resources(self):
         factory.theme = 'default'
         resources = factory.get_resources('yafowil.widget.color')
