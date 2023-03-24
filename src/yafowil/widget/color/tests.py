@@ -129,22 +129,22 @@ class TestColorWidget(YafowilTestCase):
         # hsl+alpha string
         request = {'colorwidget': 'hsl(360, 100%, 88%, 0.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('HSLA String',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect String',)])
 
         # Incorrect Hue Value
         request = {'colorwidget': 'hsl(380, 100%, 88%)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect Hue Value',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect HSL/HSLA Value',)])
 
         # Incorrect Saturation Value
         request = {'colorwidget': 'hsl(360, 102%, 88%)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect Saturation Value',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect HSL/HSLA Value',)])
 
         # Incorrect Lightness Value
         request = {'colorwidget': 'hsl(360, 100%, 88)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect Brightness Value',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect HSL/HSLA Value',)])
 
         # correct value
         request = {'colorwidget': 'hsl(360, 100%, 88%)'}
@@ -172,27 +172,27 @@ class TestColorWidget(YafowilTestCase):
         # no alpha channel
         request = {'colorwidget': 'hsla(360, 100%, 88%)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('HSL String',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect String',)])
 
         # Incorrect Hue Value
         request = {'colorwidget': 'hsla(380, 100%, 88%, 0.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect Hue Value',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect HSL/HSLA Value',)])
 
         # Incorrect Saturation Value
         request = {'colorwidget': 'hsla(360, 102%, 88%, 0.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect Saturation Value',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect HSL/HSLA Value',)])
 
         # Incorrect Lightness Value
         request = {'colorwidget': 'hsla(360, 100%, 88, 0.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect Brightness Value',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect HSL/HSLA Value',)])
 
         # Incorrect Alpha Value
         request = {'colorwidget': 'hsla(360, 100%, 88%, 1.8)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect Alpha Value',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect HSL/HSLA Value',)])
 
         # correct value
         request = {'colorwidget': 'hsla(360, 100%, 88%, 0.5)'}
@@ -220,22 +220,22 @@ class TestColorWidget(YafowilTestCase):
         # alpha channel
         request = {'colorwidget': 'rgb(122, 122, 122, 0.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('RGBA String',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect String',)])
 
         # Incorrect Red Channel Value
         request = {'colorwidget': 'rgb(-1, 122, 122)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB Value',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB/RGBA Value',)])
 
         # Incorrect Green Channel Value
         request = {'colorwidget': 'rgb(122, 300, 122)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB Value',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB/RGBA Value',)])
 
         # Incorrect Blue Channel Value
         request = {'colorwidget': 'rgb(122, 122, 300)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB Value',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB/RGBA Value',)])
 
         # correct value
         request = {'colorwidget': 'rgb(255, 255, 255)'}
@@ -263,27 +263,27 @@ class TestColorWidget(YafowilTestCase):
         # no alpha channel
         request = {'colorwidget': 'rgba(122, 122, 122)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('RGB String',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect String',)])
 
         # Incorrect Red Channel Value
         request = {'colorwidget': 'rgba(-1, 122, 122, 0.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB Value',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB/RGBA Value',)])
 
         # Incorrect Green Channel Value
         request = {'colorwidget': 'rgba(122, 300, 122, 0.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB Value',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB/RGBA Value',)])
 
         # Incorrect Blue Channel Value
         request = {'colorwidget': 'rgba(122, 122, 300, 0.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB Value',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB/RGBA Value',)])
 
         # Incorrect Alpha Channel Value
         request = {'colorwidget': 'rgba(122, 122, 300, 1.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB Value',)])
+        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB/RGBA Value',)])
 
         # correct value
         request = {'colorwidget': 'rgba(255, 255, 255, 0.5)'}
