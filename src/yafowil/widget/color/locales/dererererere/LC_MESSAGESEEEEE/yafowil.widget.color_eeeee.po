@@ -1,0 +1,117 @@
+#. Default: Incorrect Color String: 
+#: src/yafowil/widget/color/widget.py:26
+msgid "incorrect_color_string"
+msgstr "Inkorrekter Farbwert: "
+
+#. Default: Unknown Format. Supported formats: ${formats}
+#: src/yafowil/widget/color/widget.py:41
+msgid "unknown_color_format"
+msgstr "Unbekanntes Format. Unterstütze Formate: ${formats}"
+
+#. Default: Incorrect hex Color String length: string length must be 7
+#: src/yafowil/widget/color/widget.py:49
+msgid "incorrect_hex_length"
+msgstr "Inkorrekter Hex Farbwert: Länge des Wertes muss 7 Zeichen betragen."
+
+#. Default: Incorrect hex Color String length: string length must be 9
+#: src/yafowil/widget/color/widget.py:55
+msgid "incorrect_hex8_length"
+msgstr "Inkorrekter Hex8 Farbwert: Länge des Wertes muss 9 Zeichen betragen."
+
+#. Default: Incorrect Hex Value: ${args}
+#: src/yafowil/widget/color/widget.py:74
+msgid "incorrect_hex_value"
+msgstr "Inkorrekter Hex Farbwert: ${args}"
+
+#. Default: ${err_base} Unclosed bracket
+#: src/yafowil/widget/color/widget.py:85
+msgid "unclosed_brace"
+msgstr "${err_base}: Ungeschlossene Klammer"
+
+#. Default: ${err_base} String must start with 'hsl'
+#: src/yafowil/widget/color/widget.py:92
+msgid "hsl_str_start"
+msgstr "${err_base} Farbwert muss mit 'hsl' beginnen"
+
+#. Default: ${err_base} String must start with 'hsla'
+#: src/yafowil/widget/color/widget.py:99
+msgid "hsla_str_start"
+msgstr "${err_base} Farbwert muss mit 'hsla' beginnen"
+
+#. Default: ${err_base} expected format: ${hsl_format}
+#: src/yafowil/widget/color/widget.py:110
+msgid "hsl_str_length"
+msgstr "${err_base} Erwartetes Format: ${hsl_format}"
+
+#. Default: ${err_base} expected format: ${hsla_format}
+#: src/yafowil/widget/color/widget.py:117
+msgid "hsla_str_length"
+msgstr "${err_base} Erwartetes Format: ${hsla_format}"
+
+#. Default: ${err_base} value for hue must be between 0 and 360.
+#: src/yafowil/widget/color/widget.py:130
+msgid "incorrect_hue_value"
+msgstr "${err_base} Wert für Sättigung muss zwischen 0 und 360 liegen."
+
+#. Default: ${err_base} value for saturation must be between 0 and 100 followed
+#. by "%".
+#: src/yafowil/widget/color/widget.py:137
+msgid "incorrect_saturation_value"
+msgstr "${err_base} Wert für Sättigung muss zwischen 0 und 100 liegen und mit '%' enden."
+
+#. Default: ${err_base} value for lightness must be between 0 and 100 followed
+#. by "%".
+#: src/yafowil/widget/color/widget.py:144
+msgid "incorrect_lightness_value"
+msgstr "${err_base} Wert für Helligkeit muss zwischen 0 und 100 liegen und mit '%' enden."
+
+#. Default: ${err_base} Alpha value must be between 0 and 1.
+#: src/yafowil/widget/color/widget.py:151
+msgid "incorrect_alpha_value"
+msgstr "${err_base} Wert für Alpha muss zwischen 0 und 1 liegen."
+
+#. Default: ${err_base} String must start with 'rgb'
+#: src/yafowil/widget/color/widget.py:169
+msgid "rgb_str_start"
+msgstr "${err_base} Farbwert muss mit 'rgb' beginnen"
+
+#. Default: ${err_base} String must start with 'rgba'
+#: src/yafowil/widget/color/widget.py:176
+msgid "rgba_str_start"
+msgstr "${err_base} Farbwert muss mit 'rgba' beginnen"
+
+#. Default: ${err_base} expected format: ${rgb_format}
+#: src/yafowil/widget/color/widget.py:187
+msgid "rgb_str_length"
+msgstr "${err_base} Erwartetes Format: ${rgb_format}"
+
+#. Default: ${err_base} expected format: ${rgba_format}
+#: src/yafowil/widget/color/widget.py:194
+msgid "rgba_str_length"
+msgstr "${err_base} Erwartetes Format: ${rgba_format}"
+
+#. Default: ${err_base}  value for red must be between 0 and 255.
+#: src/yafowil/widget/color/widget.py:206
+msgid "incorrect_red_value"
+msgstr "${err_base} Wert für Rot muss zwischen 0 und 255 liegen."
+
+#. Default: ${err_base}  value for green must be between 0 and 255.
+#: src/yafowil/widget/color/widget.py:213
+msgid "incorrect_green_value"
+msgstr "${err_base} Wert für Grün muss zwischen 0 und 255 liegen."
+
+#. Default: ${err_base}  value for blue must be between 0 and 255.
+#: src/yafowil/widget/color/widget.py:220
+msgid "incorrect_blue_value"
+msgstr "${err_base} Wert für Blau muss zwischen 0 und 255 liegen."
+
+#. Default: Unknown Format, expected format: int(1000 - 40000) or str(1000 -
+#. 40000)
+#: src/yafowil/widget/color/widget.py:236
+msgid "incorrect_kelvin_format"
+msgstr "Unbekanntes Format, erwartetes Format: int(1000 - 40000) oder str(1000 - 40000) "
+
+#. Default: Kelvin Temperature out of range (1000-40000)
+#: src/yafowil/widget/color/widget.py:242
+msgid "incorrect_kelvin_number"
+msgstr "Kelvin Temperatur außerhalb des gültigen Bereichs (1000-40000)"
