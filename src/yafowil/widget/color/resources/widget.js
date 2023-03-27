@@ -2,12 +2,20 @@ var yafowil_color = (function (exports, $) {
     'use strict';
 
     class ColorSwatch {
-        constructor(widget, container, color, locked = false) {
+        constructor(widget, container, color, kelvin = false, locked = false) {
             this.widget = widget;
             this.container = container;
             this.color = color;
             this.locked = locked;
             this.selected = false;
+            this.kelvin = kelvin;
+            this.destroy = this.destroy.bind(this);
+            if (kelvin && !this.widget.type_kelvin ||
+                this.widget.type_kelvin && !kelvin ||
+                !this.widget.type_alpha && color.alpha < 1) {
+                    this.invalid = true;
+                    return;
+            }
             this.elem = $('<div />')
                 .addClass('color-swatch layer-transparent')
                 .appendTo(this.container);
@@ -20,7 +28,6 @@ var yafowil_color = (function (exports, $) {
                     .addClass('locked')
                     .append($('<div class="swatch-mark" />'));
             }
-            this.destroy = this.destroy.bind(this);
             this.select = this.select.bind(this);
             this.elem.on('click', this.select);
         }
@@ -30,14 +37,17 @@ var yafowil_color = (function (exports, $) {
         set selected(selected) {
             if (selected) {
                 $('div.color-swatch', this.widget.dropdown_elem)
-                    .removeClass('selected');
+                .removeClass('selected');
                 this.elem.addClass('selected');
                 this.widget.picker.color.set(this.color);
+            } else if (this.elem) {
+                this.elem.removeClass('selected');
             }
             this._selected = selected;
         }
         destroy() {
-            if (this.locked) {
+            this.widget.active_swatch = null;
+            if (this.locked || this.invalid) {
                 return;
             }
             this.elem.off('click', this.select);
@@ -45,7 +55,13 @@ var yafowil_color = (function (exports, $) {
         }
         select(e) {
             if (this.widget.active_swatch !== this) {
+                let previous = this.widget.picker.color.clone();
+                this.previous_color = previous.rgbaString;
                 this.widget.active_swatch = this;
+            } else if (this.widget.active_swatch == this) {
+                this.widget.active_swatch = null;
+                this.selected = false;
+                this.widget.picker.color.set(this.previous_color);
             }
         }
     }
@@ -58,39 +74,48 @@ var yafowil_color = (function (exports, $) {
             this.swatches = [];
             this.init_swatches(swatches);
         }
+        parse_swatch(swatch) {
+            let color,
+                kelvin = false,
+                valid_type = typeof swatch === 'string' || typeof swatch === 'object';
+            if (swatch instanceof Array) {
+                color = {
+                    r: swatch[0],
+                    g: swatch[1],
+                    b: swatch[2]
+                };
+                if (swatch[3]) {
+                    color.a = swatch[3];
+                }
+            } else if (is_kelvin(swatch)) {
+                color = iro.Color.kelvinToRgb(swatch.toString());
+                kelvin = true;
+            } else if (valid_type) {
+                color = swatch;
+            } else {
+                console.log(`ERROR: not supported color format at ${swatch}`);
+                return;
+            }
+            return {'color': new iro.Color(color), 'kelvin': kelvin};
+        }
         init_swatches(swatches) {
             if (!swatches || !swatches.length) {
                 this.elem.hide();
                 return;
             }
             for (let swatch of swatches) {
-                let color;
-                if (swatch instanceof Array) {
-                    color = {
-                        r: swatch[0],
-                        g: swatch[1],
-                        b: swatch[2],
-                        a: swatch[3] || 1
-                    };
-                } else if (
-                    typeof swatch === 'string' || typeof swatch === 'object'
-                ) {
-                    color = swatch;
-                } else {
-                    console.log(`ERROR: not supported color format at ${swatch}`);
-                    return;
-                }
+                let swatch_color = this.parse_swatch(swatch);
                 this.swatches.push(
                     new ColorSwatch(
                         this.widget,
                         this.elem,
-                        new iro.Color(color),
+                        swatch_color.color,
+                        swatch_color.kelvin,
                         true
                     )
                 );
                 this.elem.show();
             }
-            this.widget.active_swatch = this.swatches[0];
         }
     }
     class UserSwatchesContainer {
@@ -130,21 +155,18 @@ var yafowil_color = (function (exports, $) {
                 this.elem.show();
                 this.remove_color_btn.show();
                 let colors = JSON.parse(json_str);
-                for (let color of colors) {
+                for (let color_elem of colors) {
+                    let iro_color = new iro.Color(color_elem.color);
                     this.swatches.push(new ColorSwatch(
                         this.widget,
                         this.elem,
-                        new iro.Color(color)
+                        iro_color,
+                        color_elem.kelvin
                     ));
                 }
                 if (this.swatches.length > 10) {
                     this.swatches[0].destroy();
                     this.swatches.shift();
-                }
-                if (this.swatches.length && e && e.origin === this
-                    || this.swatches.length && !e) {
-                        let active_swatch = this.swatches[this.swatches.length -1];
-                        this.widget.active_swatch = active_swatch;
                 }
             } else {
                 this.remove_color_btn.hide();
@@ -169,7 +191,8 @@ var yafowil_color = (function (exports, $) {
             let swatch = new ColorSwatch(
                 this.widget,
                 this.elem,
-                this.widget.picker.color.clone()
+                this.widget.picker.color.clone(),
+                this.widget.type_kelvin
             );
             this.swatches.push(swatch);
             this.set_swatches();
@@ -178,38 +201,26 @@ var yafowil_color = (function (exports, $) {
             if (e && e.type === 'click') {
                 e.preventDefault();
             }
-            if (!this.widget.active_swatch) {
-                this.widget.active_swatch = this.swatches[this.swatches.length -1];
+            if (!this.widget.active_swatch || this.widget.active_swatch.locked) {
+                return;
             }
-            this.widget.active_swatch.destroy();
             let index = this.swatches.indexOf(this.widget.active_swatch);
+            this.widget.active_swatch.destroy();
             this.swatches.splice(index, 1);
             if (!this.swatches.length) {
-                if (this.widget.locked_swatches
-                    && this.widget.locked_swatches.swatches.length) {
-                        let l_swatches = this.widget.locked_swatches.swatches;
-                        this.widget.active_swatch = l_swatches[
-                            l_swatches.length - 1
-                        ];
-                        this.widget.picker.color.set(
-                            this.widget.active_swatch.color
-                        );
-                }
                 this.elem.hide();
                 this.remove_color_btn.hide();
                 this.widget.picker.color.reset();
-            } else {
-                this.widget.active_swatch = this.swatches[
-                    this.swatches.length - 1
-                ];
-                this.widget.picker.color.set(this.widget.active_swatch.color);
             }
+            this.elem.hide();
+            this.remove_color_btn.hide();
+            this.widget.picker.color.reset();
             this.set_swatches();
         }
         set_swatches() {
             let swatches = [];
             for (let swatch of this.swatches) {
-                swatches.push(swatch.color.hsva);
+                swatches.push({color: swatch.color.hsva, kelvin: swatch.kelvin});
             }
             if (swatches.length) {
                 localStorage.setItem('yafowil-color-swatches', JSON.stringify(swatches));
@@ -227,30 +238,40 @@ var yafowil_color = (function (exports, $) {
             this.format = format || 'hexString';
             if (this.format === 'hexString') {
                 this.elem.attr('maxlength', 7);
+            } else if (this.format === 'hex8String') {
+                this.elem.attr('maxlength', 9);
             }
             this.temperature = temperature;
             this.color = color;
-            this.update_color(color);
+            if (this.color) {
+                this.update_color(color);
+            }
             this.on_input = this.on_input.bind(this);
             this.elem.on('input', this.on_input);
+            this.on_focusout = this.on_focusout.bind(this);
+            this.elem.on('focusout', this.on_focusout);
             this.update_color = this.update_color.bind(this);
         }
         on_input(e) {
             let val = this.elem.val();
-            if (this.format === 'kelvin') {
-                let str = val.toString();
-                if (str.length < 4) {
-                    return;
-                } else if (val < this.temperature.min) {
-                    val = this.temperature.min;
-                } else if (val > this.temperature.max) {
-                    val = this.temperature.max;
+            this._color = val;
+        }
+        on_focusout() {
+            let color = this._color;
+            if (color) {
+                if (this.format === 'kelvin') {
+                    if (parseInt(color) < this.temperature.min) {
+                        color = this.temperature.min;
+                    } else if (parseInt(color) > this.temperature.max) {
+                        color = this.temperature.max;
+                    }
+                    this.widget.picker.color.kelvin = color;
+                    this.elem.val(color);
+                } else {
+                    this.widget.picker.color.set(color);
                 }
-                this.widget.picker.color.kelvin = val;
-            } else {
-                this.widget.picker.color.set(val);
+                this._color = null;
             }
-            this.elem.val(val);
         }
         update_color(color) {
             if (this.format === 'kelvin') {
@@ -269,7 +290,7 @@ var yafowil_color = (function (exports, $) {
                 .addClass('layer-transparent')
                 .append(this.layer)
                 .insertAfter(this.widget.elem);
-            this.color = color.rgbaString;
+            this.color = color ? color.rgbaString : undefined;
             this.on_click = this.on_click.bind(this);
             this.elem.on('click', this.on_click);
         }
@@ -296,6 +317,10 @@ var yafowil_color = (function (exports, $) {
         v: 'value',
         k: 'kelvin'
     };
+    function is_kelvin(value) {
+        return ((typeof value === 'string' && !value.startsWith('#') &&
+                parseInt(value) == value) || (typeof value == 'number'));
+    }
 
     class ColorWidget {
         static initialize(context) {
@@ -320,7 +345,8 @@ var yafowil_color = (function (exports, $) {
                     show_inputs: elem.data('show_inputs'),
                     show_labels: elem.data('show_labels'),
                     slider_length: elem.data('slider_length'),
-                    layout_direction: elem.data('layout_direction')
+                    layout_direction: elem.data('layout_direction'),
+                    open_on_focus: elem.data('open_on_focus')
                 };
                 new ColorWidget(elem, options);
             });
@@ -363,6 +389,9 @@ var yafowil_color = (function (exports, $) {
             } else if (!sliders) {
                 this.picker_container.hide();
             }
+            this.type_kelvin = options.format === 'kelvin';
+            let alpha_types = ['rgbaString', 'hex8String', 'hslaString'];
+            this.type_alpha = alpha_types.includes(options.format);
             if (!options.locked_swatches && !options.user_swatches) {
                 this.picker_container.css('margin-bottom', 0);
             }
@@ -375,10 +404,14 @@ var yafowil_color = (function (exports, $) {
             if (options.user_swatches) {
                 this.user_swatches = new UserSwatchesContainer(this);
             }
-            this.color = this.picker.color.clone();
-            let temp = options.temperature || {min: 2000, max: 11000};
+            if (options.color) {
+                this.color = this.picker.color.clone();
+            } else {
+                this.color = null;
+            }
+            this.temp = options.temperature || {min: 2000, max: 11000};
             this.input_elem = new InputElement(
-                this, this.elem, this.color, options.format, temp
+                this, this.elem, this.color, options.format, this.temp
             );
             let prev_elem;
             if (options.preview_elem) {
@@ -390,7 +423,9 @@ var yafowil_color = (function (exports, $) {
             }
             this.preview = new PreviewElement(this, prev_elem, this.color);
             this.open = this.open.bind(this);
-            this.elem.on('focus', this.open);
+            if (options.open_on_focus) {
+                this.elem.on('focus', this.open);
+            }
             this.update_color = this.update_color.bind(this);
             this.picker.on('color:change', this.update_color);
             this.close = this.close.bind(this);
@@ -400,12 +435,16 @@ var yafowil_color = (function (exports, $) {
         }
         init_opts(opts) {
             let iro_opts = {
-                color: opts.color,
                 width: opts.box_width,
                 boxHeight: opts.box_height || opts.box_width,
                 layoutDirection: opts.layout_direction || 'vertical',
                 layout: []
             };
+            if (opts.format === 'kelvin') {
+                iro_opts.color = iro.Color.kelvinToRgb(opts.color);
+            } else {
+                iro_opts.color = opts.color ? opts.color : '#fff';
+            }
             const sliders = opts.sliders || [];
             sliders.forEach(name => {
                 let type = slider_components[name];
@@ -443,8 +482,10 @@ var yafowil_color = (function (exports, $) {
         set active_swatch(swatch) {
             if (swatch) {
                 swatch.selected = true;
+                this._active_swatch = swatch;
+            } else {
+                this._active_swatch = null;
             }
-            this._active_swatch = swatch;
         }
         update_color() {
             this.color = this.picker.color.clone();
@@ -470,27 +511,42 @@ var yafowil_color = (function (exports, $) {
                     this.user_swatches.remove_swatch();
                 }
             } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-                if (!this.locked_swatches && !this.user_swatches) {
+                if ((!this.locked_swatches && !this.user_swatches ) ||
+                    !this.active_swatch) {
                     return;
                 }
                 let swatch = this.active_swatch,
-                    ctx = swatch.locked ? this.locked_swatches : this.user_swatches,
-                    index = ctx.swatches.indexOf(swatch);
+                    user_swatches = Boolean(this.user_swatches),
+                    locked_swatches = Boolean(this.locked_swatches),
+                    valid_user_swatches,
+                    valid_locked_swatches;
+                if (user_swatches) {
+                    valid_user_swatches = this.user_swatches.swatches.filter(el => {
+                        return !el.invalid;
+                    });
+                }
+                if (locked_swatches) {
+                    valid_locked_swatches = this.locked_swatches.swatches.filter(el => {
+                        return !el.invalid;
+                    });
+                }
+                const ctx = swatch.locked ? valid_locked_swatches : valid_user_swatches;
+                let index = ctx.indexOf(swatch);
                 index = e.key === 'ArrowLeft' ? index - 1 : index + 1;
                 if (index < 0) {
-                    if (!swatch.locked && this.locked_swatches) {
-                        let swatches = this.locked_swatches.swatches;
-                        this.active_swatch = swatches[swatches.length -1];
+                    if (!swatch.locked
+                        && locked_swatches
+                        && valid_locked_swatches.length) {
+                        this.active_swatch = valid_locked_swatches[valid_locked_swatches.length -1];
                     }
-                } else if (index >= ctx.swatches.length) {
+                } else if (index >= ctx.length) {
                     if (swatch.locked
-                        && this.user_swatches
-                        && this.user_swatches.swatches.length) {
-                            let swatches = this.user_swatches.swatches;
-                            this.active_swatch = swatches[0];
+                        && user_swatches
+                        && valid_user_swatches.length) {
+                            this.active_swatch = valid_user_swatches[0];
                     }
                 } else {
-                    this.active_swatch = ctx.swatches[index];
+                    this.active_swatch = ctx[index];
                 }
             }
         }

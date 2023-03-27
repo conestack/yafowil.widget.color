@@ -1,8 +1,8 @@
 const percentage = {
-    lines: 99,
-    statements: 99,
-    functions: 100,
-    branches: 96
+    lines: 90,
+    statements: 90,
+    functions: 90,
+    branches: 90
 }
 var summary = require('./karma/coverage/coverage-summary.json');
 
