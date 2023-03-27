@@ -1,0 +1,4 @@
+#. Default: Incorrect Color String: 
+#: src/yafowil/widget/color/widget.py:26
+msgid "incorrect_color_string"
+msgstr ""

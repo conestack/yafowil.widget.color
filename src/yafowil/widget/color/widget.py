@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.common import generic_emptyvalue_extractor
@@ -10,7 +11,6 @@ from yafowil.utils import cssclasses
 from yafowil.utils import cssid
 from yafowil.utils import data_attrs_helper
 from yafowil.utils import managedprops
-from node.utils import UNSET
 
 
 _ = TSF('yafowil.widget.color')
@@ -23,7 +23,7 @@ def color_extractor(widget, data):
         return extracted
     format = attr_value('format', widget, data)
 
-    err_base = 'Incorrect Color String:'
+    err_base = _('incorrect_color_string', default='Incorrect Color String: ')
 
     if format == 'hexString' or format == 'hex8String':
         if (not extracted.startswith('#')):
