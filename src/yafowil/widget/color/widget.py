@@ -24,10 +24,30 @@ def color_extractor(widget, data):
     format = attr_value('format', widget, data)
 
     err_base = _('incorrect_color_string', default='Incorrect Color String: ')
+    formats = ', '.join(
+        [
+            'hexString',
+            'hex8String',
+            'hslString',
+            'hslaString',
+            'rgbString',
+            'rgbaString',
+            'kelvin'
+        ]
+    )
 
     if format == 'hexString' or format == 'hex8String':
         if (not extracted.startswith('#')):
-            raise ExtractionError('Unknown Format')
+            msg = _(
+                'unknown_color_format',
+                    default=(
+                        'Unknown Format, supported formats: ${formats}'
+                    ),
+                    mapping={
+                        'formats':formats
+                    }
+                )
+            raise ExtractionError(msg)
 
         if format == 'hexString' and len(extracted) != 7:
             raise ExtractionError('Incorrect hex Color String length: string length must be 7')

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-03-27 09:59+0200\n"
+"POT-Creation-Date: 2023-03-27 10:13+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,4 +19,8 @@ msgstr ""
 #. Default: Incorrect Color String: 
 #: ./src/yafowil/widget/color/widget.py:26
 msgid "incorrect_color_string"
+msgstr ""
+
+#: ./src/yafowil/widget/color/widget.py:42
+msgid "unknown_color_format"
 msgstr ""
