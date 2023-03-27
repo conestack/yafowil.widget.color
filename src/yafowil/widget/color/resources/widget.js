@@ -235,6 +235,8 @@ var yafowil_color = (function (exports, $) {
         constructor(widget, elem, color, format, temperature = {min: 1000, max:40000}) {
             this.widget = widget;
             this.elem = elem;
+            this.elem.attr('spellcheck', 'false');
+            this.elem.addClass('form-control');
             this.format = format || 'hexString';
             if (this.format === 'hexString') {
                 this.elem.attr('maxlength', 7);
@@ -322,40 +324,32 @@ var yafowil_color = (function (exports, $) {
                 parseInt(value) == value) || (typeof value == 'number'));
     }
 
-    class ColorWidget {
-        static initialize(context) {
-            $('input.color-picker', context).each(function() {
-                let elem = $(this);
-                if (window.yafowil_array !== undefined &&
-                    window.yafowil_array.inside_template(elem)) {
-                    return;
-                }
-                let options = {
-                    format: elem.data('format'),
-                    preview_elem: elem.data('preview_elem'),
-                    sliders: elem.data('sliders'),
-                    box_width: elem.data('box_width'),
-                    box_height: elem.data('box_height'),
-                    slider_size: elem.data('slider_size'),
-                    color: elem.data('color'),
-                    locked_swatches: elem.data('locked_swatches'),
-                    user_swatches: elem.data('user_swatches'),
-                    temperature: elem.data('temperature'),
-                    disabled: elem.data('disabled'),
-                    show_inputs: elem.data('show_inputs'),
-                    show_labels: elem.data('show_labels'),
-                    slider_length: elem.data('slider_length'),
-                    layout_direction: elem.data('layout_direction'),
-                    open_on_focus: elem.data('open_on_focus')
-                };
-                new ColorWidget(elem, options);
-            });
+    function lookup_callback(path) {
+        if (!path) {
+            return null;
         }
+        let source = path.split('.'),
+            cb = window,
+            name;
+        for (const idx in source) {
+            name = source[idx];
+            if (cb[name] === undefined) {
+                throw "'" + name + "' not found.";
+            }
+            cb = cb[name];
+        }
+        return cb;
+    }
+    class ColorPicker {
         constructor(elem, options) {
-            elem.data('yafowil-color', this);
-            elem.addClass('form-control');
             this.elem = elem;
-            this.elem.attr('spellcheck', 'false');
+            if (options.on_update) {
+                console.log('yea?');
+                this.elem.on('color:update', options.on_update);
+            }
+            if (options['on_close']) {
+                this.elem.on('color:close', options['on_close']);
+            }
             this.dropdown_elem = $('<div />')
                 .addClass('color-picker-wrapper')
                 .css('top', this.elem.outerHeight())
@@ -389,9 +383,6 @@ var yafowil_color = (function (exports, $) {
             } else if (!sliders) {
                 this.picker_container.hide();
             }
-            this.type_kelvin = options.format === 'kelvin';
-            let alpha_types = ['rgbaString', 'hex8String', 'hslaString'];
-            this.type_alpha = alpha_types.includes(options.format);
             if (!options.locked_swatches && !options.user_swatches) {
                 this.picker_container.css('margin-bottom', 0);
             }
@@ -409,10 +400,6 @@ var yafowil_color = (function (exports, $) {
             } else {
                 this.color = null;
             }
-            this.temp = options.temperature || {min: 2000, max: 11000};
-            this.input_elem = new InputElement(
-                this, this.elem, this.color, options.format, this.temp
-            );
             let prev_elem;
             if (options.preview_elem) {
                 prev_elem = $(options.preview_elem)
@@ -423,15 +410,23 @@ var yafowil_color = (function (exports, $) {
             }
             this.preview = new PreviewElement(this, prev_elem, this.color);
             this.open = this.open.bind(this);
-            if (options.open_on_focus) {
-                this.elem.on('focus', this.open);
-            }
             this.update_color = this.update_color.bind(this);
             this.picker.on('color:change', this.update_color);
             this.close = this.close.bind(this);
             this.close_btn.on('click', this.close);
             this.on_keydown = this.on_keydown.bind(this);
             this.on_click = this.on_click.bind(this);
+        }
+        get active_swatch() {
+            return this._active_swatch;
+        }
+        set active_swatch(swatch) {
+            if (swatch) {
+                swatch.selected = true;
+                this._active_swatch = swatch;
+            } else {
+                this._active_swatch = null;
+            }
         }
         init_opts(opts) {
             let iro_opts = {
@@ -476,21 +471,11 @@ var yafowil_color = (function (exports, $) {
             });
             return iro_opts;
         }
-        get active_swatch() {
-            return this._active_swatch;
-        }
-        set active_swatch(swatch) {
-            if (swatch) {
-                swatch.selected = true;
-                this._active_swatch = swatch;
-            } else {
-                this._active_swatch = null;
-            }
-        }
         update_color() {
             this.color = this.picker.color.clone();
             this.preview.color = this.color.rgbaString;
-            this.input_elem.update_color(this.color);
+            let evt = new $.Event('color:update', {origin: this});
+            this.elem.trigger(evt);
         }
         open(evt) {
             if (this.dropdown_elem.css('display') === 'none') {
@@ -565,9 +550,10 @@ var yafowil_color = (function (exports, $) {
                 e.preventDefault();
             }
             this.dropdown_elem.hide();
-            this.elem.blur();
             $(window).off('keydown', this.on_keydown);
             $(window).off('mousedown', this.on_click);
+            let evt = new $.Event('color:close', {origin: this});
+            this.elem.trigger(evt);
         }
         color_equals(color) {
             if (color instanceof iro.Color &&
@@ -577,6 +563,59 @@ var yafowil_color = (function (exports, $) {
                 color.hsva.a === this.color.hsva.a) {
                 return true;
             }
+        }
+    }
+    class ColorWidget {
+        static initialize(context) {
+            $('input.color-picker', context).each(function() {
+                let elem = $(this);
+                if (window.yafowil_array !== undefined &&
+                    window.yafowil_array.inside_template(elem)) {
+                    return;
+                }
+                let options = {
+                    format: elem.data('format'),
+                    preview_elem: elem.data('preview_elem'),
+                    sliders: elem.data('sliders'),
+                    box_width: elem.data('box_width'),
+                    box_height: elem.data('box_height'),
+                    slider_size: elem.data('slider_size'),
+                    color: elem.data('color'),
+                    locked_swatches: elem.data('locked_swatches'),
+                    user_swatches: elem.data('user_swatches'),
+                    temperature: elem.data('temperature'),
+                    disabled: elem.data('disabled'),
+                    show_inputs: elem.data('show_inputs'),
+                    show_labels: elem.data('show_labels'),
+                    slider_length: elem.data('slider_length'),
+                    layout_direction: elem.data('layout_direction'),
+                    open_on_focus: elem.data('open_on_focus'),
+                    on_update: lookup_callback(elem.data('on_update')),
+                    on_close: lookup_callback(elem.data('on_close'))
+                };
+                new ColorWidget(elem, options);
+            });
+        }
+        constructor(elem, options) {
+            elem.data('yafowil-color', this);
+            this.elem = elem;
+            this.color_picker = new ColorPicker(elem, options);
+            this.type_kelvin = options.format === 'kelvin';
+            let alpha_types = ['rgbaString', 'hex8String', 'hslaString'];
+            this.type_alpha = alpha_types.includes(options.format);
+            this.temp = options.temperature || {min: 2000, max: 11000};
+            this.input_elem = new InputElement(
+                this, this.elem, this.color, options.format, this.temp
+            );
+            if (options.open_on_focus) {
+                this.elem.on('focus', this.color_picker.open);
+            }
+            this.elem.on('color:update', (e) => {
+                this.input_elem.update_color(this.color_picker.color);
+            });
+            this.elem.on('color:close', (e) => {
+                this.elem.blur();
+            });
         }
     }
     function color_on_array_add(inst, context) {
@@ -600,7 +639,9 @@ var yafowil_color = (function (exports, $) {
         register_array_subscribers();
     });
 
+    exports.ColorPicker = ColorPicker;
     exports.ColorWidget = ColorWidget;
+    exports.lookup_callback = lookup_callback;
     exports.register_array_subscribers = register_array_subscribers;
 
     Object.defineProperty(exports, '__esModule', { value: true });
