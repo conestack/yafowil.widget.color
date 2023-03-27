@@ -25,6 +25,7 @@ class TestColorWidget(YafowilTestCase):
         color.register()
 
     def test_edit_renderer(self):
+        ## TODO
         pass
 
     def test_display_renderer(self):
@@ -73,12 +74,18 @@ class TestColorWidget(YafowilTestCase):
         # too short
         request = {'colorwidget': '#ff000'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Unknown Format',)])
+        self.assertEqual(
+            data.errors, 
+            [ExtractionError('Incorrect hex Color String length: string length must be 7',)]
+        )
 
         # incorrect hex value
         request = {'colorwidget': '#ffxx00'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect Hex Value',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError("Incorrect Hex Value: invalid literal for int() with base 16: 'xx'",)]
+        )
 
     def test_color_extractor_hex8String(self):
         widget = factory(
@@ -96,12 +103,18 @@ class TestColorWidget(YafowilTestCase):
         # too short
         request = {'colorwidget': '#ff0000'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Unknown Format',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Incorrect hex alpha Color String length: string length must be 9',)]
+        )
 
         # incorrect hex value
         request = {'colorwidget': '#ff00bbxc'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect Hex Value',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError("Incorrect Hex Value: invalid literal for int() with base 16: 'xc'",)]
+        )
 
         # correct hex value
         request = {'colorwidget': '#ff00bbcc'}
@@ -119,32 +132,50 @@ class TestColorWidget(YafowilTestCase):
         # not startswith hsl(
         request = {'colorwidget': 'rgb(360, 122, 122)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Unknown Format',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError("Incorrect Color String: String must start with 'hsl('",)]
+        )
 
         # not endswith )
         request = {'colorwidget': 'hsl(360, 100%, 88%'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Unknown Format',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError("Incorrect Color String: Unclosed '('",)]
+        )
 
         # hsl+alpha string
         request = {'colorwidget': 'hsl(360, 100%, 88%, 0.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect String',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError("Incorrect Color String: expected format: hsl([0-360], [0-100]%, [0-100]%)",)]
+        )
 
         # Incorrect Hue Value
         request = {'colorwidget': 'hsl(380, 100%, 88%)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect HSL/HSLA Value',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Incorrect Color String: value for hue must be between 0 and 360.',)]
+        )
 
         # Incorrect Saturation Value
         request = {'colorwidget': 'hsl(360, 102%, 88%)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect HSL/HSLA Value',)])
+        self.assertEqual(
+            data.errors, 
+            [ExtractionError('Incorrect Color String: value for saturation must be between 0 and 100 followed by "%".',)]
+        )
 
         # Incorrect Lightness Value
         request = {'colorwidget': 'hsl(360, 100%, 88)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect HSL/HSLA Value',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Incorrect Color String: value for lightness must be between 0 and 100 followed by "%".',)]
+        )
 
         # correct value
         request = {'colorwidget': 'hsl(360, 100%, 88%)'}
@@ -162,37 +193,58 @@ class TestColorWidget(YafowilTestCase):
         # not startswith hsla(
         request = {'colorwidget': 'hsl(360, 122, 122)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Unknown Format',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError("Incorrect Color String: String must start with 'hsla('",)]
+        )
 
         # not endswith )
         request = {'colorwidget': 'hsla(360, 100%, 88%, 0.5'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Unknown Format',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError("Incorrect Color String: Unclosed '('",)]
+        )
 
         # no alpha channel
         request = {'colorwidget': 'hsla(360, 100%, 88%)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect String',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError("Incorrect Color String: expected format: hsla([0-360], [0-100]%, [0-100]%, [0-1])",)]
+        )
 
         # Incorrect Hue Value
         request = {'colorwidget': 'hsla(380, 100%, 88%, 0.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect HSL/HSLA Value',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Incorrect Color String: value for hue must be between 0 and 360.',)]
+        )
 
         # Incorrect Saturation Value
         request = {'colorwidget': 'hsla(360, 102%, 88%, 0.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect HSL/HSLA Value',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Incorrect Color String: value for saturation must be between 0 and 100 followed by "%".',)]
+        )
 
         # Incorrect Lightness Value
         request = {'colorwidget': 'hsla(360, 100%, 88, 0.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect HSL/HSLA Value',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Incorrect Color String: value for lightness must be between 0 and 100 followed by "%".',)]
+        )
 
         # Incorrect Alpha Value
         request = {'colorwidget': 'hsla(360, 100%, 88%, 1.8)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect HSL/HSLA Value',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Incorrect Color String: Alpha value must be between 0 and 1.',)]
+        )
 
         # correct value
         request = {'colorwidget': 'hsla(360, 100%, 88%, 0.5)'}
@@ -210,32 +262,50 @@ class TestColorWidget(YafowilTestCase):
         # not startswith rgb(
         request = {'colorwidget': 'rgba(122, 122, 122)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Unknown Format',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError("Incorrect Color String: String must start with 'rgb('",)]
+        )
 
         # not endswith )
         request = {'colorwidget': 'rgb(122, 122, 122'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Unknown Format',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError("Incorrect Color String: Unclosed '('",)]
+        )
 
         # alpha channel
         request = {'colorwidget': 'rgb(122, 122, 122, 0.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect String',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Incorrect Color String: expected format: rgb([0-255], [0-255], [0-255])',)]
+        )
 
         # Incorrect Red Channel Value
         request = {'colorwidget': 'rgb(-1, 122, 122)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB/RGBA Value',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Incorrect Color String: value for red must be between 0 and 255.',)]
+        )
 
         # Incorrect Green Channel Value
         request = {'colorwidget': 'rgb(122, 300, 122)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB/RGBA Value',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Incorrect Color String: value for green must be between 0 and 255.',)]
+        )
 
         # Incorrect Blue Channel Value
         request = {'colorwidget': 'rgb(122, 122, 300)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB/RGBA Value',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Incorrect Color String: value for blue must be between 0 and 255.',)]
+        )
 
         # correct value
         request = {'colorwidget': 'rgb(255, 255, 255)'}
@@ -253,37 +323,58 @@ class TestColorWidget(YafowilTestCase):
         # not startswith rgba(
         request = {'colorwidget': 'rgb(122, 122, 122, 0.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Unknown Format',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError("Incorrect Color String: String must start with 'rgba('",)]
+        )
 
         # not endswith )
         request = {'colorwidget': 'rgba(122, 122, 122, 0.5'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Unknown Format',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError("Incorrect Color String: Unclosed '('",)]
+        )
 
         # no alpha channel
         request = {'colorwidget': 'rgba(122, 122, 122)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect String',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Incorrect Color String: expected format: rgba([0-255], [0-255], [0-255], [0-1])',)]
+        )
 
         # Incorrect Red Channel Value
         request = {'colorwidget': 'rgba(-1, 122, 122, 0.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB/RGBA Value',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Incorrect Color String: value for red must be between 0 and 255.',)]
+        )
 
         # Incorrect Green Channel Value
         request = {'colorwidget': 'rgba(122, 300, 122, 0.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB/RGBA Value',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Incorrect Color String: value for green must be between 0 and 255.',)]
+        )
 
         # Incorrect Blue Channel Value
         request = {'colorwidget': 'rgba(122, 122, 300, 0.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB/RGBA Value',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Incorrect Color String: value for blue must be between 0 and 255.',)]
+        )
 
         # Incorrect Alpha Channel Value
-        request = {'colorwidget': 'rgba(122, 122, 300, 1.5)'}
+        request = {'colorwidget': 'rgba(122, 122, 122, 1.5)'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Incorrect RGB/RGBA Value',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Incorrect Color String: Alpha value must be between 0 and 1.',)]
+        )
 
         # correct value
         request = {'colorwidget': 'rgba(255, 255, 255, 0.5)'}
@@ -302,12 +393,18 @@ class TestColorWidget(YafowilTestCase):
         # not a number / convertable string
         request = {'colorwidget': '4000K'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Unknown Format',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Unknown Format, expected format: int(1000 - 40000) or str(1000 - 40000)',)]
+        )
 
         # Temperature not in range
         request = {'colorwidget': 80000}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Kelvin Temperature not in possible Range',)])
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Kelvin Temperature out of range (1000-40000)',)]
+        )
 
         # number / convertable string
         request = {'colorwidget': '4000'}

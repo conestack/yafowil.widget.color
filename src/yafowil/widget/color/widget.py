@@ -23,14 +23,16 @@ def color_extractor(widget, data):
         return extracted
     format = attr_value('format', widget, data)
 
+    err_base = 'Incorrect Color String:'
+
     if format == 'hexString' or format == 'hex8String':
-        if (
-            not extracted.startswith('#') or
-            format == 'hexString' and len(extracted) != 7 or
-            format == 'hex8String' and len(extracted) != 9
-        ):
+        if (not extracted.startswith('#')):
             raise ExtractionError('Unknown Format')
 
+        if format == 'hexString' and len(extracted) != 7:
+            raise ExtractionError('Incorrect hex Color String length: string length must be 7')
+        elif format == 'hex8String' and len(extracted) != 9:
+            raise ExtractionError('Incorrect hex alpha Color String length: string length must be 9')
         color = extracted[1:]
         r = color[0:2]
         g = color[2:4]
@@ -43,66 +45,111 @@ def color_extractor(widget, data):
             b = int(b, 16)
             if format == 'hex8String':
                 a = int(a, 16)
-        except ValueError:
-            raise ExtractionError('Incorrect Hex Value')
+        except Exception as e:
+            args = ', '.join(e.args)
+            raise ExtractionError(u'Incorrect Hex Value: {}'.format(args))
     elif format == 'hslString' or format == 'hslaString':
-        if (
-            format == 'hslString' and not extracted.startswith('hsl(')
-            or format == 'hslaString' and not extracted.startswith('hsla(')
-            or not extracted.endswith(')')
-        ):
-            raise ExtractionError('Unknown Format')
+        hsl_format = 'hsl([0-360], [0-100]%, [0-100]%)'
+        hsla_format = 'hsla([0-360], [0-100]%, [0-100]%, [0-1])'
+
+        if not extracted.endswith(')'):
+            raise ExtractionError("{} Unclosed '('".format(err_base))
+        elif format == 'hslString' and not extracted.startswith('hsl('):
+            raise ExtractionError(
+                "{} String must start with 'hsl('".format(err_base)
+            )
+        elif format == 'hslaString' and not extracted.startswith('hsla('):
+            raise ExtractionError(
+                "{} String must start with 'hsla('".format(err_base)
+            )
         length = 3 if format == 'hslString' else 4
         color = extracted[length + 1:-1]
         color = [channel.strip() for channel in color.split(',')]
-        if len(color) != length:
-            raise ExtractionError('Incorrect String')
+
+        if format == 'hslString' and len(color) != 3:
+            raise ExtractionError(
+                '{} expected format: {}'.format(err_base, hsl_format)
+            )
+        if format == 'hslaString' and len(color) != 4:
+            raise ExtractionError(
+                '{} expected format: {}'.format(err_base, hsla_format)
+            )
+
         h = color[0]
         s = color[1]
         l = color[2]
         a = color[3] if format == 'hslaString' else False
 
-        if (
-            int(h) not in range(0, 361)
-            or not s.endswith('%') or int(s[0:-1]) not in range(0, 101)
-            or not l.endswith('%') or int(l[0:-1]) not in range(0, 101)
-            or a and float(a) < 0 or float(a) > 1
-        ):
-            raise ExtractionError('Incorrect HSL/HSLA Value')
+        if int(h) < 0 or int(h) > 360:
+            raise ExtractionError(
+                '{} value for hue must be between 0 and 360.'.format(err_base))
+        elif not s.endswith('%') or int(s[0:-1]) not in range(0, 101):
+            raise ExtractionError(
+                '{} value for saturation must be between 0 and 100 followed by "%".'
+                .format(err_base)
+            )
+        elif not l.endswith('%') or int(l[0:-1]) not in range(0, 101):
+            raise ExtractionError(
+                '{} value for lightness must be between 0 and 100 followed by "%".'
+                .format(err_base)
+            )
+        elif a and float(a) < 0 or float(a) > 1:
+            raise ExtractionError(
+                '{} Alpha value must be between 0 and 1.'.format(err_base)
+            )
     elif format == 'rgbString' or format == 'rgbaString':
-        if (
-            format == 'rgbString' and not extracted.startswith('rgb(')
-            or format == 'rgbaString' and not extracted.startswith('rgba(')
-            or not extracted.endswith(')')
-        ):
-            raise ExtractionError('Unknown Format')
+        rgb_format = 'rgb([0-255], [0-255], [0-255])'
+        rgba_format = 'rgba([0-255], [0-255], [0-255], [0-1])'
+
+        if not extracted.endswith(')'):
+            raise ExtractionError("{} Unclosed '('".format(err_base))
+        elif format == 'rgbString' and not extracted.startswith('rgb('):
+            raise ExtractionError(
+                "{} String must start with 'rgb('".format(err_base)
+            )
+        elif format == 'rgbaString' and not extracted.startswith('rgba('):
+            raise ExtractionError(
+                "{} String must start with 'rgba('".format(err_base)
+            )
         length = 3 if format == 'rgbString' else 4
         color = extracted[length + 1:-1]
         color = [channel.strip() for channel in color.split(',')]
-        if len(color) != length:
-            raise ExtractionError('Incorrect String')
 
+        if format == 'rgbString' and len(color) != 3:
+            raise ExtractionError(
+                '{} expected format: {}'.format(err_base, rgb_format)
+            )
+        elif format == 'rgbaString' and len(color) != 4:
+            raise ExtractionError(
+                '{} expected format: {}'.format(err_base, rgba_format)
+            )
         r = color[0]
         g = color[1]
         b = color[2]
         a = color[3] if format == 'rgbaString' else False
 
-        if (
-            int(r) not in range(0, 256) or
-            int(g) not in range(0, 256) or
-            int(b) not in range(0, 256) or
-            a and float(a) < 0 or float(a) > 1
-        ):
-            raise ExtractionError('Incorrect RGB/RGBA Value')
+        if int(r) < 0 or int(r) > 255:
+            raise ExtractionError(
+                '{} value for red must be between 0 and 255.'.format(err_base))
+        elif int(g) < 0 or int(g) > 255:
+            raise ExtractionError(
+                '{} value for green must be between 0 and 255.'.format(err_base))
+        elif int(b) < 0 or int(b) > 255:
+            raise ExtractionError(
+                '{} value for blue must be between 0 and 255.'.format(err_base))
+        elif a and float(a) < 0 or float(a) > 1:
+            raise ExtractionError(
+                '{} Alpha value must be between 0 and 1.'.format(err_base)
+            )
     elif format == 'kelvin':
         try:
             color = int(extracted)
         except ValueError:
-            raise ExtractionError('Unknown Format')
+            raise ExtractionError('Unknown Format, expected format: int(1000 - 40000) or str(1000 - 40000)')
         if color < 1000 or color > 40000:
-            raise ExtractionError('Kelvin Temperature not in possible Range')
+            raise ExtractionError('Kelvin Temperature out of range (1000-40000)')
     else:
-        pass
+        raise ExtractionError('Unknown Format')
     return extracted
 
 
