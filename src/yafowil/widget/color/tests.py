@@ -91,6 +91,25 @@ class TestColorWidget(YafowilTestCase):
             })
         data = widget.extract({})
         self.assertEqual(data.value, '#ffffff')
+        # unknown format
+        color = '#ff0000'
+        widget = factory(
+            'color',
+            name='colorwidget',
+            value=color,
+            props={
+                'format': 'unknown_format_type',
+                'color': color
+            })
+        request = {'colorwidget': 'abc'}
+        data = widget.extract(request)
+        self.assertEqual(
+            data.errors,
+            [ExtractionError(
+              'Unknown Format. Supported formats: hexString, hex8String, '
+              'hslString, hslaString, rgbString, rgbaString, kelvin',
+            )]
+        )
 
     def test_color_extractor_hexString(self):
         widget = factory(
