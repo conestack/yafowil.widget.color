@@ -76,8 +76,8 @@ def color_extractor(widget, data):
             )
             raise ExtractionError(msg)
     elif format == 'hslString' or format == 'hslaString':
-        hsl_format = 'hsl([0-360], [0-100]%, [0-100]%)'
-        hsla_format = 'hsla([0-360], [0-100]%, [0-100]%, [0-1])'
+        hsl_format = u'hsl([0-360], [0-100]%, [0-100]%)'
+        hsla_format = u'hsla([0-360], [0-100]%, [0-100]%, [0-1])'
 
         if not extracted.endswith(')'):
             msg = _(
@@ -112,7 +112,7 @@ def color_extractor(widget, data):
             msg = _(
                 'hsla_str_length',
                 default=u"Incorrect Color String: expected format: ${hsla_format}",
-                mapping={'hsl_format':hsla_format}
+                mapping={'hsla_format':hsla_format}
             )
             raise ExtractionError(msg)
 

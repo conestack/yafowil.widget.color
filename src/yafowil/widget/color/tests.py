@@ -69,7 +69,13 @@ class TestColorWidget(YafowilTestCase):
         # not startswith '#'
         request = {'colorwidget': 'ff0000'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Unknown Format',)])
+        self.assertEqual(
+            data.errors, 
+            [ExtractionError(
+                'Unknown Format. Supported formats: hexString, hex8String, '
+                'hslString, hslaString, rgbString, rgbaString, kelvin'
+            )]
+        )
 
         # too short
         request = {'colorwidget': '#ff000'}
@@ -98,14 +104,20 @@ class TestColorWidget(YafowilTestCase):
         # not startswith '#'
         request = {'colorwidget': 'ff000000'}
         data = widget.extract(request)
-        self.assertEqual(data.errors, [ExtractionError('Unknown Format',)])
+        self.assertEqual(
+            data.errors, 
+            [ExtractionError(
+                'Unknown Format. Supported formats: hexString, hex8String, '
+                'hslString, hslaString, rgbString, rgbaString, kelvin'
+            )]
+        )
 
         # too short
         request = {'colorwidget': '#ff0000'}
         data = widget.extract(request)
         self.assertEqual(
             data.errors,
-            [ExtractionError('Incorrect hex alpha Color String length: string length must be 9',)]
+            [ExtractionError('Incorrect hex8 Color String length: string length must be 9',)]
         )
 
         # incorrect hex value
@@ -134,7 +146,7 @@ class TestColorWidget(YafowilTestCase):
         data = widget.extract(request)
         self.assertEqual(
             data.errors,
-            [ExtractionError("Incorrect Color String: String must start with 'hsl('",)]
+            [ExtractionError("Incorrect Color String: String must start with 'hsl'",)]
         )
 
         # not endswith )
@@ -142,7 +154,7 @@ class TestColorWidget(YafowilTestCase):
         data = widget.extract(request)
         self.assertEqual(
             data.errors,
-            [ExtractionError("Incorrect Color String: Unclosed '('",)]
+            [ExtractionError("Incorrect Color String:  Unclosed bracket.",)]
         )
 
         # hsl+alpha string
@@ -195,7 +207,7 @@ class TestColorWidget(YafowilTestCase):
         data = widget.extract(request)
         self.assertEqual(
             data.errors,
-            [ExtractionError("Incorrect Color String: String must start with 'hsla('",)]
+            [ExtractionError("Incorrect Color String: String must start with 'hsla'",)]
         )
 
         # not endswith )
@@ -203,7 +215,7 @@ class TestColorWidget(YafowilTestCase):
         data = widget.extract(request)
         self.assertEqual(
             data.errors,
-            [ExtractionError("Incorrect Color String: Unclosed '('",)]
+            [ExtractionError("Incorrect Color String:  Unclosed bracket.",)]
         )
 
         # no alpha channel
@@ -264,7 +276,7 @@ class TestColorWidget(YafowilTestCase):
         data = widget.extract(request)
         self.assertEqual(
             data.errors,
-            [ExtractionError("Incorrect Color String: String must start with 'rgb('",)]
+            [ExtractionError("Incorrect Color String: String must start with 'rgb'",)]
         )
 
         # not endswith )
@@ -272,7 +284,7 @@ class TestColorWidget(YafowilTestCase):
         data = widget.extract(request)
         self.assertEqual(
             data.errors,
-            [ExtractionError("Incorrect Color String: Unclosed '('",)]
+            [ExtractionError("Incorrect Color String: Unclosed bracket.",)]
         )
 
         # alpha channel
@@ -325,7 +337,7 @@ class TestColorWidget(YafowilTestCase):
         data = widget.extract(request)
         self.assertEqual(
             data.errors,
-            [ExtractionError("Incorrect Color String: String must start with 'rgba('",)]
+            [ExtractionError("Incorrect Color String: String must start with 'rgba'",)]
         )
 
         # not endswith )
@@ -333,7 +345,7 @@ class TestColorWidget(YafowilTestCase):
         data = widget.extract(request)
         self.assertEqual(
             data.errors,
-            [ExtractionError("Incorrect Color String: Unclosed '('",)]
+            [ExtractionError("Incorrect Color String: Unclosed bracket.",)]
         )
 
         # no alpha channel
