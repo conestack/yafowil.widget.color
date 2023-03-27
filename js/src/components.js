@@ -262,6 +262,8 @@ export class InputElement {
     constructor(widget, elem, color, format, temperature = {min: 1000, max:40000}) {
         this.widget = widget;
         this.elem = elem;
+        this.elem.attr('spellcheck', 'false');
+        this.elem.addClass('form-control');
         this.format = format || 'hexString';
         if (this.format === 'hexString') {
             this.elem.attr('maxlength', 7);
