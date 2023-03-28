@@ -90,6 +90,10 @@ export class ColorPicker {
             this.color = null;
         }
 
+        this.type_kelvin = options.format === 'kelvin';
+        let alpha_types = ['rgbaString', 'hex8String', 'hslaString'];
+        this.type_alpha = alpha_types.includes(options.format);
+
         let prev_elem;
         if (options.preview_elem) {
             prev_elem = $(options.preview_elem)
@@ -308,9 +312,6 @@ export class ColorWidget {
         this.elem = elem;
         this.color_picker = new ColorPicker(elem, options);
 
-        this.type_kelvin = options.format === 'kelvin';
-        let alpha_types = ['rgbaString', 'hex8String', 'hslaString'];
-        this.type_alpha = alpha_types.includes(options.format);
         this.temp = options.temperature || {min: 2000, max: 11000};
         this.input_elem = new InputElement(
             this, this.elem, this.color, options.format, this.temp

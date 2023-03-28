@@ -344,11 +344,10 @@ var yafowil_color = (function (exports, $) {
         constructor(elem, options) {
             this.elem = elem;
             if (options.on_update) {
-                console.log('yea?');
                 this.elem.on('color:update', options.on_update);
             }
-            if (options['on_close']) {
-                this.elem.on('color:close', options['on_close']);
+            if (options.on_close) {
+                this.elem.on('color:close', options.on_close);
             }
             this.dropdown_elem = $('<div />')
                 .addClass('color-picker-wrapper')
@@ -400,6 +399,9 @@ var yafowil_color = (function (exports, $) {
             } else {
                 this.color = null;
             }
+            this.type_kelvin = options.format === 'kelvin';
+            let alpha_types = ['rgbaString', 'hex8String', 'hslaString'];
+            this.type_alpha = alpha_types.includes(options.format);
             let prev_elem;
             if (options.preview_elem) {
                 prev_elem = $(options.preview_elem)
@@ -600,9 +602,6 @@ var yafowil_color = (function (exports, $) {
             elem.data('yafowil-color', this);
             this.elem = elem;
             this.color_picker = new ColorPicker(elem, options);
-            this.type_kelvin = options.format === 'kelvin';
-            let alpha_types = ['rgbaString', 'hex8String', 'hslaString'];
-            this.type_alpha = alpha_types.includes(options.format);
             this.temp = options.temperature || {min: 2000, max: 11000};
             this.input_elem = new InputElement(
                 this, this.elem, this.color, options.format, this.temp
