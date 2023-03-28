@@ -33,6 +33,9 @@ var yafowil_color = (function (exports, $) {
                     .addClass('locked')
                     .append($('<div class="swatch-mark" />'));
             }
+            if (this.widget.color_equals(color)) {
+                this.selected = true;
+            }
             this.select = this.select.bind(this);
             this.elem.on('click', this.select);
         }
@@ -397,6 +400,11 @@ var yafowil_color = (function (exports, $) {
             if (!options.locked_swatches && !options.user_swatches) {
                 this.picker_container.css('margin-bottom', 0);
             }
+            if (options.color) {
+                this.color = this.picker.color.clone();
+            } else {
+                this.color = null;
+            }
             if (options.locked_swatches) {
                 this.locked_swatches = new LockedSwatchesContainer(
                     this,
@@ -405,11 +413,6 @@ var yafowil_color = (function (exports, $) {
             }
             if (options.user_swatches) {
                 this.user_swatches = new UserSwatchesContainer(this);
-            }
-            if (options.color) {
-                this.color = this.picker.color.clone();
-            } else {
-                this.color = null;
             }
             let prev_elem;
             if (options.preview_elem) {
