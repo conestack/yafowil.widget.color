@@ -380,7 +380,10 @@ class TestColorWidget(YafowilTestCase):
         data = widget.extract(request)
         self.assertEqual(
             data.errors,
-            [ExtractionError('Incorrect Color String: expected format: rgba([0-255], [0-255], [0-255], [0-1])',)]
+            [ExtractionError(
+                'Incorrect Color String: expected format: '
+                'rgba([0-255], [0-255], [0-255], [0-1])'
+            )]
         )
         # Incorrect Red Channel Value
         request = {'colorwidget': 'rgba(-1, 122, 122, 0.5)'}
