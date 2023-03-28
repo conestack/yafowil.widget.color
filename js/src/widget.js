@@ -72,6 +72,10 @@ export class ColorPicker {
             this.picker_container.hide();
         }
 
+        this.type_kelvin = options.format === 'kelvin';
+        let alpha_types = ['rgbaString', 'hex8String', 'hslaString'];
+        this.type_alpha = alpha_types.includes(options.format);
+
         if (!options.locked_swatches && !options.user_swatches) {
             this.picker_container.css('margin-bottom', 0);
         }
@@ -89,10 +93,6 @@ export class ColorPicker {
         } else {
             this.color = null;
         }
-
-        this.type_kelvin = options.format === 'kelvin';
-        let alpha_types = ['rgbaString', 'hex8String', 'hslaString'];
-        this.type_alpha = alpha_types.includes(options.format);
 
         let prev_elem;
         if (options.preview_elem) {
