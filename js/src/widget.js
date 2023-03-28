@@ -83,6 +83,11 @@ export class ColorPicker {
         if (!options.locked_swatches && !options.user_swatches) {
             this.picker_container.css('margin-bottom', 0);
         }
+        if (options.color) {
+            this.color = this.picker.color.clone();
+        } else {
+            this.color = null;
+        }
         if (options.locked_swatches) {
             this.locked_swatches = new LockedSwatchesContainer(
                 this,
@@ -91,11 +96,6 @@ export class ColorPicker {
         }
         if (options.user_swatches) {
             this.user_swatches = new UserSwatchesContainer(this);
-        }
-        if (options.color) {
-            this.color = this.picker.color.clone();
-        } else {
-            this.color = null;
         }
 
         let prev_elem;

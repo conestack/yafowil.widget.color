@@ -37,6 +37,10 @@ export class ColorSwatch {
                 .addClass('locked')
                 .append($('<div class="swatch-mark" />'));
         }
+        if (this.widget.color_equals(color)) {
+            this.selected = true;
+        }
+
         this.select = this.select.bind(this);
         this.elem.on('click', this.select);
     }
