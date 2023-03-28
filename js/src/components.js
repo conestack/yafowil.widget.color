@@ -17,6 +17,11 @@ export class ColorSwatch {
                 this.invalid = true;
                 return;
         }
+        if (kelvin && this.widget.type_kelvin &&
+            (color.kelvin < this.widget.min ||
+             color.kelvin > this.widget.max)) {
+                return;
+        }
 
         this.elem = $('<div />')
             .addClass('color-swatch layer-transparent')

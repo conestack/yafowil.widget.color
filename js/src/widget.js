@@ -73,6 +73,10 @@ export class ColorPicker {
         }
 
         this.type_kelvin = options.format === 'kelvin';
+        if (this.type_kelvin) {
+            this.min = options.temperature.min;
+            this.max = options.temperature.max;
+        }
         let alpha_types = ['rgbaString', 'hex8String', 'hslaString'];
         this.type_alpha = alpha_types.includes(options.format);
 
