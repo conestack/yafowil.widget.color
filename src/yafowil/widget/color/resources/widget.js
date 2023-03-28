@@ -462,8 +462,8 @@ var yafowil_color = (function (exports, $) {
                             sliderType: type,
                             sliderSize: opts.slider_size,
                             sliderLength: opts.slider_length,
-                            minTemperature: opts.temperature.min || undefined,
-                            maxTemperature: opts.temperature.max || undefined,
+                            minTemperature: opts.temperature ? opts.temperature.min : undefined,
+                            maxTemperature: opts.temperature ? opts.temperature.max : undefined,
                             disabled: opts.disabled,
                             showInput: opts.show_inputs,
                             showLabel: opts.show_labels
