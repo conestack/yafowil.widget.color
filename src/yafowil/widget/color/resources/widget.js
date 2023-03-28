@@ -16,6 +16,11 @@ var yafowil_color = (function (exports, $) {
                     this.invalid = true;
                     return;
             }
+            if (kelvin && this.widget.type_kelvin &&
+                (color.kelvin < this.widget.min ||
+                 color.kelvin > this.widget.max)) {
+                    return;
+            }
             this.elem = $('<div />')
                 .addClass('color-swatch layer-transparent')
                 .appendTo(this.container);
@@ -383,6 +388,10 @@ var yafowil_color = (function (exports, $) {
                 this.picker_container.hide();
             }
             this.type_kelvin = options.format === 'kelvin';
+            if (this.type_kelvin) {
+                this.min = options.temperature.min;
+                this.max = options.temperature.max;
+            }
             let alpha_types = ['rgbaString', 'hex8String', 'hslaString'];
             this.type_alpha = alpha_types.includes(options.format);
             if (!options.locked_swatches && !options.user_swatches) {
