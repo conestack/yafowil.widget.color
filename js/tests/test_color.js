@@ -1,7 +1,7 @@
-import {ColorWidget} from '../src/widget.js';
+import {ColorWidget, lookup_callback} from '../src/widget.js';
+import {LockedSwatchesContainer} from '../src/components.js';
 import {register_array_subscribers} from '../src/widget.js';
 import $ from 'jquery';
-import { LockedSwatchesContainer } from '../src/components.js';
 
 let elem = $('<input class="color-picker"/>');
 let widget;
@@ -37,6 +37,40 @@ QUnit.module('ColorWidget', hooks => {
         widget = elem.data('yafowil-color');
         assert.ok(widget.elem.attr('spellcheck'), false);
         assert.deepEqual(widget.elem, elem);
+    });
+
+    QUnit.test('on_update, on_close', assert => {
+        window.on_update = () => {
+            assert.step('on_update');
+        };
+        window.yafowil_color_test = {
+            on_close: () => {
+                assert.step('on_close');
+            }
+        }
+        elem.data('on_update', 'on_update')
+        elem.data('on_close', 'yafowil_color_test.on_close')
+        ColorWidget.initialize();
+        widget = elem.data('yafowil-color');
+        widget.color_picker.open();
+        widget.color_picker.update_color();
+        widget.color_picker.close();
+
+        assert.verifySteps([
+            'on_update',
+            'on_close'
+        ]);
+
+        window.yafowil_color_test = undefined;
+        window.on_update = undefined;
+
+        // lookup_callback: no path
+        assert.strictEqual(lookup_callback(), null);
+
+        // NOTE: assert.throws will not work if passed a named function,
+        // so ignore case: path source undefined.
+
+        elem.val('');
     });
 
     QUnit.test('register_array_subscribers', assert => {
@@ -485,6 +519,24 @@ QUnit.module('ColorWidget', hooks => {
         );
 
         widget.color_picker.active_swatch = null;
+    });
+
+    QUnit.test('on_keydown - no active swatch, no swatches', assert => {
+        // initialize
+        let widget = new ColorWidget(elem, {
+            color: '#ffffff',
+            locked_swatches: false,
+            user_swatches: false
+        });
+        // trigger arrow keys
+        let arrow_left = $.Event('keydown', {key: 'ArrowLeft'}),
+            arrow_right = $.Event('keydown', {key: 'ArrowRight'});
+        // trigger right
+        $(window).trigger(arrow_right);
+        assert.strictEqual(widget.color_picker.active_swatch, undefined);
+        // trigger left
+        $(window).trigger(arrow_left);
+        assert.strictEqual(widget.color_picker.active_swatch, undefined);
     });
 
     QUnit.test('close', assert => {

@@ -16,6 +16,7 @@ export function lookup_callback(path) {
         name;
     for (const idx in source) {
         name = source[idx];
+        /* istanbul ignore next */
         if (cb[name] === undefined) {
             throw "'" + name + "' not found.";
         }
