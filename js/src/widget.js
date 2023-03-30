@@ -267,7 +267,8 @@ export class ColorPicker {
     }
 
     color_equals(color) {
-        if (color instanceof iro.Color &&
+        if (this.color &&
+            color instanceof iro.Color &&
             color.hsva.h === this.color.hsva.h &&
             color.hsva.s === this.color.hsva.s &&
             color.hsva.v === this.color.hsva.v &&
@@ -318,7 +319,7 @@ export class ColorWidget {
 
         this.temp = options.temperature || {min: 2000, max: 11000};
         this.input_elem = new InputElement(
-            this, this.elem, this.color, options.format, this.temp
+            this, this.elem, this.color_picker.color, options.format, this.temp
         );
 
         if (options.open_on_focus) {

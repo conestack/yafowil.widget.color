@@ -306,10 +306,10 @@ export class InputElement {
                 } else if (parseInt(color) > this.temperature.max) {
                     color = this.temperature.max;
                 }
-                this.widget.picker.color.kelvin = color;
+                this.widget.color_picker.picker.color.kelvin = color;
                 this.elem.val(color);
             } else {
-                this.widget.picker.color.set(color);
+                this.widget.color_picker.picker.color.set(color);
             }
             this._color = null;
         }
