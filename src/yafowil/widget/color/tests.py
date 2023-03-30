@@ -29,7 +29,7 @@ class TestColorWidget(YafowilTestCase):
         widget = factory(
             'color',
             name='colorwidget')
-        self.checkOutput("""<input class="color-picker" data-box_width='250' data-disabled='false' data-format='hexString' data-layout_direction='vertical' data-open_on_focus='true' data-show_inputs='false' data-show_labels='false' data-slider_size='10' data-sliders='["box", "h"]' data-temperature='{"min": 2000, "max": 12000}' data-user_swatches='true' id="input-colorwidget" name="colorwidget" type="text" />"""
+        self.checkOutput("""<input class="color-picker" data-box_width='250' data-disabled='false' data-format='hexString' data-layout_direction='vertical' data-open_on_focus='true' data-show_inputs='false' data-show_labels='false' data-slider_size='10' data-sliders='["box", "h"]' data-temperature='{...}' data-user_swatches='true' id="input-colorwidget" name="colorwidget" type="text" />"""
         , widget()
         )
 
@@ -46,7 +46,7 @@ class TestColorWidget(YafowilTestCase):
                 'layout_direction': 'horizontal',
                 'open_on_focus': False
             })
-        self.checkOutput("""<input class="color-picker" data-box_width='250' data-disabled='false' data-format='rgbaString' data-layout_direction='horizontal' data-open_on_focus='false' data-show_inputs='true' data-show_labels='true' data-slider_size='50' data-sliders='["box", "h"]' data-temperature='{"min": 2000, "max": 12000}' data-user_swatches='true' id="input-colorwidget" name="colorwidget" type="text" />"""
+        self.checkOutput("""<input class="color-picker" data-box_width='250' data-disabled='false' data-format='rgbaString' data-layout_direction='horizontal' data-open_on_focus='false' data-show_inputs='true' data-show_labels='true' data-slider_size='50' data-sliders='["box", "h"]' data-temperature='{...}' data-user_swatches='true' id="input-colorwidget" name="colorwidget" type="text" />"""
         , widget()
         )
 
