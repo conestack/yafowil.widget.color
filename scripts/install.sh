@@ -40,5 +40,6 @@ function install {
     fi
 }
 
+install python2 py2
 install python3 py3
 install pypy3 pypy3

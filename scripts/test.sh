@@ -12,5 +12,6 @@ function run_tests {
     fi
 }
 
+run_tests py2
 run_tests py3
 run_tests pypy3
