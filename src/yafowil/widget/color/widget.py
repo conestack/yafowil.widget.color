@@ -2,7 +2,7 @@
 from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
-from yafowil.common import generic_emptyvalue_extractor
+from yafowil.common import generic_emptyvalue_extractor, input_attributes_common
 from yafowil.common import generic_extractor
 from yafowil.common import generic_required_extractor
 from yafowil.tsf import TSF
@@ -261,17 +261,11 @@ color_options = [
 
 @managedprops(*color_options)
 def color_edit_renderer(widget, data):
-    input_attrs = {
-        'class_': cssclasses(widget, data),
-        'id': cssid(widget, 'input'),
-        'name_': widget.dottedpath,
-        'type': 'text'
-    }
+    input_attrs = input_attributes_common(widget, data)
     custom_attrs = data_attrs_helper(widget, data, color_options)
-    # XXX: widget options
-    for key in custom_attrs:
-        input_attrs[key] = custom_attrs[key]
-
+    input_attrs.update(custom_attrs)
+    input_attrs['type'] = 'text'
+    input_attrs['data-color'] = input_attrs['value']
     return data.tag('input', **input_attrs)
 
 
