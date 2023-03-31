@@ -19,6 +19,7 @@ var yafowil_color = (function (exports, $) {
             if (kelvin && this.widget.type_kelvin &&
                 (color.kelvin < this.widget.min ||
                  color.kelvin > this.widget.max)) {
+                    this.invalid = true;
                     return;
             }
             this.elem = $('<div />')
