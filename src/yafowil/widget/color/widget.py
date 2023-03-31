@@ -19,22 +19,42 @@ _ = TSF('yafowil.widget.color')
 class ColorDatatypeConverter(DatatypeConverter):
     """Datatype Converter for Color Formats."""
 
-    def __init__(self, format=None, minmax=[0,255]):
+    def __init__(self, format=None, range='0-1'):
         self.format = format
-        self.minmax = minmax
+        self.range = range
 
     def to_value(self, value):
         if isinstance(value, str):
-            if self.format == 'rgbaString':
+            if self.format == 'kelvin':
+                return int(value)
+            elif self.format in ('hexString', 'hex8String'):
+                return value
+            elif self.format == 'rgbaString':
                 value = value[5:-1].split(', ')
+                updated_value = list()
+                updated_value[0] = value[0] / 255
+                updated_value[1] = value[1] / 255
+                updated_value[2] = value[2] / 255
+                updated_value[3] = value[3]
+                value = updated_value
             elif self.format == 'rgbString':
                 value = value[4:-1].split(', ')
+                value = [channel/255 for channel in value]
             elif self.format == 'hslString':
                 value = value[4:-1].replace('%', '').split(', ')
             elif self.format == 'hslaString':
                 value = value[5:-1].replace('%', '').split(', ')
-            elif self.format == 'kelvin':
-                value = int(value)
+                updated_value = list()
+                updated_value[0] = value[0] / 360
+                updated_value[1] = value[1] / 100
+                updated_value[2] = value[2] / 100
+                updated_value[3] = value[3]
+                value = updated_value
+            value = [int(channel) for channel in value]
+
+            if self.range == '0-1':
+                value = [channel/250 for channel in value]
+                print(value)
             return value
         elif isinstance(value, int) and self.format == 'kelvin':
             return value
@@ -82,7 +102,7 @@ class ColorDatatypeConverter(DatatypeConverter):
                                 'Expected value between 0 and 1, value is: {}'
                                 .format(value.index(item), item)
                             )
-                    elif item < self.minmax[0] or item > self.minmax[1]:
+                    elif item < 0 or item > 255:
                         raise ValueError(
                             u'Value out of bounds at index {}. '
                             'Expected value between 0 and 255, value is: {}'
@@ -96,7 +116,7 @@ class ColorDatatypeConverter(DatatypeConverter):
                         .format(type_name, length)
                     )
                 for item in value:
-                    if item < self.minmax[0] or item > self.minmax[1]:
+                    if item < 0 or item > 255:
                         raise ValueError(
                             u'Value out of bounds at index {}. '
                                 'Expected value between 0 and 255, value is: {}'
