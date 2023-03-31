@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.common import generic_emptyvalue_extractor, input_attributes_common
@@ -7,8 +6,6 @@ from yafowil.common import generic_extractor
 from yafowil.common import generic_required_extractor
 from yafowil.tsf import TSF
 from yafowil.utils import attr_value
-from yafowil.utils import cssclasses
-from yafowil.utils import cssid
 from yafowil.utils import data_attrs_helper
 from yafowil.utils import managedprops
 
