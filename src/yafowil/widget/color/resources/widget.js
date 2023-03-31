@@ -353,10 +353,10 @@ var yafowil_color = (function (exports, $) {
         constructor(elem, options) {
             this.elem = elem;
             if (options.on_update) {
-                this.elem.on('color:update', options.on_update);
+                this.elem.on('color_update', options.on_update);
             }
             if (options.on_close) {
-                this.elem.on('color:close', options.on_close);
+                this.elem.on('color_close', options.on_close);
             }
             this.dropdown_elem = $('<div />')
                 .addClass('color-picker-wrapper')
@@ -489,7 +489,7 @@ var yafowil_color = (function (exports, $) {
         update_color() {
             this.color = this.picker.color.clone();
             this.preview.color = this.color.rgbaString;
-            let evt = new $.Event('color:update', {origin: this});
+            let evt = new $.Event('color_update', {origin: this});
             this.elem.trigger(evt);
         }
         open(evt) {
@@ -567,7 +567,7 @@ var yafowil_color = (function (exports, $) {
             this.dropdown_elem.hide();
             $(window).off('keydown', this.on_keydown);
             $(window).off('mousedown', this.on_click);
-            let evt = new $.Event('color:close', {origin: this});
+            let evt = new $.Event('color_close', {origin: this});
             this.elem.trigger(evt);
         }
         color_equals(color) {
@@ -623,10 +623,10 @@ var yafowil_color = (function (exports, $) {
             if (options.open_on_focus) {
                 this.elem.on('focus', this.color_picker.open);
             }
-            this.elem.on('color:update', (e) => {
+            this.elem.on('color_update', (e) => {
                 this.input_elem.update_color(this.color_picker.color);
             });
-            this.elem.on('color:close', (e) => {
+            this.elem.on('color_close', (e) => {
                 this.elem.blur();
             });
         }
