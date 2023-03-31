@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from yafowil.base import factory
+from yafowil.widget.color.widget import ColorDatatypeConverter
 
 
 DOC_COLOR = """
@@ -20,6 +21,26 @@ def default_example():
         '#field:color',
         props={
             'label': 'Default Color Picker'
+        })
+    return {
+        'widget': part,
+        'doc': DOC_COLOR,
+        'title': 'Default Color Picker'
+    }
+
+
+def foo():
+    part = factory(u'fieldset', name='yafowil.widget.color.default')
+    type_ = 'hslaString'
+    color = (200, 0, 100, 1)
+    part['color'] = factory(
+        '#field:color',
+        value=color,
+        props={
+            'label': 'Default Color Picker',
+            'format': type_,
+            'color': color,
+            'datatype': ColorDatatypeConverter(type_, minmax=[0,255])
         })
     return {
         'widget': part,
@@ -568,16 +589,17 @@ def swatches_only_example():
 
 def get_example():
     return [
-        default_example(),
-        wheel_example(),
-        layout_example(),
-        dim_example(),
-        length_example(),
-        input_example(),
-        preview_example(),
-        swatches_example(),
-        swatches_only_example(),
-        rgb_example(),
-        hsv_example(),
-        kelvin_example()
+        foo()
+        # default_example(),
+        # wheel_example(),
+        # layout_example(),
+        # dim_example(),
+        # length_example(),
+        # input_example(),
+        # preview_example(),
+        # swatches_example(),
+        # swatches_only_example(),
+        # rgb_example(),
+        # hsv_example(),
+        # kelvin_example()
     ]

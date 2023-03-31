@@ -1,16 +1,130 @@
 # -*- coding: utf-8 -*-
 from yafowil.base import ExtractionError
 from yafowil.base import factory
-from yafowil.common import generic_emptyvalue_extractor, input_attributes_common
+from yafowil.datatypes import generic_emptyvalue_extractor
+from yafowil.common import input_attributes_common
 from yafowil.common import generic_extractor
 from yafowil.common import generic_required_extractor
 from yafowil.tsf import TSF
 from yafowil.utils import attr_value
 from yafowil.utils import data_attrs_helper
 from yafowil.utils import managedprops
+from yafowil.datatypes import DatatypeConverter
 
 
 _ = TSF('yafowil.widget.color')
+
+
+class ColorDatatypeConverter(DatatypeConverter):
+    """Datatype Converter for Color Formats."""
+
+    def __init__(self, format=None, minmax=[0,255]):
+        self.format = format
+        self.minmax = minmax
+
+    def to_value(self, value):
+        print('XXXX to_value')
+        return value
+
+    def to_form(self, value):
+        if isinstance(value, tuple):
+            length = len(value)
+            if self.format == 'rgbaString':
+                if length != 4:
+                    raise ValueError(
+                        u'Tuple must contain 4 items, contains: {}'
+                        .format(length)
+                    )
+                for item in value:
+                    if value.index(item) == 3:
+                        if item < 0 or item > 1:
+                            raise ValueError(
+                                u'Value out of bounds at index {}. '
+                                'Expected value between 0 and 1, value is: {}'
+                                .format(value.index(item), item)
+                            )
+                    elif item < self.minmax[0] or item > self.minmax[1]:
+                        raise ValueError(
+                            u'Value out of bounds at index {}. '
+                            'Expected value between 0 and 255, value is: {}'
+                            .format(value.index(item), item)
+                        )
+                return 'rgba{0}'.format(value)
+            elif self.format == 'rgbString':
+                if length != 3:
+                    raise ValueError(
+                        u'Tuple must contain 3 items, contains: {}'
+                        .format(length)
+                    )
+                for item in value:
+                    if item < self.minmax[0] or item > self.minmax[1]:
+                        raise ValueError(
+                            u'Value out of bounds at index {}. '
+                                'Expected value between 0 and 255, value is: {}'
+                                .format(value.index(item), item)
+                        )
+                return 'rgb{0}'.format(value)
+            elif self.format == 'hslString':
+                if length != 3:
+                    raise ValueError(
+                        u'Tuple must contain 3 items, contains: {}'
+                        .format(length)
+                    )
+                for item in value:
+                    index = value.index(item)
+                    if index == 0 and item < 0 or item > 360:
+                        raise ValueError(
+                            u'Value out of bounds at index {}. '
+                                'Expected Hue value between 0 and 360, value is: {}'
+                                .format(index, item)
+                        )
+                    if (index == 1 or index == 2) and (item < 0 or item > 100):
+                        raise ValueError(
+                            u'Value out of bounds at index {}. '
+                                'Expected value between 0 and 100, value is: {}'
+                                .format(index, item)
+                        )
+                return 'hsl({}, {}%, {}%)'.format(value[0], value[1], value[2])
+            elif self.format == 'hslaString':
+                if length != 4:
+                    raise ValueError(
+                        u'Tuple must contain 4 items, contains: {}'
+                        .format(length)
+                    )
+                for item in value:
+                    index = value.index(item)
+                    if index == 0 and item < 0 or item > 360:
+                        raise ValueError(
+                            u'Value out of bounds at index {}. '
+                             'Expected Hue value between 0 and 360, value is: {}'
+                             .format(index, item)
+                        )
+                    elif (index == 1) and (item < 0 or item > 100):
+                        raise ValueError(
+                            u'Value out of bounds at index {}. '
+                             'Expected Saturation value between 0 and 100, value is: {}'
+                             .format(index, item)
+                        )
+                    elif (index == 2) and (item < 0 or item > 100):
+                        raise ValueError(
+                            u'Value out of bounds at index {}. '
+                             'Expected Lightness value between 0 and 100, value is: {}'
+                             .format(index, item)
+                        )
+                    elif (index == 3) and (item < 0 or item > 1):
+                        raise ValueError(
+                            u'Value out of bounds at index {}. '
+                             'Expected Alpha value between 0 and 1, value is: {}'
+                             .format(index, item)
+                        )
+                return 'hsl({}, {}%, {}%)'.format(value[0], value[1], value[2])
+            elif self.format == 'hexString':
+                pass
+            elif self.format == 'hex8String':
+                pass
+            elif self.format == 'kelvin':
+                pass
+        return value
 
 
 @managedprops('format')
