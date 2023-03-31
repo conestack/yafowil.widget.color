@@ -1,5 +1,5 @@
 import {ColorWidget, lookup_callback} from '../src/widget.js';
-import {LockedSwatchesContainer} from '../src/components.js';
+import {ColorSwatch, LockedSwatchesContainer} from '../src/components.js';
 import {register_array_subscribers} from '../src/widget.js';
 import $ from 'jquery';
 
@@ -66,9 +66,8 @@ QUnit.module('ColorWidget', hooks => {
 
         // lookup_callback: no path
         assert.strictEqual(lookup_callback(), null);
-
-        // NOTE: assert.throws will not work if passed a named function,
-        // so ignore case: path source undefined.
+        // path not found
+        assert.throws(() => { lookup_callback('foo.bar') }, 'foo not found.');
 
         elem.val('');
     });
@@ -911,6 +910,27 @@ QUnit.module('ColorWidget', hooks => {
             );
         });
 
+        QUnit.test('constructor - return cases', assert => {
+            let swatches = [
+                {color: '#ffd0a4', kelvin:true},
+                {color:'#e1e8ff', kelvin:true},
+                {color:'#ff0000', kelvin:false}
+            ];
+            swatches = JSON.stringify(swatches);
+            localStorage.setItem('yafowil-color-swatches', swatches);
+            widget = new ColorWidget(elem, {
+                user_swatches: true,
+                format: 'kelvin',
+                temperature: {min: 5000, max: 5001}
+            });
+            let user_swatches = widget.color_picker.user_swatches.swatches;
+            assert.strictEqual(user_swatches.length, 3);
+            assert.true(user_swatches[0].invalid);
+            assert.true(user_swatches[1].invalid);
+            assert.true(user_swatches[2].invalid);
+            localStorage.removeItem('yafowil-color-swatches');
+        });
+
         QUnit.test('color_equals', assert => {
             let color = { h: 100, s: 100, v: 75, a: 1 };
             let colors = [
@@ -954,11 +974,13 @@ QUnit.module('ColorWidget', hooks => {
             widget.color_picker.picker.color.hsl = color1;
             widget.color_picker.user_swatches.create_swatch();
             assert.strictEqual(widget.color_picker.user_swatches.swatches.length, 1);
+            assert.true(widget.color_picker.user_swatches.swatches[0].selected);
 
             // create second swatch
             widget.color_picker.picker.color.hsl = color2;
             widget.color_picker.user_swatches.create_swatch();
             assert.strictEqual(widget.color_picker.user_swatches.swatches.length, 2);
+            assert.true(widget.color_picker.user_swatches.swatches[1].selected);
 
             // delete swatch
             widget.color_picker.active_swatch = widget.color_picker.user_swatches.swatches[1];
