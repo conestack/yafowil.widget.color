@@ -20,6 +20,7 @@ export class ColorSwatch {
         if (kelvin && this.widget.type_kelvin &&
             (color.kelvin < this.widget.min ||
              color.kelvin > this.widget.max)) {
+                this.invalid = true;
                 return;
         }
 
