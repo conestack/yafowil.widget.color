@@ -2,6 +2,7 @@
 from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.datatypes import generic_emptyvalue_extractor
+from yafowil.datatypes import generic_datatype_extractor
 from yafowil.common import input_attributes_common
 from yafowil.common import generic_extractor
 from yafowil.common import generic_required_extractor
@@ -23,17 +24,55 @@ class ColorDatatypeConverter(DatatypeConverter):
         self.minmax = minmax
 
     def to_value(self, value):
-        print('XXXX to_value')
-        return value
+        if isinstance(value, str):
+            if self.format == 'rgbaString':
+                value = value[5:-1].split(', ')
+            elif self.format == 'rgbString':
+                value = value[4:-1].split(', ')
+            elif self.format == 'hslString':
+                value = value[4:-1].replace('%', '').split(', ')
+            elif self.format == 'hslaString':
+                value = value[5:-1].replace('%', '').split(', ')
+            elif self.format == 'kelvin':
+                value = int(value)
+            return value
+        elif isinstance(value, int) and self.format == 'kelvin':
+            return value
+        else:
+            raise ValueError(
+                u'Not supported type: {}'
+                .format(type(value).__name__)
+            )
 
     def to_form(self, value):
-        if isinstance(value, tuple):
+        type_name = type(value).__name__
+        accepted_formats = [
+            'hexString',
+            'hex8String',
+            'hslString',
+            'hslaString',
+            'rgbString',
+            'rgbaString',
+            'kelvin'
+        ]
+
+        if not self.format in accepted_formats:
+            raise ValueError(
+                u'Not supported format: {}'
+                .format(self.format)
+            )
+
+        if isinstance(value, (tuple, list)):
             length = len(value)
+
+            if isinstance(value, list):
+                value = tuple(value)
+
             if self.format == 'rgbaString':
                 if length != 4:
                     raise ValueError(
-                        u'Tuple must contain 4 items, contains: {}'
-                        .format(length)
+                        u'{} must contain 4 items, contains: {}'
+                        .format(type_name, length)
                     )
                 for item in value:
                     if value.index(item) == 3:
@@ -53,8 +92,8 @@ class ColorDatatypeConverter(DatatypeConverter):
             elif self.format == 'rgbString':
                 if length != 3:
                     raise ValueError(
-                        u'Tuple must contain 3 items, contains: {}'
-                        .format(length)
+                        u'{} must contain 3 items, contains: {}'
+                        .format(type_name, length)
                     )
                 for item in value:
                     if item < self.minmax[0] or item > self.minmax[1]:
@@ -67,8 +106,8 @@ class ColorDatatypeConverter(DatatypeConverter):
             elif self.format == 'hslString':
                 if length != 3:
                     raise ValueError(
-                        u'Tuple must contain 3 items, contains: {}'
-                        .format(length)
+                        u'{} must contain 3 items, contains: {}'
+                        .format(type_name, length)
                     )
                 for item in value:
                     index = value.index(item)
@@ -88,8 +127,8 @@ class ColorDatatypeConverter(DatatypeConverter):
             elif self.format == 'hslaString':
                 if length != 4:
                     raise ValueError(
-                        u'Tuple must contain 4 items, contains: {}'
-                        .format(length)
+                        u'{} must contain 4 items, contains: {}'
+                        .format(type_name, length)
                     )
                 for item in value:
                     index = value.index(item)
@@ -118,13 +157,36 @@ class ColorDatatypeConverter(DatatypeConverter):
                              .format(index, item)
                         )
                 return 'hsl({}, {}%, {}%)'.format(value[0], value[1], value[2])
-            elif self.format == 'hexString':
-                pass
-            elif self.format == 'hex8String':
-                pass
+            elif self.format == 'hexString' or self.format == 'hex8String':
+                raise ValueError(
+                    u'Format {} does not accept type {}, accepted type: string'
+                     .format(self.format, type_name)
+                )
             elif self.format == 'kelvin':
-                pass
-        return value
+                raise ValueError(
+                    u'Format {} does not accept type {}, accepted type: string | number'
+                     .format(self.format, type_name)
+                )
+            else:
+                raise ValueError(
+                    u'Unknown Format: {}, accepted formats: {}'
+                     .format(self.format, accepted_formats)
+                )
+        elif isinstance(value, str):
+            return value
+        elif isinstance(value, int):
+            if self.format == 'kelvin':
+                return value
+            else:
+                raise ValueError(
+                    u'Format {} does not accept type {}, accepted type: string'
+                     .format(self.format, type_name)
+                )
+        else:
+            raise ValueError(
+                u'Unsupported value type: {}'
+                 .format(type_name)
+            )
 
 
 @managedprops('format')
@@ -390,7 +452,8 @@ factory.register(
         generic_extractor,
         generic_required_extractor,
         color_extractor,
-        generic_emptyvalue_extractor
+        generic_emptyvalue_extractor,
+        generic_datatype_extractor
     ],
     edit_renderers=[
         color_edit_renderer
