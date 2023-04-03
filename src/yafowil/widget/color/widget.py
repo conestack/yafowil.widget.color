@@ -11,6 +11,7 @@ from yafowil.utils import attr_value
 from yafowil.utils import data_attrs_helper
 from yafowil.utils import managedprops
 from yafowil.datatypes import DatatypeConverter
+from yafowil.common import UNSET
 
 
 _ = TSF('yafowil.widget.color')
@@ -20,13 +21,13 @@ class ColorDatatypeConverter(DatatypeConverter):
     """Datatype Converter for Color Formats."""
 
     def __init__(self, type_=None, format=None, range='full'):
-        super(ColorDatatypeConverter, self).__init__(type_)
+        self.type_ = type_
         self.format = format
         self.range = range
 
     def to_value(self, value):
         if isinstance(value, str):
-            if self.format == 'kelvin':
+            if self.format == 'kelvin' and self.type_ == int:
                 return int(value)
             elif self.format in ('hexString', 'hex8String'):
                 return value
@@ -68,9 +69,11 @@ class ColorDatatypeConverter(DatatypeConverter):
                 return tuple(value)
             return value
         elif isinstance(value, int) and self.format == 'kelvin':
-            return value
+            if self.type_ == int:
+                return value
+            return str(value)
         else:
-            raise ValueError(
+            raise TypeError(
                 u'Not supported type: {}'
                 .format(type(value).__name__)
             )
@@ -88,11 +91,12 @@ class ColorDatatypeConverter(DatatypeConverter):
         ]
 
         if not self.format in accepted_formats:
-            raise ValueError(
+            raise TypeError(
                 u'Not supported format: {}'
                 .format(self.format)
             )
-
+        if not value:
+            return value
         if isinstance(value, (tuple, list)):
             length = len(value)
 
@@ -237,11 +241,6 @@ class ColorDatatypeConverter(DatatypeConverter):
                 raise ValueError(
                     u'Format {} does not accept type {}, accepted type: string | number'
                      .format(self.format, type_name)
-                )
-            else:
-                raise ValueError(
-                    u'Unknown Format: {}, accepted formats: {}'
-                     .format(self.format, accepted_formats)
                 )
         elif isinstance(value, str):
             return value
