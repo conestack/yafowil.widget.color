@@ -42,9 +42,10 @@ class ColorDatatypeConverter(DatatypeConverter):
                     value[2] = value[2] / 255
             elif self.format == 'rgbString':
                 value = value[4:-1].split(', ')
-                value = [int(channel) for channel in value]
                 if self.range == 'toInterval':
-                    value = [channel / 255 for channel in value]
+                    value = [int(channel) / 255 for channel in value]
+                else:
+                    value = [int(channel) for channel in value]
             elif self.format == 'hslString':
                 value = value[4:-1].replace('%', '').split(', ')
                 value = [int(channel) for channel in value]
@@ -62,6 +63,9 @@ class ColorDatatypeConverter(DatatypeConverter):
                     value[0] = value[0] / 360
                     value[1] = value[1] / 100
                     value[2] = value[2] / 100
+
+            if isinstance(value, list) and self.type_ == tuple:
+                return tuple(value)
             return value
         elif isinstance(value, int) and self.format == 'kelvin':
             return value
@@ -296,6 +300,8 @@ def color_extractor(widget, data):
             'kelvin'
         ]
     )
+
+    # hex
     if format == 'hexString' or format == 'hex8String':
         if (not extracted.startswith('#')):
             msg = _(
@@ -336,6 +342,7 @@ def color_extractor(widget, data):
                 mapping={'args':args}
             )
             raise ExtractionError(msg)
+    # hsl
     elif format == 'hslString' or format == 'hslaString':
         hsl_format = u'hsl([0-360], [0-100]%, [0-100]%)'
         hsla_format = u'hsla([0-360], [0-100]%, [0-100]%, [0-1])'
@@ -406,6 +413,7 @@ def color_extractor(widget, data):
                 default=u'Incorrect Color String: Alpha value must be between 0 and 1.'
             )
             raise ExtractionError(msg)
+    # rgb
     elif format == 'rgbString' or format == 'rgbaString':
         rgb_format = 'rgb([0-255], [0-255], [0-255])'
         rgba_format = 'rgba([0-255], [0-255], [0-255], [0-1])'
@@ -475,6 +483,7 @@ def color_extractor(widget, data):
                 default=u'Incorrect Color String: Alpha value must be between 0 and 1.'
             )
             raise ExtractionError(msg)
+    # kelvin
     elif format == 'kelvin':
         try:
             color = int(extracted)
@@ -490,6 +499,7 @@ def color_extractor(widget, data):
                 default=u'Kelvin Temperature out of range (1000-40000)'
             )
             raise ExtractionError(msg)
+    # other
     else:
         msg = _(
             'unknown_color_format',
