@@ -19,7 +19,7 @@ _ = TSF('yafowil.widget.color')
 class ColorDatatypeConverter(DatatypeConverter):
     """Datatype Converter for Color Formats."""
 
-    def __init__(self, format=None, range='0-1'):
+    def __init__(self, format=None, range='full'):
         self.format = format
         self.range = range
 
@@ -31,30 +31,30 @@ class ColorDatatypeConverter(DatatypeConverter):
                 return value
             elif self.format == 'rgbaString':
                 value = value[5:-1].split(', ')
-                updated_value = list()
-                updated_value[0] = value[0] / 255
-                updated_value[1] = value[1] / 255
-                updated_value[2] = value[2] / 255
-                updated_value[3] = value[3]
-                value = updated_value
+                value = [int(channel) for channel in value]
+                if self.range == 'toInterval':
+                    value[0] = value[0] / 255
+                    value[1] = value[1] / 255
+                    value[2] = value[2] / 255
             elif self.format == 'rgbString':
                 value = value[4:-1].split(', ')
-                value = [channel/255 for channel in value]
+                value = [int(channel) for channel in value]
+                if self.range == 'toInterval':
+                    value = [channel / 255 for channel in value]
             elif self.format == 'hslString':
                 value = value[4:-1].replace('%', '').split(', ')
+                value = [int(channel) for channel in value]
+                if self.range == 'toInterval':
+                    value[0] = value[0] / 360
+                    value[1] = value[1] / 100
+                    value[2] = value[2] / 100
             elif self.format == 'hslaString':
                 value = value[5:-1].replace('%', '').split(', ')
-                updated_value = list()
-                updated_value[0] = value[0] / 360
-                updated_value[1] = value[1] / 100
-                updated_value[2] = value[2] / 100
-                updated_value[3] = value[3]
-                value = updated_value
-            value = [int(channel) for channel in value]
-
-            if self.range == '0-1':
-                value = [channel/250 for channel in value]
-                print(value)
+                value = [int(channel) for channel in value]
+                if self.range == 'toInterval':
+                    value[0] = value[0] / 360
+                    value[1] = value[1] / 100
+                    value[2] = value[2] / 100
             return value
         elif isinstance(value, int) and self.format == 'kelvin':
             return value
