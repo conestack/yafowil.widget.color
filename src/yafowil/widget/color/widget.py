@@ -272,7 +272,8 @@ def color_extractor(widget, data):
             .format(datatype.__name__)
         )
 
-    widget.attrs['datatype'] = ColorDatatypeConverter(datatype, format, range_)
+    converter = ColorDatatypeConverter(datatype, format, range_)
+    widget.attrs['datatype'] = converter
 
     extracted = data.extracted
     if not extracted:
@@ -492,6 +493,8 @@ def color_extractor(widget, data):
             mapping={'formats':formats}
         )
         raise ExtractionError(msg)
+    converter = widget.attrs['datatype']
+    extracted = converter.to_value(extracted)
     return extracted
 
 
@@ -535,8 +538,7 @@ factory.register(
         generic_extractor,
         generic_required_extractor,
         generic_emptyvalue_extractor,
-        color_extractor,
-        generic_datatype_extractor
+        color_extractor
     ],
     edit_renderers=[
         color_edit_renderer
