@@ -32,7 +32,10 @@ class ColorDatatypeConverter(DatatypeConverter):
                 return value
             elif self.format == 'rgbaString':
                 value = value[5:-1].split(', ')
-                value = [int(channel) for channel in value]
+                value[0] = int(value[0])
+                value[1] = int(value[1])
+                value[2] = int(value[2])
+                value[3] = float(value[3])
                 if self.range == 'toInterval':
                     value[0] = value[0] / 255
                     value[1] = value[1] / 255
@@ -51,7 +54,10 @@ class ColorDatatypeConverter(DatatypeConverter):
                     value[2] = value[2] / 100
             elif self.format == 'hslaString':
                 value = value[5:-1].replace('%', '').split(', ')
-                value = [int(channel) for channel in value]
+                value[0] = int(value[0])
+                value[1] = int(value[1])
+                value[2] = int(value[2])
+                value[3] = float(value[3])
                 if self.range == 'toInterval':
                     value[0] = value[0] / 360
                     value[1] = value[1] / 100
@@ -250,8 +256,7 @@ class ColorDatatypeConverter(DatatypeConverter):
             )
 
 
-@managedprops('format', 'datatype')
-def color_extractor(widget, data):
+def color_builder(widget, factory):
     format = widget.attrs['format']
     datatype = widget.attrs['datatype']
     range_ = widget.attrs['datatype_range']
@@ -271,15 +276,15 @@ def color_extractor(widget, data):
             u'Not supported value datatype: {}' \
             .format(datatype.__name__)
         )
+    widget.attrs['datatype'] = ColorDatatypeConverter(datatype, format, range_)
 
-    converter = ColorDatatypeConverter(datatype, format, range_)
-    widget.attrs['datatype'] = converter
 
+@managedprops('format', 'datatype')
+def color_extractor(widget, data):
     extracted = data.extracted
     if not extracted:
         return extracted
     format = attr_value('format', widget, data)
-
     formats = ', '.join(
         [
             'hexString',
@@ -291,7 +296,6 @@ def color_extractor(widget, data):
             'kelvin'
         ]
     )
-
     if format == 'hexString' or format == 'hex8String':
         if (not extracted.startswith('#')):
             msg = _(
@@ -493,6 +497,7 @@ def color_extractor(widget, data):
             mapping={'formats':formats}
         )
         raise ExtractionError(msg)
+
     converter = widget.attrs['datatype']
     extracted = converter.to_value(extracted)
     return extracted
@@ -545,7 +550,8 @@ factory.register(
     ],
     display_renderers=[
         color_display_renderer
-    ]
+    ],
+    builders=[color_builder]
 )
 
 factory.doc['blueprint']['color'] = """\
