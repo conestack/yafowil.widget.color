@@ -19,7 +19,8 @@ _ = TSF('yafowil.widget.color')
 class ColorDatatypeConverter(DatatypeConverter):
     """Datatype Converter for Color Formats."""
 
-    def __init__(self, format=None, range='full'):
+    def __init__(self, type_=None, format=None, range='full'):
+        super(ColorDatatypeConverter, self).__init__(type_)
         self.format = format
         self.range = range
 
@@ -85,8 +86,8 @@ class ColorDatatypeConverter(DatatypeConverter):
         if isinstance(value, (tuple, list)):
             length = len(value)
 
-            if isinstance(value, list):
-                value = tuple(value)
+            if isinstance(value, tuple):
+                value = list(value)
 
             if self.format == 'rgbaString':
                 if length != 4:
@@ -95,7 +96,16 @@ class ColorDatatypeConverter(DatatypeConverter):
                         .format(type_name, length)
                     )
                 for item in value:
-                    if value.index(item) == 3:
+                    index = value.index(item)
+                    if self.range == 'toInterval' and index < 3:
+                        if item < 0 or item > 1:
+                            raise ValueError(
+                                u'Value out of bounds at index {}. '
+                                'toInterval expected value between 0 and 1, value is: {}'
+                                .format(index, item)
+                            )
+                        value[index] = item * 255
+                    elif value.index(item) == 3:
                         if item < 0 or item > 1:
                             raise ValueError(
                                 u'Value out of bounds at index {}. '
@@ -108,7 +118,7 @@ class ColorDatatypeConverter(DatatypeConverter):
                             'Expected value between 0 and 255, value is: {}'
                             .format(value.index(item), item)
                         )
-                return 'rgba{0}'.format(value)
+                return 'rgba({}, {}, {}, {})'.format(value[0], value[1], value[2], value[3])
             elif self.format == 'rgbString':
                 if length != 3:
                     raise ValueError(
@@ -116,13 +126,22 @@ class ColorDatatypeConverter(DatatypeConverter):
                         .format(type_name, length)
                     )
                 for item in value:
-                    if item < 0 or item > 255:
+                    index = value.index(item)
+                    if self.range == 'toInterval':
+                        if item < 0 or item > 1:
+                            raise ValueError(
+                                u'Value out of bounds at index {}. '
+                                'toInterval expected value between 0 and 1, value is: {}'
+                                .format(value.index(item), item)
+                            )
+                        value[index] = item * 255
+                    elif item < 0 or item > 255:
                         raise ValueError(
                             u'Value out of bounds at index {}. '
                                 'Expected value between 0 and 255, value is: {}'
                                 .format(value.index(item), item)
                         )
-                return 'rgb{0}'.format(value)
+                return 'rgb({}, {}, {})'.format(value[0], value[1], value[2])
             elif self.format == 'hslString':
                 if length != 3:
                     raise ValueError(
@@ -131,6 +150,17 @@ class ColorDatatypeConverter(DatatypeConverter):
                     )
                 for item in value:
                     index = value.index(item)
+                    if self.range == 'toInterval':
+                        if item < 0 or item > 1:
+                            raise ValueError(
+                                u'Value out of bounds at index {}. '
+                                'toInterval expected value between 0 and 1, value is: {}'
+                                .format(value.index(item), item)
+                            )
+                        if index == 0:
+                            value[index] = item * 360
+                        else:
+                            value[index] = item * 100
                     if index == 0 and item < 0 or item > 360:
                         raise ValueError(
                             u'Value out of bounds at index {}. '
@@ -152,6 +182,17 @@ class ColorDatatypeConverter(DatatypeConverter):
                     )
                 for item in value:
                     index = value.index(item)
+                    if self.range == 'toInterval':
+                        if item < 0 or item > 1:
+                            raise ValueError(
+                                u'Value out of bounds at index {}. '
+                                'toInterval expected value between 0 and 1, value is: {}'
+                                .format(value.index(item), item)
+                            )
+                        if index == 0:
+                            value[index] = item * 360
+                        elif index < 3:
+                            value[index] = item * 100
                     if index == 0 and item < 0 or item > 360:
                         raise ValueError(
                             u'Value out of bounds at index {}. '
@@ -209,8 +250,30 @@ class ColorDatatypeConverter(DatatypeConverter):
             )
 
 
-@managedprops('format')
+@managedprops('format', 'datatype')
 def color_extractor(widget, data):
+    format = widget.attrs['format']
+    datatype = widget.attrs['datatype']
+    range_ = widget.attrs['datatype_range']
+    if datatype in [tuple, list]:
+        if not format in ['rgbString', 'rgbaString', 'hslString', 'hslaString']:
+            raise ValueError(
+                u'Format {} does not support datatype {}' \
+                .format(format, datatype.__name__)
+            )
+    elif datatype == int and format != 'kelvin':
+        raise ValueError(
+            u'Format {} does not support datatype {}' \
+            .format(format, datatype.__name__)
+        )
+    elif datatype != str:
+        raise ValueError(
+            u'Not supported value datatype: {}' \
+            .format(datatype.__name__)
+        )
+
+    widget.attrs['datatype'] = ColorDatatypeConverter(datatype, format, range_)
+
     extracted = data.extracted
     if not extracted:
         return extracted
@@ -471,8 +534,8 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
-        color_extractor,
         generic_emptyvalue_extractor,
+        color_extractor,
         generic_datatype_extractor
     ],
     edit_renderers=[
@@ -614,4 +677,18 @@ factory.defaults['color.open_on_focus'] = True
 factory.doc['props']['color.open_on_focus'] = """\
 Flag whether the picker dropdown opens on input focus.
 Values: [True | False].
+"""
+
+factory.defaults['color.datatype'] = str
+factory.doc['props']['color.datatype'] = """\
+Datatype for extraction.
+Values: [str|int|tuple|list].
+"""
+
+factory.defaults['color.datatype_range'] = 'full'
+factory.doc['props']['color.datatype'] = """\
+Datatype range for extraction.
+'full': full number range for format
+'toInterval': 0 - 1
+Values: ['full'|'toInterval'].
 """
