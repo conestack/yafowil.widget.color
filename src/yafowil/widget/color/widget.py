@@ -697,7 +697,7 @@ Flag whether the picker dropdown opens on input focus.
 Values: [True | False].
 """
 
-factory.defaults['color.datatype'] = str
+factory.defaults['color.datatype'] = None
 factory.doc['props']['color.datatype'] = """\
 Datatype for extraction.
 Values: [str|int|tuple|list].
