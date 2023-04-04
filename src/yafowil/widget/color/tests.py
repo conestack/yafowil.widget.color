@@ -3,7 +3,8 @@ from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.tests import YafowilTestCase
-from yafowil.widget.color.widget import ColorDatatypeConverter
+from .widget import ColorDatatypeConverter
+from .widget import color_builder
 import os
 import unittest
 
@@ -509,128 +510,127 @@ class TestColorWidget(YafowilTestCase):
         data = widget.extract(request)
         self.assertEqual(data.errors, [])
 
-    def test_color_convertor_to_value(self):
+    def test_color_convertor_to_value_hexString(self):
         convertor = ColorDatatypeConverter()
-
+        convertor.type_ = str
         # hexString
         convertor.format = 'hexString'
-        val = '#ff0000'
-        res = convertor.to_value(val)
-        self.assertEqual(res, val)
+        res = convertor.to_value('#ff0000')
+        self.assertEqual(res, '#ff0000')
         # hex8String
-        val = '#66000000'
         convertor.format = 'hex8String'
-        res = convertor.to_value(val)
-        self.assertEqual(res, val)
-        # kelvin
-        val = '8000'
-        convertor.format = 'kelvin'
-        convertor.type_ = str
-        res = convertor.to_value(val)
-        self.assertEqual(res, val)
-        # rgbaString
-        val = 'rgba(255, 255, 0, 0.5)'
-        convertor.format = 'rgbaString'
-        convertor.type_ = list
-        res = convertor.to_value(val)
-        self.assertEqual(res, [255, 255, 0, 0.5])
-        # rgbaString to tuple
-        convertor.type_ = tuple
-        res = convertor.to_value(val)
-        self.assertEqual(res, (255, 255, 0, 0.5))
-        # rgbaString toInterval
-        convertor.range = 'toInterval'
-        res = convertor.to_value(val)
-        self.assertEqual(res, (1, 1, 0, 0.5))
-        # rgbString
-        val = 'rgb(125, 125, 5)'
-        convertor.format = 'rgbString'
-        convertor.type_ = list
-        convertor.range = 'full'
-        res = convertor.to_value(val)
-        self.assertEqual(res, [125, 125, 5])
-        # rgbString toInterval
-        convertor.range = 'toInterval'
-        res = convertor.to_value(val)
-        self.assertEqual(round(res[0], 2), 0.49)
-        self.assertEqual(round(res[1], 2), 0.49)
-        self.assertEqual(round(res[2], 2), 0.02)
-        # hslString
-        val = 'hsl(360, 100, 50)'
-        convertor.format = 'hslString'
-        convertor.type_ = list
-        convertor.range = 'full'
-        res = convertor.to_value(val)
-        self.assertEqual(res, [360, 100, 50])
-        convertor.range = 'toInterval'
-        res = convertor.to_value(val)
-        self.assertEqual(res, [1, 1, 0.5])
-        # hslaString
-        val = 'hsla(360, 100, 50, 0.3)'
-        convertor.format = 'hslaString'
-        convertor.type_ = int
-        convertor.range = 'full'
-        res = convertor.to_value(val)
-        self.assertEqual(res, [360, 100, 50, 0.3])
-        convertor.range = 'toInterval'
-        res = convertor.to_value(val)
-        self.assertEqual(res, [1, 1, 0.5, 0.3])
-
-        # number kelvin to str
-        val = 4500
-        convertor.format = 'kelvin'
-        convertor.type_ = str
-        res = convertor.to_value(val)
-        self.assertEqual(res, '4500')
-        # number kelvin
-        val = 4500
-        convertor.format = 'kelvin'
-        convertor.type_ = int
-        res = convertor.to_value(val)
-        self.assertEqual(res, 4500)
-
+        res = convertor.to_value('#66000000')
+        self.assertEqual(res, '#66000000')
         # unsupported type
         val = {'foo': 'bar'}
         self.assertRaises(TypeError, convertor.to_value, val)
 
-
-    def test_color_convertor_to_form(self):
+    def test_color_convertor_to_value_rgb_rgba(self):
         convertor = ColorDatatypeConverter()
-
-        # not in accepted formats
-        val = ''
-        convertor.format = 'someString'
-        self.assertRaises(TypeError, convertor.to_form, val)
-
-        # empty
-        convertor.format = 'hexString'
-        val = None
-        res = convertor.to_form(val)
-        self.assertEqual(res, None)
-
-        # format tuple
+        convertor.type_ = list
+        # rgbaString
+        convertor.format = 'rgbaString'
+        res = convertor.to_value('rgba(255, 255, 0, 0.5)')
+        self.assertEqual(res, [255, 255, 0, 0.5])
+        # rgbaString to tuple
         convertor.type_ = tuple
-        val = (100, 100, 50)
-        a_val = (100, 100, 50, 0.5)
+        res = convertor.to_value('rgba(255, 255, 0, 0.5)')
+        self.assertEqual(res, (255, 255, 0, 0.5))
+        # rgbaString toInterval
+        convertor.range = 'toInterval'
+        res = convertor.to_value('rgba(255, 255, 0, 0.5)')
+        self.assertEqual(res, (1, 1, 0, 0.5))
+        # rgbString
+        convertor.format = 'rgbString'
+        convertor.type_ = list
+        convertor.range = 'full'
+        res = convertor.to_value('rgb(125, 125, 5)')
+        self.assertEqual(res, [125, 125, 5])
+        # rgbString toInterval
+        convertor.range = 'toInterval'
+        res = convertor.to_value('rgb(125, 125, 5)')
+        self.assertEqual(round(res[0], 2), 0.49)
+        self.assertEqual(round(res[1], 2), 0.49)
+        self.assertEqual(round(res[2], 2), 0.02)
 
-        # hexString to tuple
+    def test_color_convertor_to_value_hsl_hsla(self):
+        convertor = ColorDatatypeConverter()
+        convertor.type_ = list
+        # hslString
+        convertor.format = 'hslString'
+        convertor.range = 'full'
+        res = convertor.to_value('hsl(360, 100, 50)')
+        self.assertEqual(res, [360, 100, 50])
+        convertor.range = 'toInterval'
+        res = convertor.to_value('hsl(360, 100, 50)')
+        self.assertEqual(res, [1, 1, 0.5])
+        # hslaString
+        convertor.format = 'hslaString'
+        convertor.range = 'full'
+        res = convertor.to_value('hsla(360, 100, 50, 0.3)')
+        self.assertEqual(res, [360, 100, 50, 0.3])
+        convertor.range = 'toInterval'
+        res = convertor.to_value('hsla(360, 100, 50, 0.3)')
+        self.assertEqual(res, [1, 1, 0.5, 0.3])
+
+    def test_color_convertor_to_value_kelvin(self):
+        convertor = ColorDatatypeConverter()
+        # int to str
+        convertor.type_ = str
+        convertor.format = 'kelvin'
+        res = convertor.to_value(4500)
+        self.assertEqual(res, '4500')
+        # str to str
+        convertor.format = 'kelvin'
+        res = convertor.to_value('8000')
+        self.assertEqual(res, '8000')
+        # int to int
+        convertor.type_ = int
+        convertor.format = 'kelvin'
+        res = convertor.to_value(4500)
+        self.assertEqual(res, 4500)
+        # str to int
+        convertor.format = 'kelvin'
+        res = convertor.to_value('2000')
+        self.assertEqual(res, 2000)
+
+    def test_color_convertor_to_form_hexString(self):
+        convertor = ColorDatatypeConverter()
+        # not in accepted formats
+        convertor.format = 'someString'
+        self.assertRaises(TypeError, convertor.to_form, '')
+        # type None
         convertor.format = 'hexString'
-        self.assertRaises(ValueError, convertor.to_form, val)
+        res = convertor.to_form(None)
+        self.assertEqual(res, None)
+        # hexString
+        res = convertor.to_form('#ff0000')
+        self.assertEqual(res, '#ff0000')
+
+    def test_color_convertor_to_form_unsupported_types(self):
+        convertor = ColorDatatypeConverter()
+        convertor.format = 'hexString'
+        # unsupported value type
+        self.assertRaises(ValueError, convertor.to_form, {'a': 'b'})
+        # hexString to tuple
+        convertor.type_ = tuple
+        convertor.format = 'hexString'
+        self.assertRaises(ValueError, convertor.to_form, (100, 100, 50))
         # hex8String to tuple
         convertor.format = 'hex8String'
-        self.assertRaises(ValueError, convertor.to_form, val)
+        self.assertRaises(ValueError, convertor.to_form, (100, 100, 50))
         # kelvin to tuple
         convertor.format = 'kelvin'
-        self.assertRaises(ValueError, convertor.to_form, val)
+        self.assertRaises(ValueError, convertor.to_form, (100, 100, 50))
 
-        # rgbString #
+    def test_color_convertor_to_form_rgb_rgba(self):
+        convertor = ColorDatatypeConverter()
 
         # to tuple - range full correct
         convertor.format = 'rgbString'
         res = convertor.to_form((255, 255, 0))
         self.assertEqual(res, 'rgb(255, 255, 0)')
         # to tuple - range full incorrect
-        convertor.format = 'rgbString'
         self.assertRaises(ValueError, convertor.to_form, (360, 255, 0.5))
         self.assertEqual(res, 'rgb(255, 255, 0)')
         # to tuple - range toInterval correct
@@ -641,16 +641,100 @@ class TestColorWidget(YafowilTestCase):
         self.assertRaises(ValueError, convertor.to_form, (0, 22, 1))
         # wrong length
         convertor.range = 'full'
-        self.assertRaises(ValueError, convertor.to_form, (0, 1, 0, 1))
+        self.assertRaises(ValueError, convertor.to_form, (255, 255, 255, 1))
 
-        # rgbaString
+        # rgbaString - range full correct
+        convertor.format = 'rgbaString'
+        res = convertor.to_form((255, 255, 0, 1))
+        self.assertEqual(res, 'rgba(255, 255, 0, 1)')
+        # rgbaString - range full incorrect
+        convertor.format = 'rgbaString'
+        self.assertRaises(ValueError, convertor.to_form, (255, 255, 0, 5))
+        self.assertRaises(ValueError, convertor.to_form, (300, 255, 0, 1))
+        # to tuple - range toInterval correct
+        convertor.range = 'toInterval'
+        res = convertor.to_form((0, 1, 0, 0.5))
+        self.assertEqual(res, 'rgba(0, 255, 0, 0.5)')
+        # to tuple - range toInterval incorrect
+        self.assertRaises(ValueError, convertor.to_form, (0, 22, 1, 1))
+        # wrong length
+        convertor.range = 'full'
+        self.assertRaises(ValueError, convertor.to_form, (255, 255, 255))
 
-        # hslString
+    def test_color_convertor_to_form_hsl_hsla(self):
+        convertor = ColorDatatypeConverter()
 
-        # hslaString
+        # to tuple - range full correct
+        convertor.format = 'hslString'
+        res = convertor.to_form((360, 100, 0))
+        self.assertEqual(res, 'hsl(360, 100%, 0%)')
+        # to tuple - range full incorrect
+        self.assertRaises(ValueError, convertor.to_form, (360, 255, 0.5))
+        self.assertRaises(ValueError, convertor.to_form, (500, 100, 0.5))
+        # to tuple - range toInterval correct
+        convertor.range = 'toInterval'
+        res = convertor.to_form((0, 1, 0))
+        self.assertEqual(res, 'hsl(0, 100%, 0%)')
+        # to tuple - range toInterval incorrect
+        self.assertRaises(ValueError, convertor.to_form, (0, 22, 1))
+        # wrong length
+        convertor.range = 'full'
+        self.assertRaises(ValueError, convertor.to_form, (360, 50, 50, 1))
 
-        # kelvin
+        # to tuple - range full correct
+        convertor.format = 'hslaString'
+        res = convertor.to_form((360, 100, 0, 0.5))
+        self.assertEqual(res, 'hsla(360, 100%, 0%, 0.5)')
+        # to tuple - range full incorrect
+        self.assertRaises(ValueError, convertor.to_form, (361, 100, 100, 0.5))
+        self.assertRaises(ValueError, convertor.to_form, (360, 500, 100, 0.5))
+        self.assertRaises(ValueError, convertor.to_form, (360, 50, 500, 0.5))
+        self.assertRaises(ValueError, convertor.to_form, (360, 50, 50, -1))
+        # to tuple - range toInterval correct
+        convertor.range = 'toInterval'
+        res = convertor.to_form((0, 1, 0, 0.3))
+        self.assertEqual(res, 'hsla(0, 100%, 0%, 0.3)')
+        # to tuple - range toInterval incorrect
+        self.assertRaises(ValueError, convertor.to_form, (0, 22, 1, 0.3))
+        # wrong length
+        convertor.range = 'full'
+        self.assertRaises(ValueError, convertor.to_form, (360, 50, 50))
 
+    def test_color_convertor_to_form_kelvin(self):
+        convertor = ColorDatatypeConverter()
+        # wrong format
+        convertor.format = 'rgbaString'
+        self.assertRaises(ValueError, convertor.to_form, 3500)
+        # correct format
+        convertor.format = 'kelvin'
+        res = convertor.to_form(3000)
+        self.assertEqual(res, 3000)
+
+    def test_color_builder(self):
+        class MockWidget:
+            attrs = {
+                'format': 'rgbString',
+                'datatype': tuple,
+                'datatype_range': 'full'
+            }
+        widget = MockWidget
+        color_builder(widget, None)
+        datatype = widget.attrs['datatype']
+        # XXX: compare class names. Does not work due to import
+        self.assertEqual(datatype.type_, tuple)
+        self.assertEqual(datatype.format, 'rgbString')
+        self.assertEqual(datatype.range, 'full')
+        # not supported format for datatype tuple
+        widget.attrs['format'] = 'hexString'
+        widget.attrs['datatype'] = tuple
+        self.assertRaises(ValueError, color_builder, widget, None)
+        # datatype int, format not kelvin
+        widget.attrs['datatype'] = int
+        self.assertRaises(ValueError, color_builder, widget, None)
+        # not supported datatype
+        widget.attrs['format'] = 'hexString'
+        widget.attrs['datatype'] = object
+        self.assertRaises(ValueError, color_builder, widget, None)
 
     def test_resources(self):
         factory.theme = 'default'

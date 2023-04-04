@@ -2,7 +2,6 @@
 from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.datatypes import generic_emptyvalue_extractor
-from yafowil.datatypes import generic_datatype_extractor
 from yafowil.common import input_attributes_common
 from yafowil.common import generic_extractor
 from yafowil.common import generic_required_extractor
@@ -11,7 +10,6 @@ from yafowil.utils import attr_value
 from yafowil.utils import data_attrs_helper
 from yafowil.utils import managedprops
 from yafowil.datatypes import DatatypeConverter
-from yafowil.common import UNSET
 
 
 _ = TSF('yafowil.widget.color')
@@ -207,31 +205,31 @@ class ColorDatatypeConverter(DatatypeConverter):
                             value[index] = item * 360
                         elif index < 3:
                             value[index] = item * 100
-                    if index == 0 and item < 0 or item > 360:
+                    if index == 0 and (item < 0 or item > 360):
                         raise ValueError(
                             u'Value out of bounds at index {}. '
                              'Expected Hue value between 0 and 360, value is: {}'
                              .format(index, item)
                         )
-                    elif (index == 1) and (item < 0 or item > 100):
+                    if index == 1 and (item < 0 or item > 100):
                         raise ValueError(
                             u'Value out of bounds at index {}. '
                              'Expected Saturation value between 0 and 100, value is: {}'
                              .format(index, item)
                         )
-                    elif (index == 2) and (item < 0 or item > 100):
+                    if index == 2 and (item < 0 or item > 100):
                         raise ValueError(
                             u'Value out of bounds at index {}. '
                              'Expected Lightness value between 0 and 100, value is: {}'
                              .format(index, item)
                         )
-                    elif (index == 3) and (item < 0 or item > 1):
+                    if index == 3 and (item < 0 or item > 1):
                         raise ValueError(
                             u'Value out of bounds at index {}. '
                              'Expected Alpha value between 0 and 1, value is: {}'
                              .format(index, item)
                         )
-                return 'hsl({}, {}%, {}%)'.format(value[0], value[1], value[2])
+                return 'hsla({}, {}%, {}%, {})'.format(value[0], value[1], value[2], value[3])
             elif self.format == 'hexString' or self.format == 'hex8String':
                 raise ValueError(
                     u'Format {} does not accept type {}, accepted type: string'
@@ -260,8 +258,8 @@ class ColorDatatypeConverter(DatatypeConverter):
 
 
 def color_builder(widget, factory):
-    format = widget.attrs['format']
     datatype = widget.attrs['datatype']
+    format = widget.attrs['format']
     range_ = widget.attrs['datatype_range']
     if datatype in [tuple, list]:
         if not format in ['rgbString', 'rgbaString', 'hslString', 'hslaString']:
