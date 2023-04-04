@@ -25,44 +25,48 @@ class ColorDatatypeConverter(DatatypeConverter):
 
     def to_value(self, value):
         if isinstance(value, str):
-            if self.format == 'kelvin' and self.type_ == int:
-                return int(value)
-            elif self.format in ('hexString', 'hex8String'):
+            # XXX: more checks if value is correct type
+            if self.type_ == str:
                 return value
-            elif self.format == 'rgbaString':
-                value = value[5:-1].split(', ')
-                value[0] = int(value[0])
-                value[1] = int(value[1])
-                value[2] = int(value[2])
-                value[3] = float(value[3])
-                if self.range == 'toInterval':
-                    value[0] = value[0] / 255
-                    value[1] = value[1] / 255
-                    value[2] = value[2] / 255
-            elif self.format == 'rgbString':
-                value = value[4:-1].split(', ')
-                if self.range == 'toInterval':
-                    value = [int(channel) / 255 for channel in value]
-                else:
-                    value = [int(channel) for channel in value]
-            elif self.format == 'hslString':
-                value = value[4:-1].replace('%', '').split(', ')
-                value = [int(channel) for channel in value]
-                if self.range == 'toInterval':
-                    value[0] = value[0] / 360
-                    value[1] = value[1] / 100
-                    value[2] = value[2] / 100
-            elif self.format == 'hslaString':
-                value = value[5:-1].replace('%', '').split(', ')
-                value[0] = int(value[0])
-                value[1] = int(value[1])
-                value[2] = int(value[2])
-                value[3] = float(value[3])
-                if self.range == 'toInterval':
-                    value[0] = value[0] / 360
-                    value[1] = value[1] / 100
-                    value[2] = value[2] / 100
-
+            elif self.type_ == int and self.format == 'kelvin':
+                return int(value)
+            elif self.type_ in [list, tuple]:
+                if self.format == 'rgbaString':
+                    value = value[5:-1].split(', ')
+                    value[0] = int(value[0])
+                    value[1] = int(value[1])
+                    value[2] = int(value[2])
+                    value[3] = float(value[3])
+                    if self.range == 'toInterval':
+                        value[0] = value[0] / 255
+                        value[1] = value[1] / 255
+                        value[2] = value[2] / 255
+                elif self.format == 'rgbString':
+                    if self.type_ in [list, tuple]:
+                        value = value[4:-1].split(', ')
+                        if self.range == 'toInterval':
+                            value = [int(channel) / 255 for channel in value]
+                        else:
+                            value = [int(channel) for channel in value]
+                elif self.format == 'hslString':
+                    if self.type_ in [list, tuple]:
+                        value = value[4:-1].replace('%', '').split(', ')
+                        value = [int(channel) for channel in value]
+                        if self.range == 'toInterval':
+                            value[0] = value[0] / 360
+                            value[1] = value[1] / 100
+                            value[2] = value[2] / 100
+                elif self.format == 'hslaString':
+                    if self.type_ in [list, tuple]:
+                        value = value[5:-1].replace('%', '').split(', ')
+                        value[0] = int(value[0])
+                        value[1] = int(value[1])
+                        value[2] = int(value[2])
+                        value[3] = float(value[3])
+                        if self.range == 'toInterval':
+                            value[0] = value[0] / 360
+                            value[1] = value[1] / 100
+                            value[2] = value[2] / 100
             if isinstance(value, list) and self.type_ == tuple:
                 return tuple(value)
             return value
