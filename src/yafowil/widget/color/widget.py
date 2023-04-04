@@ -259,6 +259,8 @@ class ColorDatatypeConverter(DatatypeConverter):
 
 def color_builder(widget, factory):
     datatype = widget.attrs['datatype']
+    if not datatype:
+        return
     format = widget.attrs['format']
     range_ = widget.attrs['datatype_range']
     if datatype in [tuple, list]:
@@ -506,7 +508,8 @@ def color_extractor(widget, data):
         raise ExtractionError(msg)
 
     converter = widget.attrs['datatype']
-    extracted = converter.to_value(extracted)
+    if converter:
+        extracted = converter.to_value(extracted)
     return extracted
 
 
