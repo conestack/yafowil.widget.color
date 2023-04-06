@@ -17,6 +17,5 @@ function run_coverage {
     fi
 }
 
-run_coverage py2
 run_coverage py3
 run_coverage pypy3

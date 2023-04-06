@@ -17,6 +17,12 @@ export class ColorSwatch {
                 this.invalid = true;
                 return;
         }
+        if (kelvin && this.widget.type_kelvin &&
+            (color.kelvin < this.widget.min ||
+             color.kelvin > this.widget.max)) {
+                this.invalid = true;
+                return;
+        }
 
         this.elem = $('<div />')
             .addClass('color-swatch layer-transparent')
@@ -32,6 +38,10 @@ export class ColorSwatch {
                 .addClass('locked')
                 .append($('<div class="swatch-mark" />'));
         }
+        if (this.widget.color_equals(color)) {
+            this.selected = true;
+        }
+
         this.select = this.select.bind(this);
         this.elem.on('click', this.select);
     }
@@ -262,6 +272,8 @@ export class InputElement {
     constructor(widget, elem, color, format, temperature = {min: 1000, max:40000}) {
         this.widget = widget;
         this.elem = elem;
+        this.elem.attr('spellcheck', 'false');
+        this.elem.addClass('form-control');
         this.format = format || 'hexString';
         if (this.format === 'hexString') {
             this.elem.attr('maxlength', 7);
@@ -295,10 +307,10 @@ export class InputElement {
                 } else if (parseInt(color) > this.temperature.max) {
                     color = this.temperature.max;
                 }
-                this.widget.picker.color.kelvin = color;
+                this.widget.color_picker.picker.color.kelvin = color;
                 this.elem.val(color);
             } else {
-                this.widget.picker.color.set(color);
+                this.widget.color_picker.picker.color.set(color);
             }
             this._color = null;
         }
