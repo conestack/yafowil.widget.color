@@ -273,11 +273,12 @@ def color_builder(widget, factory):
                 u'Format {} does not support datatype {}' \
                 .format(format, datatype.__name__)
             )
-    elif datatype == int and format != 'kelvin':
-        raise ValueError(
-            u'Format {} does not support datatype {}' \
-            .format(format, datatype.__name__)
-        )
+    elif datatype == int:
+        if format != 'kelvin':
+            raise ValueError(
+                u'Format {} does not support datatype {}' \
+                .format(format, datatype.__name__)
+            )
     elif datatype != str:
         raise ValueError(
             u'Not supported value datatype: {}' \
