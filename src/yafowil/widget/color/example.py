@@ -29,26 +29,6 @@ def default_example():
     }
 
 
-def foo():
-    part = factory(u'fieldset', name='yafowil.widget.color.default')
-    type_ = 'hslaString'
-    color = (200, 0, 100, 1)
-    part['color'] = factory(
-        '#field:color',
-        value=color,
-        props={
-            'label': 'Default Color Picker',
-            'format': type_,
-            'color': color,
-            'datatype': ColorDatatypeConverter(type_, minmax=[0,255])
-        })
-    return {
-        'widget': part,
-        'doc': DOC_COLOR,
-        'title': 'Default Color Picker'
-    }
-
-
 DOC_WHEEL = """
 Color Wheel
 -----------
@@ -235,7 +215,6 @@ The color of your element is set by css 'background-color' attribute.
             'label': 'Picker with custom preview',
             'sliders': ['box', 'h', 'a'],
             'preview_elem': '<div id="my-preview" style="border-radius: 50%; width:100px; height:100px; margin:20px; border: 1px solid gray;" />',
-            'color': '#4287f5'
         }
     )
 """
@@ -249,7 +228,6 @@ def preview_example():
             'label': 'Picker with custom preview',
             'sliders': ['box', 'h', 'a'],
             'preview_elem': '<div id="my-preview" style="border-radius: 50%; width:100px; height:100px; margin:20px; border: 1px solid gray;" />',
-            'color': '#4287f5'
         })
     return {
         'widget': part,
@@ -285,10 +263,10 @@ Supported formats (locked swatches):
     color = factory(
         'color',
         name='colorwidget',
+        value='#ff0000',
         props={
             'label': 'Picker with locked swatches',
             'sliders': ['h', 's', 'v', 'a'],
-            'color': '#ff0000',
             'locked_swatches': [
                 [255, 0, 0],          # default interpretation as rgb
                 [255, 150, 0, 0.5],     # default interpretation as rgba
@@ -316,10 +294,10 @@ def swatches_example():
     part = factory(u'fieldset', name='yafowil.widget.color.swatches')
     part['color'] = factory(
         '#field:color',
+        value='#ff0000',
         props={
             'label': 'Picker with locked swatches',
             'sliders': ['h', 's', 'v', 'a'],
-            'color': '#ff0000',
             'locked_swatches': [
                 [255, 0, 0],          # default interpretation as rgb
                 [255, 150, 0, 0.5],     # default interpretation as rgba
@@ -408,6 +386,7 @@ Pass 'a' in the 'sliders' option to edit alpha channel value.
     color = factory(
         'color',
         name='colorwidget',
+        value='rgba(100, 100, 255, .5)',
         props={
             'label': 'Example: RGBA Picker',
             'sliders': ['r', 'g', 'b', 'a'],
@@ -423,6 +402,7 @@ def rgb_example():
     part = factory(u'fieldset', name='yafowil.widget.color.rgb_example')
     part['color'] = factory(
         '#field:color',
+        value='rgba(100, 100, 255, .5)',
         props={
             'label': 'Example: RGBA Picker',
             'sliders': ['r', 'g', 'b', 'a'],
@@ -449,6 +429,7 @@ Pass the following values to create a HSV/HSVA color picker.
     color = factory(
         'color',
         name='colorwidget',
+        value='hsl(260, 100, 50)',
         props={
             'label': 'Example: HSV Picker',
             'sliders': ['h', 's', 'v'],
@@ -463,6 +444,7 @@ def hsv_example():
     part = factory(u'fieldset', name='yafowil.widget.color.hsv_example')
     part['color'] = factory(
         '#field:color',
+        value='hsl(260, 100, 50)',
         props={
             'label': 'Example: HSV Picker',
             'sliders': ['h', 's', 'v', 'a'],
@@ -494,12 +476,12 @@ The possible kelvin temperature ranges from 1000 to 40000.
     color = factory(
         'color',
         name='colorwidget',
+        value=5000,
         props={
             'label': 'Example: Temperature Picker',
             'sliders': ['k'],
             'slider_size': 30,
             'format': 'kelvin',
-            'color': '#ffffff',
             'temperature': {'min': 4000, 'max': 8000},
             'locked_swatches': False,
             'user_swatches': False
@@ -512,12 +494,12 @@ def kelvin_example():
     part = factory(u'fieldset', name='yafowil.widget.color.temperature_example')
     part['color'] = factory(
         '#field:color',
+        value=5000,
         props={
             'label': 'Example: Temperature Picker',
             'sliders': ['k'],
             'slider_size': 30,
             'format': 'kelvin',
-            'color': '#ffffff',
             'temperature': {'min': 4000, 'max': 8000},
             'locked_swatches': False,
             'user_swatches': False
@@ -541,6 +523,7 @@ Pass False in the 'sliders' option of your widget to create a swatch only widget
     color = factory(
         'color',
         name='colorwidget',
+        value='#ff0000',
         props={
             'label': 'Example: Swatch Widget',
             'sliders': False,
@@ -559,9 +542,10 @@ Pass False in the 'sliders' option of your widget to create a swatch only widget
 
 
 def swatches_only_example():
-    part = factory(u'fieldset', name='yafowil.widget.color.test')
+    part = factory(u'fieldset', name='yafowil.widget.color.swatches_only')
     part['color'] = factory(
         '#field:color',
+        value='#80dbad',
         props={
             'label': 'Example: Swatch Widget',
             'sliders': False,
@@ -587,19 +571,74 @@ def swatches_only_example():
     }
 
 
+DOC_VALUE_CONVERSION = """
+Value Conversion
+----------------
+
+In some cases, values need to be converted between different formats for further
+use.
+
+The Color Widget provides functionality to convert values to the following formats:
+
+- tuple (rgb/a and hsl/a only)
+- list (rgb/a and hsl/a only)
+- string (all formats)
+- int (kelvin only)
+
+The widget's 'datatype' property specifies the format to convert from/to, and the
+'datatype_range' property specifies the desired range:
+Either '0-1' or 'default' range for the specified format.
+
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='colorwidget',
+        value=(.5, 0, 1, .5),
+        props={
+            'label': 'Example: Value Conversion',
+            'format': 'rgbaString',
+            'datatype': tuple,
+            'datatype_range': '0-1'
+        }
+    )
+"""
+
+
+def value_conversion_example():
+    part = factory(u'fieldset', name='yafowil.widget.color.value_conversion')
+    part['color'] = factory(
+        '#field:color',
+        name='colorwidget',
+        value=(.5, 0, 1, .5),
+        props={
+            'label': 'Example: Value Conversion',
+            'format': 'rgbaString',
+            'datatype': tuple,
+            'datatype_range': '0-1'
+        }
+    )
+    return {
+        'widget': part,
+        'doc': DOC_VALUE_CONVERSION,
+        'title': 'Example: Value Conversion'
+    }
+
+
 def get_example():
     return [
-        foo()
-        # default_example(),
-        # wheel_example(),
-        # layout_example(),
-        # dim_example(),
-        # length_example(),
-        # input_example(),
-        # preview_example(),
-        # swatches_example(),
-        # swatches_only_example(),
-        # rgb_example(),
-        # hsv_example(),
-        # kelvin_example()
+        default_example(),
+        wheel_example(),
+        layout_example(),
+        dim_example(),
+        length_example(),
+        input_example(),
+        preview_example(),
+        swatches_example(),
+        swatches_only_example(),
+        rgb_example(),
+        hsv_example(),
+        value_conversion_example(),
+        kelvin_example(),
     ]
