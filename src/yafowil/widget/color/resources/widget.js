@@ -572,7 +572,7 @@ var yafowil_color = (function (exports, $) {
         }
         color_equals(color) {
             if (this.color &&
-                color instanceof iro.Color &&
+                (color instanceof iro.Color) &&
                 color.hsva.h === this.color.hsva.h &&
                 color.hsva.s === this.color.hsva.s &&
                 color.hsva.v === this.color.hsva.v &&
