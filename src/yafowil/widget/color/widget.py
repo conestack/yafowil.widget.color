@@ -523,7 +523,6 @@ color_options = [
     'box_width',
     'box_height',
     'slider_size',
-    'color',
     'locked_swatches',
     'user_swatches',
     'temperature',
@@ -636,14 +635,6 @@ factory.defaults['color.slider_size'] = 10
 factory.doc['props']['color.slider_size'] = """\
 Set the height of slider elements (in pixels).
 Values: [px].
-"""
-
-factory.defaults['color.color'] = ''
-factory.doc['props']['color.color'] = """\
-Set the inital picker color.
-The color can be passed as hexString, hslString, hslaString,
-rgbString, rgbaString or kelvin number.
-Values: [String()].
 """
 
 factory.defaults['color.locked_swatches'] = None

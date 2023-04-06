@@ -294,7 +294,7 @@ export class ColorWidget {
                 box_width: elem.data('box_width'),
                 box_height: elem.data('box_height'),
                 slider_size: elem.data('slider_size'),
-                color: elem.data('color'),
+                color: elem.val(),
                 locked_swatches: elem.data('locked_swatches'),
                 user_swatches: elem.data('user_swatches'),
                 temperature: elem.data('temperature'),
