@@ -33,7 +33,7 @@ function install {
         virtualenv --clear -p $interpreter $target
         ./$target/bin/pip install wheel coverage
         ./$target/bin/pip install https://github.com/conestack/webresource/archive/master.zip
-        ./$target/bin/pip install https://github.com/conestack/yafowil/archive/datatypes-refactoring.zip
+        ./$target/bin/pip install https://github.com/conestack/yafowil/archive/master.zip
         ./$target/bin/pip install -e .[test]
     else
         echo "Interpreter $interpreter not found. Skip install."
