@@ -18,7 +18,7 @@ _ = TSF('yafowil.widget.color')
 class ColorDatatypeConverter(DatatypeConverter):
     """Datatype Converter for Color Formats."""
 
-    def __init__(self, type_=None, format=None, range='full'):
+    def __init__(self, type_=None, format=None, range='default'):
         self.type_ = type_
         self.format = format
         self.range = range
@@ -37,14 +37,14 @@ class ColorDatatypeConverter(DatatypeConverter):
                     value[1] = int(value[1])
                     value[2] = int(value[2])
                     value[3] = float(value[3])
-                    if self.range == 'toInterval':
+                    if self.range == '0-1':
                         value[0] = value[0] / 255
                         value[1] = value[1] / 255
                         value[2] = value[2] / 255
                 elif self.format == 'rgbString':
                     if self.type_ in [list, tuple]:
                         value = value[4:-1].split(', ')
-                        if self.range == 'toInterval':
+                        if self.range == '0-1':
                             value = [int(channel) / 255 for channel in value]
                         else:
                             value = [int(channel) for channel in value]
@@ -52,7 +52,7 @@ class ColorDatatypeConverter(DatatypeConverter):
                     if self.type_ in [list, tuple]:
                         value = value[4:-1].replace('%', '').split(', ')
                         value = [int(channel) for channel in value]
-                        if self.range == 'toInterval':
+                        if self.range == '0-1':
                             value[0] = value[0] / 360
                             value[1] = value[1] / 100
                             value[2] = value[2] / 100
@@ -63,7 +63,7 @@ class ColorDatatypeConverter(DatatypeConverter):
                         value[1] = int(value[1])
                         value[2] = int(value[2])
                         value[3] = float(value[3])
-                        if self.range == 'toInterval':
+                        if self.range == '0-1':
                             value[0] = value[0] / 360
                             value[1] = value[1] / 100
                             value[2] = value[2] / 100
@@ -113,11 +113,11 @@ class ColorDatatypeConverter(DatatypeConverter):
                     )
                 for item in value:
                     index = value.index(item)
-                    if self.range == 'toInterval' and index < 3:
+                    if self.range == '0-1' and index < 3:
                         if item < 0 or item > 1:
                             raise ValueError(
                                 u'Value out of bounds at index {}. '
-                                'toInterval expected value between 0 and 1, value is: {}'
+                                '0-1 expected value between 0 and 1, value is: {}'
                                 .format(index, item)
                             )
                         value[index] = item * 255
@@ -143,11 +143,11 @@ class ColorDatatypeConverter(DatatypeConverter):
                     )
                 for item in value:
                     index = value.index(item)
-                    if self.range == 'toInterval':
+                    if self.range == '0-1':
                         if item < 0 or item > 1:
                             raise ValueError(
                                 u'Value out of bounds at index {}. '
-                                'toInterval expected value between 0 and 1, value is: {}'
+                                '0-1 expected value between 0 and 1, value is: {}'
                                 .format(value.index(item), item)
                             )
                         value[index] = item * 255
@@ -166,11 +166,11 @@ class ColorDatatypeConverter(DatatypeConverter):
                     )
                 for item in value:
                     index = value.index(item)
-                    if self.range == 'toInterval':
+                    if self.range == '0-1':
                         if item < 0 or item > 1:
                             raise ValueError(
                                 u'Value out of bounds at index {}. '
-                                'toInterval expected value between 0 and 1, value is: {}'
+                                '0-1 expected value between 0 and 1, value is: {}'
                                 .format(value.index(item), item)
                             )
                         if index == 0:
@@ -198,11 +198,11 @@ class ColorDatatypeConverter(DatatypeConverter):
                     )
                 for item in value:
                     index = value.index(item)
-                    if self.range == 'toInterval':
+                    if self.range == '0-1':
                         if item < 0 or item > 1:
                             raise ValueError(
                                 u'Value out of bounds at index {}. '
-                                'toInterval expected value between 0 and 1, value is: {}'
+                                '0-1 expected value between 0 and 1, value is: {}'
                                 .format(value.index(item), item)
                             )
                         if index == 0:
@@ -699,10 +699,10 @@ Datatype for extraction.
 Values: [str|int|tuple|list].
 """
 
-factory.defaults['color.datatype_range'] = 'full'
+factory.defaults['color.datatype_range'] = 'default'
 factory.doc['props']['color.datatype'] = """\
 Datatype range for extraction.
-'full': full number range for format
-'toInterval': 0 - 1
-Values: ['full'|'toInterval'].
+'default': default number range for given format
+'0-1': range 0 - 1
+Values: ['default'|'0-1'].
 """
