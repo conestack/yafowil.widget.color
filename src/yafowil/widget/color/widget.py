@@ -31,7 +31,7 @@ class ColorDatatypeConverter(DatatypeConverter):
             elif self.type_ == int and self.format == 'kelvin':
                 return int(value)
             elif self.type_ in [list, tuple]:
-                if self.format == 'rgbaString':
+                if self.format == 'rgba':
                     value = value[5:-1].split(', ')
                     value[0] = int(value[0])
                     value[1] = int(value[1])
@@ -41,14 +41,14 @@ class ColorDatatypeConverter(DatatypeConverter):
                         value[0] = value[0] / 255
                         value[1] = value[1] / 255
                         value[2] = value[2] / 255
-                elif self.format == 'rgbString':
+                elif self.format == 'rgb':
                     if self.type_ in [list, tuple]:
                         value = value[4:-1].split(', ')
                         if self.range == '0-1':
                             value = [int(channel) / 255 for channel in value]
                         else:
                             value = [int(channel) for channel in value]
-                elif self.format == 'hslString':
+                elif self.format == 'hsl':
                     if self.type_ in [list, tuple]:
                         value = value[4:-1].replace('%', '').split(', ')
                         value = [int(channel) for channel in value]
@@ -56,7 +56,7 @@ class ColorDatatypeConverter(DatatypeConverter):
                             value[0] = value[0] / 360
                             value[1] = value[1] / 100
                             value[2] = value[2] / 100
-                elif self.format == 'hslaString':
+                elif self.format == 'hsla':
                     if self.type_ in [list, tuple]:
                         value = value[5:-1].replace('%', '').split(', ')
                         value[0] = int(value[0])
@@ -83,12 +83,12 @@ class ColorDatatypeConverter(DatatypeConverter):
     def to_form(self, value):
         type_name = type(value).__name__
         accepted_formats = [
-            'hexString',
-            'hex8String',
-            'hslString',
-            'hslaString',
-            'rgbString',
-            'rgbaString',
+            'hex',
+            'hex8',
+            'hsl',
+            'hsla',
+            'rgb',
+            'rgba',
             'kelvin'
         ]
 
@@ -104,7 +104,7 @@ class ColorDatatypeConverter(DatatypeConverter):
             if isinstance(value, tuple):
                 value = list(value)
 
-            if self.format == 'rgbaString':
+            if self.format == 'rgba':
                 if length != 4:
                     raise ValueError(
                         '{} must contain 4 items, contains: {}'
@@ -136,7 +136,7 @@ class ColorDatatypeConverter(DatatypeConverter):
                     value[2],
                     value[3]
                 )
-            elif self.format == 'rgbString':
+            elif self.format == 'rgb':
                 if length != 3:
                     raise ValueError(
                         '{} must contain 3 items, contains: {}'
@@ -157,7 +157,7 @@ class ColorDatatypeConverter(DatatypeConverter):
                             'Expected value between 0 and 255, value is: {}'
                         ).format(value.index(item), item))
                 return 'rgb({}, {}, {})'.format(value[0], value[1], value[2])
-            elif self.format == 'hslString':
+            elif self.format == 'hsl':
                 if length != 3:
                     raise ValueError(
                         '{} must contain 3 items, contains: {}'
@@ -186,7 +186,7 @@ class ColorDatatypeConverter(DatatypeConverter):
                             'Expected value between 0 and 100, value is: {}'
                         ).format(index, item))
                 return 'hsl({}, {}%, {}%)'.format(value[0], value[1], value[2])
-            elif self.format == 'hslaString':
+            elif self.format == 'hsla':
                 if length != 4:
                     raise ValueError(
                         '{} must contain 4 items, contains: {}'
@@ -231,7 +231,7 @@ class ColorDatatypeConverter(DatatypeConverter):
                     value[2],
                     value[3]
                 )
-            elif self.format == 'hexString' or self.format == 'hex8String':
+            elif self.format == 'hex' or self.format == 'hex8':
                 raise ValueError(
                     'Format {} does not accept type {}, accepted type: string'
                      .format(self.format, type_name)
@@ -265,7 +265,7 @@ def color_builder(widget, factory):
     format = widget.attrs['format']
     range_ = widget.attrs['datatype_range']
     if datatype in [tuple, list]:
-        if not format in ['rgbString', 'rgbaString', 'hslString', 'hslaString']:
+        if not format in ['rgb', 'rgba', 'hsl', 'hsla']:
             raise ValueError(
                 'Format {} does not support datatype {}' \
                 .format(format, datatype.__name__)
@@ -292,18 +292,18 @@ def color_extractor(widget, data):
     format = attr_value('format', widget, data)
     formats = ', '.join(
         [
-            'hexString',
-            'hex8String',
-            'hslString',
-            'hslaString',
-            'rgbString',
-            'rgbaString',
+            'hex',
+            'hex8',
+            'hsl',
+            'hsla',
+            'rgb',
+            'rgba',
             'kelvin'
         ]
     )
 
     # hex
-    if format == 'hexString' or format == 'hex8String':
+    if format == 'hex' or format == 'hex8':
         if (not extracted.startswith('#')):
             msg = _(
                 'unknown_color_format',
@@ -311,13 +311,13 @@ def color_extractor(widget, data):
                 mapping={'formats':formats}
             )
             raise ExtractionError(msg)
-        elif format == 'hexString' and len(extracted) != 7:
+        elif format == 'hex' and len(extracted) != 7:
             msg = _(
                 'incorrect_hex_length',
                 default='Incorrect hex Color String length: string length must be 7'
             )
             raise ExtractionError(msg)
-        elif format == 'hex8String' and len(extracted) != 9:
+        elif format == 'hex8' and len(extracted) != 9:
             msg = _(
                 'incorrect_hex8_length',
                 default='Incorrect hex8 Color String length: string length must be 9'
@@ -327,13 +327,13 @@ def color_extractor(widget, data):
         r = color[0:2]
         g = color[2:4]
         b = color[4:6]
-        if format == 'hex8String':
+        if format == 'hex8':
             a = color[6:8]
         try:
             r = int(r, 16)
             g = int(g, 16)
             b = int(b, 16)
-            if format == 'hex8String':
+            if format == 'hex8':
                 a = int(a, 16)
         except Exception as e:
             args = ', '.join(e.args)
@@ -344,7 +344,7 @@ def color_extractor(widget, data):
             )
             raise ExtractionError(msg)
     # hsl
-    elif format == 'hslString' or format == 'hslaString':
+    elif format == 'hsl' or format == 'hsla':
         hsl_format = 'hsl([0-360], [0-100]%, [0-100]%)'
         hsla_format = 'hsla([0-360], [0-100]%, [0-100]%, [0-1])'
 
@@ -353,27 +353,27 @@ def color_extractor(widget, data):
                 'unclosed_brace',
                 default='Incorrect Color String:  Unclosed bracket.'
             ))
-        elif format == 'hslString' and not extracted.startswith('hsl('):
+        elif format == 'hsl' and not extracted.startswith('hsl('):
             raise ExtractionError(_(
                 'hsl_str_start',
                 default="Incorrect Color String: String must start with 'hsl'"
             ))
-        elif format == 'hslaString' and not extracted.startswith('hsla('):
+        elif format == 'hsla' and not extracted.startswith('hsla('):
             raise ExtractionError(_(
                 'hsla_str_start',
                 default="Incorrect Color String: String must start with 'hsla'"
             ))
-        length = 3 if format == 'hslString' else 4
+        length = 3 if format == 'hsl' else 4
         color = extracted[length + 1:-1]
         color = [channel.strip() for channel in color.split(',')]
 
-        if format == 'hslString' and len(color) != 3:
+        if format == 'hsl' and len(color) != 3:
             raise ExtractionError(_(
                 'hsl_str_length',
                 default='Incorrect Color String: expected format: ${hsl_format}',
                 mapping={'hsl_format':hsl_format}
             ))
-        if format == 'hslaString' and len(color) != 4:
+        if format == 'hsla' and len(color) != 4:
             raise ExtractionError(_(
                 'hsla_str_length',
                 default='Incorrect Color String: expected format: ${hsla_format}',
@@ -383,7 +383,7 @@ def color_extractor(widget, data):
         h = color[0]
         s = color[1]
         l = color[2]
-        a = color[3] if format == 'hslaString' else False
+        a = color[3] if format == 'hsla' else False
 
         if int(h) < 0 or int(h) > 360:
             raise ExtractionError(_(
@@ -414,7 +414,7 @@ def color_extractor(widget, data):
                 default='Incorrect Color String: Alpha value must be between 0 and 1.'
             ))
     # rgb
-    elif format == 'rgbString' or format == 'rgbaString':
+    elif format == 'rgb' or format == 'rgba':
         rgb_format = 'rgb([0-255], [0-255], [0-255])'
         rgba_format = 'rgba([0-255], [0-255], [0-255], [0-1])'
 
@@ -423,27 +423,27 @@ def color_extractor(widget, data):
                 'unclosed_brace',
                 default='Incorrect Color String: Unclosed bracket.'
             ))
-        elif format == 'rgbString' and not extracted.startswith('rgb('):
+        elif format == 'rgb' and not extracted.startswith('rgb('):
             raise ExtractionError(_(
                 'rgb_str_start',
                 default="Incorrect Color String: String must start with 'rgb'"
             ))
-        elif format == 'rgbaString' and not extracted.startswith('rgba('):
+        elif format == 'rgba' and not extracted.startswith('rgba('):
             raise ExtractionError(_(
                 'rgba_str_start',
                 default="Incorrect Color String: String must start with 'rgba'"
             ))
-        length = 3 if format == 'rgbString' else 4
+        length = 3 if format == 'rgb' else 4
         color = extracted[length + 1:-1]
         color = [channel.strip() for channel in color.split(',')]
 
-        if format == 'rgbString' and len(color) != 3:
+        if format == 'rgb' and len(color) != 3:
             raise ExtractionError(_(
                 'rgb_str_length',
                 default='Incorrect Color String: expected format: ${rgb_format}',
                 mapping={'rgb_format':rgb_format}
             ))
-        elif format == 'rgbaString' and len(color) != 4:
+        elif format == 'rgba' and len(color) != 4:
             raise ExtractionError(_(
                 'rgba_str_length',
                 default='Incorrect Color String: expected format: ${rgba_format}',
@@ -452,7 +452,7 @@ def color_extractor(widget, data):
         r = color[0]
         g = color[1]
         b = color[2]
-        a = color[3] if format == 'rgbaString' else False
+        a = color[3] if format == 'rgba' else False
 
         if int(r) < 0 or int(r) > 255:
             raise ExtractionError(_(
@@ -521,10 +521,23 @@ color_options = [
 ]
 
 
+format_mapping = {
+    'hex': 'hexString',
+    'hex8': 'hex8String',
+    'hsl': 'hslString',
+    'hsla': 'hslaString',
+    'rgb': 'rgbString',
+    'rgba': 'rgbaString',
+    'kelvin': 'kelvin'
+}
+
+
 @managedprops(*color_options)
 def color_edit_renderer(widget, data):
     input_attrs = input_attributes_common(widget, data)
     custom_attrs = data_attrs_helper(widget, data, color_options)
+    format = custom_attrs['data-format']
+    custom_attrs['data-format'] = format_mapping[format]
     input_attrs.update(custom_attrs)
     input_attrs['type'] = 'text'
     input_attrs['data-color'] = input_attrs['value']
@@ -552,6 +565,7 @@ factory.register(
     builders=[color_builder]
 )
 
+
 factory.doc['blueprint']['color'] = """\
 Add-on blueprint
 `yafowil.widget.color <http://github.com/conestack/yafowil.widget.color/>`_ .
@@ -566,18 +580,18 @@ factory.doc['props']['color.emptyvalue'] = """\
 If color value empty, return as extracted value.
 """
 
-factory.defaults['color.format'] = 'hexString'
+factory.defaults['color.format'] = 'hex'
 factory.doc['props']['color.format'] = """\
 Specify the output format of the color picker color.
 Values: [Str].
 
 Available options:
-- hexString
-- hex8String
-- hslString
-- hslaString
-- rgbString
-- rgbaString
+- hex
+- hex8
+- hsl
+- hsla
+- rgb
+- rgba
 - kelvin
 """
 
