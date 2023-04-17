@@ -114,16 +114,17 @@ div.color-picker-wrapper div.color-picker-recent div.color-swatch > .layer-color
 }
 
 span.yafowil-color-picker-color {
-  position: relative;
+  position: absolute;
   display: block;
   width: 33px;
   height: 33px;
-  top: -33px;
-  margin-left: 5px;
+  top: 0;
+  /* left: 10px; */
+  /* right: 0; */
+  margin-left: 20px;
   border: #ccc 3px solid;
   border-radius: 4px;
   box-shadow: inset 0px 0px 3px rgba(0, 0, 0, 0.4);
-  overflow: hidden;
 }
 span.yafowil-color-picker-color.layer-transparent {
   background: conic-gradient(rgb(204, 204, 204) 25%, rgb(255, 255, 255) 0deg, rgb(255, 255, 255) 50%, rgb(204, 204, 204) 0deg, rgb(204, 204, 204) 75%, rgb(255, 255, 255) 0deg) 0% 0%/8px 8px;
