@@ -44,7 +44,7 @@ class TestColorWidget(YafowilTestCase):
             name='colorwidget',
             props={
                 'color': 'rgba(255, 255, 0, 1)',
-                'format': 'rgbaString',
+                'format': 'rgba',
                 'show_inputs': True,
                 'show_labels': True,
                 'slider_size': 50,
@@ -72,7 +72,7 @@ class TestColorWidget(YafowilTestCase):
             name='colorwidget',
             value=UNSET,
             props={
-                'format': 'hexString',
+                'format': 'hex',
                 'color': UNSET
             })
         data = widget.extract({})
@@ -84,7 +84,7 @@ class TestColorWidget(YafowilTestCase):
             name='colorwidget',
             value=color,
             props={
-                'format': 'hexString',
+                'format': 'hex',
                 'color': color
             })
         data = widget.extract({})
@@ -104,8 +104,8 @@ class TestColorWidget(YafowilTestCase):
         self.assertEqual(
             data.errors,
             [ExtractionError(
-                'Unknown Format. Supported formats: hexString, hex8String, '
-                'hslString, hslaString, rgbString, rgbaString, kelvin'
+                'Unknown Format. Supported formats: hex, hex8, '
+                'hsl, hsla, rgb, rgba, kelvin'
             )]
         )
 
@@ -115,7 +115,7 @@ class TestColorWidget(YafowilTestCase):
             name='colorwidget',
             value=UNSET,
             props={
-                'format': 'hexString'
+                'format': 'hex'
             })
         # not startswith '#'
         request = {'colorwidget': 'ff0000'}
@@ -123,8 +123,8 @@ class TestColorWidget(YafowilTestCase):
         self.assertEqual(
             data.errors, 
             [ExtractionError(
-                'Unknown Format. Supported formats: hexString, hex8String, '
-                'hslString, hslaString, rgbString, rgbaString, kelvin'
+                'Unknown Format. Supported formats: hex, hex8, '
+                'hsl, hsla, rgb, rgba, kelvin'
             )]
         )
         # too short
@@ -152,7 +152,7 @@ class TestColorWidget(YafowilTestCase):
             name='colorwidget',
             value=UNSET,
             props={
-                'format': 'hex8String'
+                'format': 'hex8'
             })
         # not startswith '#'
         request = {'colorwidget': 'ff000000'}
@@ -160,8 +160,8 @@ class TestColorWidget(YafowilTestCase):
         self.assertEqual(
             data.errors, 
             [ExtractionError(
-                'Unknown Format. Supported formats: hexString, hex8String, '
-                'hslString, hslaString, rgbString, rgbaString, kelvin'
+                'Unknown Format. Supported formats: hex, hex8, '
+                'hsl, hsla, rgb, rgba, kelvin'
             )]
         )
         # too short
@@ -193,7 +193,7 @@ class TestColorWidget(YafowilTestCase):
             name='colorwidget',
             value=UNSET,
             props={
-                'format': 'hslString'
+                'format': 'hsl'
             })
         # not startswith hsl(
         request = {'colorwidget': 'rgb(360, 122, 122)'}
@@ -261,7 +261,7 @@ class TestColorWidget(YafowilTestCase):
             name='colorwidget',
             value=UNSET,
             props={
-                'format': 'hslaString'
+                'format': 'hsla'
             })
         # not startswith hsla(
         request = {'colorwidget': 'hsl(360, 122, 122)'}
@@ -338,7 +338,7 @@ class TestColorWidget(YafowilTestCase):
             name='colorwidget',
             value=UNSET,
             props={
-                'format': 'rgbString'
+                'format': 'rgb'
             })
         # not startswith rgb(
         request = {'colorwidget': 'rgba(122, 122, 122)'}
@@ -404,7 +404,7 @@ class TestColorWidget(YafowilTestCase):
             name='colorwidget',
             value=UNSET,
             props={
-                'format': 'rgbaString'
+                'format': 'rgba'
             })
         # not startswith rgba(
         request = {'colorwidget': 'rgb(122, 122, 122, 0.5)'}
@@ -510,11 +510,11 @@ class TestColorWidget(YafowilTestCase):
         convertor = ColorDatatypeConverter()
         convertor.type_ = str
         # hexString
-        convertor.format = 'hexString'
+        convertor.format = 'hex'
         res = convertor.to_value('#ff0000')
         self.assertEqual(res, '#ff0000')
         # hex8String
-        convertor.format = 'hex8String'
+        convertor.format = 'hex8'
         res = convertor.to_value('#66000000')
         self.assertEqual(res, '#66000000')
         # unsupported type
@@ -525,7 +525,7 @@ class TestColorWidget(YafowilTestCase):
         convertor = ColorDatatypeConverter()
         convertor.type_ = list
         # rgbaString
-        convertor.format = 'rgbaString'
+        convertor.format = 'rgba'
         res = convertor.to_value('rgba(255, 255, 0, 0.5)')
         self.assertEqual(res, [255, 255, 0, 0.5])
         # rgbaString to tuple
@@ -537,7 +537,7 @@ class TestColorWidget(YafowilTestCase):
         res = convertor.to_value('rgba(255, 255, 0, 0.5)')
         self.assertEqual(res, (1, 1, 0, 0.5))
         # rgbString
-        convertor.format = 'rgbString'
+        convertor.format = 'rgb'
         convertor.type_ = list
         convertor.range = 'default'
         res = convertor.to_value('rgb(125, 125, 5)')
@@ -553,7 +553,7 @@ class TestColorWidget(YafowilTestCase):
         convertor = ColorDatatypeConverter()
         convertor.type_ = list
         # hslString
-        convertor.format = 'hslString'
+        convertor.format = 'hsl'
         convertor.range = 'default'
         res = convertor.to_value('hsl(360, 100, 50)')
         self.assertEqual(res, [360, 100, 50])
@@ -561,7 +561,7 @@ class TestColorWidget(YafowilTestCase):
         res = convertor.to_value('hsl(360, 100, 50)')
         self.assertEqual(res, [1, 1, 0.5])
         # hslaString
-        convertor.format = 'hslaString'
+        convertor.format = 'hsla'
         convertor.range = 'default'
         res = convertor.to_value('hsla(360, 100, 50, 0.3)')
         self.assertEqual(res, [360, 100, 50, 0.3])
@@ -596,7 +596,7 @@ class TestColorWidget(YafowilTestCase):
         convertor.format = 'someString'
         self.assertRaises(TypeError, convertor.to_form, '')
         # type None
-        convertor.format = 'hexString'
+        convertor.format = 'hex'
         res = convertor.to_form(None)
         self.assertEqual(res, None)
         # hexString
@@ -605,15 +605,15 @@ class TestColorWidget(YafowilTestCase):
 
     def test_color_convertor_to_form_unsupported_types(self):
         convertor = ColorDatatypeConverter()
-        convertor.format = 'hexString'
+        convertor.format = 'hex'
         # unsupported value type
         self.assertRaises(ValueError, convertor.to_form, {'a': 'b'})
         # hexString to tuple
         convertor.type_ = tuple
-        convertor.format = 'hexString'
+        convertor.format = 'hex'
         self.assertRaises(ValueError, convertor.to_form, (100, 100, 50))
         # hex8String to tuple
-        convertor.format = 'hex8String'
+        convertor.format = 'hex8'
         self.assertRaises(ValueError, convertor.to_form, (100, 100, 50))
         # kelvin to tuple
         convertor.format = 'kelvin'
@@ -623,7 +623,7 @@ class TestColorWidget(YafowilTestCase):
         convertor = ColorDatatypeConverter()
 
         # to tuple - range default correct
-        convertor.format = 'rgbString'
+        convertor.format = 'rgb'
         res = convertor.to_form((255, 255, 0))
         self.assertEqual(res, 'rgb(255, 255, 0)')
         # to tuple - range default incorrect
@@ -640,11 +640,11 @@ class TestColorWidget(YafowilTestCase):
         self.assertRaises(ValueError, convertor.to_form, (255, 255, 255, 1))
 
         # rgbaString - range default correct
-        convertor.format = 'rgbaString'
+        convertor.format = 'rgba'
         res = convertor.to_form((255, 255, 0, 1))
         self.assertEqual(res, 'rgba(255, 255, 0, 1)')
         # rgbaString - range default incorrect
-        convertor.format = 'rgbaString'
+        convertor.format = 'rgba'
         self.assertRaises(ValueError, convertor.to_form, (255, 255, 0, 5))
         self.assertRaises(ValueError, convertor.to_form, (300, 255, 0, 1))
         # to tuple - range 0-1 correct
@@ -661,7 +661,7 @@ class TestColorWidget(YafowilTestCase):
         convertor = ColorDatatypeConverter()
 
         # to tuple - range default correct
-        convertor.format = 'hslString'
+        convertor.format = 'hsl'
         res = convertor.to_form((360, 100, 0))
         self.assertEqual(res, 'hsl(360, 100%, 0%)')
         # to tuple - range default incorrect
@@ -678,7 +678,7 @@ class TestColorWidget(YafowilTestCase):
         self.assertRaises(ValueError, convertor.to_form, (360, 50, 50, 1))
 
         # to tuple - range default correct
-        convertor.format = 'hslaString'
+        convertor.format = 'hsla'
         res = convertor.to_form((360, 100, 0, 0.5))
         self.assertEqual(res, 'hsla(360, 100%, 0%, 0.5)')
         # to tuple - range default incorrect
@@ -699,7 +699,7 @@ class TestColorWidget(YafowilTestCase):
     def test_color_convertor_to_form_kelvin(self):
         convertor = ColorDatatypeConverter()
         # wrong format
-        convertor.format = 'rgbaString'
+        convertor.format = 'rgba'
         self.assertRaises(ValueError, convertor.to_form, 3500)
         # correct format
         convertor.format = 'kelvin'
@@ -709,7 +709,7 @@ class TestColorWidget(YafowilTestCase):
     def test_color_builder(self):
         class MockWidget:
             attrs = {
-                'format': 'rgbString',
+                'format': 'rgb',
                 'datatype': tuple,
                 'datatype_range': 'default'
             }
@@ -718,17 +718,17 @@ class TestColorWidget(YafowilTestCase):
         datatype = widget.attrs['datatype']
         # XXX: compare class names. Does not work due to import
         self.assertEqual(datatype.type_, tuple)
-        self.assertEqual(datatype.format, 'rgbString')
+        self.assertEqual(datatype.format, 'rgb')
         self.assertEqual(datatype.range, 'default')
         # not supported format for datatype tuple
-        widget.attrs['format'] = 'hexString'
+        widget.attrs['format'] = 'hex'
         widget.attrs['datatype'] = tuple
         self.assertRaises(ValueError, color_builder, widget, None)
         # datatype int, format not kelvin
         widget.attrs['datatype'] = int
         self.assertRaises(ValueError, color_builder, widget, None)
         # not supported datatype
-        widget.attrs['format'] = 'hexString'
+        widget.attrs['format'] = 'hex'
         widget.attrs['datatype'] = object
         self.assertRaises(ValueError, color_builder, widget, None)
 

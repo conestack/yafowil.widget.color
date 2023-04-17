@@ -8,7 +8,7 @@ $checkered-pattern: conic-gradient(
     0% 0% / 8px 8px;
 
 input.color-picker {
-    display: inline-block;
+    display: block;
     width: auto;
     height: 34px;
     padding: 6px 12px;
@@ -131,14 +131,14 @@ div.color-picker-wrapper {
 }
 span.yafowil-color-picker-color {
     position: absolute;
-    display: inline-block;
+    display: block;
     width: 33px;
     height: 33px;
-    margin-left: 5px;
+    top: 0;
+    margin-left: 20px;
     border: #ccc 3px solid;
     border-radius: 4px;
-    box-shadow: inset 0px 0px 3px rgb(0 0 0 / 40%);
-    overflow: hidden;
+    box-shadow: inset 0px 0px 3px rgba(0, 0, 0, 0.4);
 
     &.layer-transparent {
         background: $checkered-pattern;

@@ -338,7 +338,7 @@ Input fields can be set as read-only with the 'disabled' property.
             'show_inputs' : True,
             'show_labels': True,
             # 'disabled': True,
-            'format': 'hexString'
+            'format': 'hex'
         }
     )
 """
@@ -354,7 +354,7 @@ def input_example():
             'show_inputs' : True,
             'show_labels': True,
             # 'disabled': True,
-            'format': 'hexString'
+            'format': 'hex'
         })
     return {
         'widget': part,
@@ -384,7 +384,7 @@ Pass 'a' in the 'sliders' option to edit alpha channel value.
         props={
             'label': 'Example: RGBA Picker',
             'sliders': ['r', 'g', 'b', 'a'],
-            'format': 'rgbaString',
+            'format': 'rgba',
             'show_labels': True,
             'show_inputs': True
         }
@@ -400,7 +400,7 @@ def rgb_example():
         props={
             'label': 'Example: RGBA Picker',
             'sliders': ['r', 'g', 'b', 'a'],
-            'format': 'rgbaString',
+            'format': 'rgba',
             'show_labels': True,
             'show_inputs': True
         })
@@ -426,7 +426,7 @@ Pass the following values to create a HSV/HSVA color picker.
         props={
             'label': 'Example: HSV Picker',
             'sliders': ['h', 's', 'v'],
-            'format': 'hslaString',
+            'format': 'hsla',
             'show_labels': True
         }
     )
@@ -441,7 +441,7 @@ def hsv_example():
         props={
             'label': 'Example: HSV Picker',
             'sliders': ['h', 's', 'v', 'a'],
-            'format': 'hslaString',
+            'format': 'hsla',
             'show_labels': True
         })
     return {
@@ -595,7 +595,7 @@ the 'datatype_range' property specifies the desired range, Either '0-1' or
         value=(.5, 0, 1, .5),
         props={
             'label': 'Example: Value Conversion',
-            'format': 'rgbaString',
+            'format': 'rgba',
             'datatype': tuple,
             'datatype_range': '0-1'
         }
@@ -611,7 +611,7 @@ def value_conversion_example():
         value=(.5, 0, 1, .5),
         props={
             'label': 'Example: Value Conversion',
-            'format': 'rgbaString',
+            'format': 'rgba',
             'datatype': tuple,
             'datatype_range': '0-1'
         }

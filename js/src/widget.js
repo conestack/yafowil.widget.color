@@ -103,8 +103,10 @@ export class ColorPicker {
             prev_elem = $(options.preview_elem)
                 .addClass('yafowil-color-picker-preview');
         } else {
+            let elem_width = this.elem.outerWidth();
             prev_elem = $('<span />')
-                .addClass('yafowil-color-picker-color layer-transparent');
+                .addClass('yafowil-color-picker-color layer-transparent')
+                .css('left', `${elem_width}px`);
         }
         this.preview = new PreviewElement(this, prev_elem, this.color);
 
