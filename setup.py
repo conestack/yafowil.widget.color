@@ -8,7 +8,7 @@ def read_file(name):
         return f.read()
 
 
-version = '1.0a1.dev0'
+version = '1.0a1'
 shortdesc = 'Color picker widget for YAFOWIL'
 longdesc = '\n\n'.join([read_file(name) for name in [
     'README.rst',
