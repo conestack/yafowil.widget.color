@@ -29,11 +29,14 @@ export class ColorPicker {
     constructor(elem, options) {
         this.elem = elem;
 
+        if (options.on_open) {
+            this.elem.on('color_open', options.on_open);
+        }
         if (options.on_update) {
-            this.elem.on('color_update', options.on_update)
+            this.elem.on('color_update', options.on_update);
         }
         if (options.on_close) {
-            this.elem.on('color_close', options.on_close)
+            this.elem.on('color_close', options.on_close);
         }
 
         this.dropdown_elem = $('<div />')
@@ -192,6 +195,7 @@ export class ColorPicker {
         } else {
             this.close();
         }
+        this.elem.trigger(new $.Event('color_open', {origin: this}));
     }
 
     on_keydown(e) {
@@ -306,6 +310,7 @@ export class ColorWidget {
                 slider_length: elem.data('slider_length'),
                 layout_direction: elem.data('layout_direction'),
                 open_on_focus: elem.data('open_on_focus'),
+                on_open: lookup_callback(elem.data('on_open')),
                 on_update: lookup_callback(elem.data('on_update')),
                 on_close: lookup_callback(elem.data('on_close'))
             };

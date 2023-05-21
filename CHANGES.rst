@@ -4,7 +4,8 @@ Changes
 1.0a2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Introduce ``on_open`` handler in ``ColorPicker`` JS.
+  [rnix]
 
 
 1.0a1 (2023-05-15)

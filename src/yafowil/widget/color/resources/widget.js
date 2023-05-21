@@ -352,6 +352,9 @@ var yafowil_color = (function (exports, $) {
     class ColorPicker {
         constructor(elem, options) {
             this.elem = elem;
+            if (options.on_open) {
+                this.elem.on('color_open', options.on_open);
+            }
             if (options.on_update) {
                 this.elem.on('color_update', options.on_update);
             }
@@ -502,6 +505,7 @@ var yafowil_color = (function (exports, $) {
             } else {
                 this.close();
             }
+            this.elem.trigger(new $.Event('color_open', {origin: this}));
         }
         on_keydown(e) {
             if (e.key === 'Enter' || e.key === 'Escape') {
@@ -608,6 +612,7 @@ var yafowil_color = (function (exports, $) {
                     slider_length: elem.data('slider_length'),
                     layout_direction: elem.data('layout_direction'),
                     open_on_focus: elem.data('open_on_focus'),
+                    on_open: lookup_callback(elem.data('on_open')),
                     on_update: lookup_callback(elem.data('on_update')),
                     on_close: lookup_callback(elem.data('on_close'))
                 };
