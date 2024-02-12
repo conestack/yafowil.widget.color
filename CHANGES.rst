@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.0a2 (unreleased)
+1.0a2 (2024-02-12)
 ------------------
 
 - Introduce ``on_open`` handler in ``ColorPicker`` JS.
