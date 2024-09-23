@@ -505,6 +505,7 @@ def color_extractor(widget, data):
 color_options = [
     'preview_elem',
     'sliders',
+    'placement',
     'box_width',
     'box_height',
     'slider_size',
@@ -578,6 +579,12 @@ CSS classes for color widget wrapper DOM element.
 
 factory.doc['props']['color.emptyvalue'] = """\
 If color value empty, return as extracted value.
+"""
+
+factory.defaults['color.placement'] = 'auto'
+factory.doc['props']['color.placement'] = """\
+Specify the color picker dropdown's placement.
+Values: ['top'|'bottom'|'left'|'right'|'static'|'auto-top'|'auto'(default)].
 """
 
 factory.defaults['color.format'] = 'hex'

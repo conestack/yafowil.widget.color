@@ -64,6 +64,52 @@ def wheel_example():
     }
 
 
+DOC_PLACEMENT = """
+Placement
+---------
+
+The color widget can be initialized with a variety of placement options.
+'auto', 'auto-top', 'left' and 'right' options will automatically horizontally
+align the widget on top or bottom of the input field, depending on available
+space within the viewport.
+
+Supported options:
+
+- top
+- bottom
+- left
+- right
+- static
+- auto (top/bottom)
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='colorwidget',
+        props={
+            'label': 'Placement on right side',
+            'placement': 'right'
+        }
+    )
+"""
+
+
+def placement_example():
+    part = factory(u'fieldset', name='yafowil.widget.color.default')
+    part['color'] = factory(
+        '#field:color',
+        props={
+            'label': 'Placement on right side',
+            'placement': 'right'
+        })
+    return {
+        'widget': part,
+        'doc': DOC_PLACEMENT,
+        'title': 'Placement on right side'
+    }
+
+
 DOC_DIM = """
 Custom dimensions
 -----------------
@@ -627,6 +673,7 @@ def get_example():
     return [
         default_example(),
         wheel_example(),
+        placement_example(),
         layout_example(),
         dim_example(),
         length_example(),

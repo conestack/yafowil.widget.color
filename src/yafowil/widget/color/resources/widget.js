@@ -360,7 +360,6 @@ var yafowil_color = (function (exports, $) {
             }
             this.dropdown_elem = $('<div />')
                 .addClass('color-picker-wrapper')
-                .css('top', this.elem.outerHeight())
                 .insertAfter(this.elem);
             this.picker_container = $('<div />')
                 .addClass('color-picker-container')
@@ -369,6 +368,7 @@ var yafowil_color = (function (exports, $) {
                 .addClass('close-button')
                 .text('✕')
                 .appendTo(this.dropdown_elem);
+            this.placement = options.placement;
             this.slider_size = options.slider_size;
             let iro_opts = this.init_opts(options);
             this.picker = new iro.ColorPicker(this.picker_container.get(0), iro_opts);
@@ -433,6 +433,7 @@ var yafowil_color = (function (exports, $) {
             this.close_btn.on('click', this.close);
             this.on_keydown = this.on_keydown.bind(this);
             this.on_click = this.on_click.bind(this);
+            this.place(options.placement, options.preview_elem);
         }
         get active_swatch() {
             return this._active_swatch;
@@ -488,6 +489,75 @@ var yafowil_color = (function (exports, $) {
             });
             return iro_opts;
         }
+        place(placement, custom_preview) {
+            let left, top;
+            const auto_place = (on_top, on_bottom, prefers) => {
+                const window_height = $(window).height();
+                const dd_height = this.dropdown_elem.outerHeight();
+                const offset = this.elem[0].getBoundingClientRect();
+                const y_pos = offset.top + this.elem.outerHeight();
+                const below = window_height - y_pos;
+                if (!prefers || prefers === 'bottom') {
+                    if (below >= dd_height) {
+                        return on_bottom;
+                    } else if (y_pos >= dd_height) {
+                        on_top -= dd_height;
+                    } else {
+                        return on_bottom;
+                    }
+                } else if (prefers === 'top') {
+                    if (y_pos >= dd_height) {
+                        on_top -= dd_height;
+                    } else if (below >= dd_height) {
+                        return on_bottom;
+                    } else {
+                        return on_bottom;
+                    }
+                }
+                return on_top;
+            };
+            switch (placement) {
+                case 'left':
+                    left = - this.dropdown_elem.outerWidth();
+                    top = auto_place(0, -this.elem.outerHeight());
+                    break;
+                case 'right':
+                    left = this.elem.outerWidth();
+                    if (!custom_preview && this.preview) {
+                        left += this.preview.elem.outerWidth(true);
+                    }
+                    top = auto_place(0, -this.elem.outerHeight());
+                    break;
+                case 'top':
+                    left = 0;
+                    top = -(this.dropdown_elem.outerHeight() + this.elem.outerHeight());
+                    break;
+                case 'bottom':
+                    left = 0;
+                    top = 0;
+                    break;
+                case 'static':
+                    left = 0;
+                    top = 0;
+                    this.dropdown_elem.css('position', 'static');
+                    break;
+                case 'auto-top':
+                    left = 0;
+                    top = auto_place(-this.elem.outerHeight(), 0, 'top');
+                    break;
+                case 'auto':
+                    left = 0;
+                    top = auto_place(-this.elem.outerHeight(), 0);
+                    break;
+                default:
+                    console.warn(`Unknown placement: ${placement}`);
+                    break;
+            }
+            this.dropdown_elem.css(
+                'transform',
+                `translate(${left}px, ${top}px)`
+            );
+        }
         update_color() {
             this.color = this.picker.color.clone();
             this.preview.color = this.color.rgbaString;
@@ -495,6 +565,9 @@ var yafowil_color = (function (exports, $) {
             this.elem.trigger(evt);
         }
         open(evt) {
+            if (['auto-top', 'auto', 'left', 'right'].includes(this.placement)) {
+                this.place(this.placement);
+            }
             if (this.dropdown_elem.css('display') === 'none') {
                 this.dropdown_elem.show();
                 $(window).on('keydown', this.on_keydown);
@@ -593,6 +666,7 @@ var yafowil_color = (function (exports, $) {
                 }
                 let options = {
                     format: elem.data('format'),
+                    placement: elem.data('placement'),
                     preview_elem: elem.data('preview_elem'),
                     sliders: elem.data('sliders'),
                     box_width: elem.data('box_width'),
