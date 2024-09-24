@@ -80,7 +80,10 @@ Supported options:
 - left
 - right
 - static
-- auto (top/bottom)
+
+To specify whether or not the dropdown will change position when there is not
+enough available space, use the auto_align option with [True|False]
+(defaults to True).
 
 .. code-block:: python
 

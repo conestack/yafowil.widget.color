@@ -506,6 +506,7 @@ color_options = [
     'preview_elem',
     'sliders',
     'placement',
+    'auto_align',
     'box_width',
     'box_height',
     'slider_size',
@@ -581,10 +582,17 @@ factory.doc['props']['color.emptyvalue'] = """\
 If color value empty, return as extracted value.
 """
 
-factory.defaults['color.placement'] = 'auto'
+factory.defaults['color.placement'] = 'bottom'
 factory.doc['props']['color.placement'] = """\
 Specify the color picker dropdown's placement.
-Values: ['top'|'bottom'|'left'|'right'|'static'|'auto-top'|'auto'(default)].
+Values: ['top'|'bottom'(default)|'left'|'right'|'static'].
+"""
+
+factory.defaults['color.auto_align'] = True
+factory.doc['props']['color.auto_align'] = """\
+Whether the color picker's dropdown will change placement depending on available
+space.
+Values: [True|False]
 """
 
 factory.defaults['color.format'] = 'hex'

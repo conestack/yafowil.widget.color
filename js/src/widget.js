@@ -48,6 +48,7 @@ export class ColorPicker {
             .appendTo(this.dropdown_elem);
 
         this.placement = options.placement;
+        this.auto_align = options.auto_align;
         this.slider_size = options.slider_size;
         let iro_opts = this.init_opts(options);
         this.picker = new iro.ColorPicker(this.picker_container.get(0), iro_opts);
@@ -181,6 +182,7 @@ export class ColorPicker {
 
     place(placement, custom_preview) {
         let left, top;
+        const auto_align = this.auto_align;
 
         const auto_place = (on_top, on_bottom, prefers) => {
             const window_height = $(window).height();
@@ -190,33 +192,38 @@ export class ColorPicker {
             const below = window_height - y_pos;
 
             if (!prefers || prefers === 'bottom') {
-                if (below >= dd_height) {
-                    return on_bottom;
-                } else if (y_pos >= dd_height) {
-                    on_top -= dd_height;
+                if (auto_align) {
+                    if (below >= dd_height) {
+                        return on_bottom;
+                    } else if (y_pos >= dd_height) {
+                        on_top -= dd_height;
+                    } else {
+                        return on_bottom;
+                    }
                 } else {
                     return on_bottom;
                 }
             } else if (prefers === 'top') {
-                if (y_pos >= dd_height) {
-                    on_top -= dd_height;
-                } else if (below >= dd_height) {
-                    return on_bottom;
+                if (auto_align) {
+                    if (y_pos >= dd_height) {
+                        on_top -= dd_height;
+                    } else if (below >= dd_height) {
+                        return on_bottom;
+                    } else {
+                        return on_bottom;
+                    }
                 } else {
-                    return on_bottom;
+                    return on_top;
                 }
             }
-
             return on_top;
         }
 
         switch (placement) {
-
             case 'left':
                 left = - this.dropdown_elem.outerWidth();
                 top = auto_place(0, -this.elem.outerHeight());
                 break;
-
             case 'right':
                 left = this.elem.outerWidth();
                 if (!custom_preview && this.preview) {
@@ -225,33 +232,19 @@ export class ColorPicker {
                 }
                 top = auto_place(0, -this.elem.outerHeight());
                 break;
-
             case 'top':
                 left = 0;
-                top = -(this.dropdown_elem.outerHeight() + this.elem.outerHeight());
+                top = auto_place(-this.elem.outerHeight(), 0, 'top');
                 break;
-
             case 'bottom':
                 left = 0;
-                top = 0;
+                top = auto_place(-this.elem.outerHeight(), 0);
                 break;
-
             case 'static':
                 left = 0;
                 top = 0;
                 this.dropdown_elem.css('position', 'static');
                 break;
-
-            case 'auto-top':
-                left = 0;
-                top = auto_place(-this.elem.outerHeight(), 0, 'top');
-                break;
-
-            case 'auto':
-                left = 0;
-                top = auto_place(-this.elem.outerHeight(), 0);
-                break;
-
             default:
                 console.warn(`Unknown placement: ${placement}`);
                 break;
@@ -271,7 +264,7 @@ export class ColorPicker {
     }
 
     open(evt) {
-        if (['auto-top', 'auto', 'left', 'right'].includes(this.placement)) {
+        if (this.placement !== 'static' && this.auto_align) {
             this.place(this.placement);
         }
         if (this.dropdown_elem.css('display') === 'none') {
@@ -381,6 +374,7 @@ export class ColorWidget {
             let options = {
                 format: elem.data('format'),
                 placement: elem.data('placement'),
+                auto_align: elem.data('auto_align'),
                 preview_elem: elem.data('preview_elem'),
                 sliders: elem.data('sliders'),
                 box_width: elem.data('box_width'),
