@@ -827,6 +827,7 @@ var yafowil_color = (function (exports, $, Popper) {
             } else {
                 this.close();
             }
+            this.popper.forceUpdate();
         }
     }
     class BS5ColorWidget extends ColorWidget {

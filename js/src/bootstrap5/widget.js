@@ -114,6 +114,7 @@ export class BS5ColorPicker extends ColorPicker {
         } else {
             this.close();
         }
+        this.popper.forceUpdate();
     }
 }
 
