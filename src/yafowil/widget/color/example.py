@@ -113,6 +113,41 @@ def placement_example():
     }
 
 
+DOC_PLACEMENT_BS5 = """
+Placement
+---------
+
+The color widget can be initialized with a variety of placement options,
+which can be found in the <a href="https://popper.js.org/docs/v2/" target="_blank">Popper.js documentation</a>.
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='colorwidget',
+        props={
+            'label': 'Placement on right side',
+            'placement': 'right-start'
+        }
+    )
+"""
+
+
+def placement_example_bs5():
+    part = factory(u'fieldset', name='yafowil.widget.color.default')
+    part['color'] = factory(
+        '#field:color',
+        props={
+            'label': 'Placement on right side',
+            'placement': 'right-start'
+        })
+    return {
+        'widget': part,
+        'doc': DOC_PLACEMENT_BS5,
+        'title': 'Placement on right side'
+    }
+
+
 DOC_DIM = """
 Custom dimensions
 -----------------
@@ -676,7 +711,7 @@ def get_example():
     return [
         default_example(),
         wheel_example(),
-        placement_example(),
+        placement_example_bs5() if factory.theme == 'bootstrap5' else placement_example(),
         layout_example(),
         dim_example(),
         length_example(),

@@ -89,27 +89,8 @@ export class ColorPicker {
         } else {
             this.color = null;
         }
-        if (options.locked_swatches) {
-            this.locked_swatches = new LockedSwatchesContainer(
-                this,
-                options.locked_swatches
-            );
-        }
-        if (options.user_swatches) {
-            this.user_swatches = new UserSwatchesContainer(this);
-        }
-
-        let prev_elem;
-        if (options.preview_elem) {
-            prev_elem = $(options.preview_elem)
-                .addClass('yafowil-color-picker-preview');
-        } else {
-            let elem_width = this.elem.outerWidth();
-            prev_elem = $('<span />')
-                .addClass('yafowil-color-picker-color layer-transparent')
-                .css('left', `${elem_width}px`);
-        }
-        this.preview = new PreviewElement(this, prev_elem, this.color);
+        this.create_swatch_containers(options);
+        this.create_preview_element(options);
 
         this.open = this.open.bind(this);
         this.update_color = this.update_color.bind(this);
@@ -178,6 +159,32 @@ export class ColorPicker {
             }
         });
         return iro_opts;
+    }
+
+    create_swatch_containers(options) {
+        if (options.locked_swatches) {
+            this.locked_swatches = new LockedSwatchesContainer(
+                this,
+                options.locked_swatches
+            );
+        }
+        if (options.user_swatches) {
+            this.user_swatches = new UserSwatchesContainer(this);
+        }
+    }
+
+    create_preview_element(options) {
+        let prev_elem;
+        if (options.preview_elem) {
+            prev_elem = $(options.preview_elem)
+                .addClass('yafowil-color-picker-preview');
+        } else {
+            let elem_width = this.elem.outerWidth();
+            prev_elem = $('<span />')
+                .addClass('yafowil-color-picker-color layer-transparent')
+                .css('left', `${elem_width}px`);
+        }
+        this.preview = new PreviewElement(this, prev_elem, this.color);
     }
 
     place(placement, custom_preview) {
@@ -401,7 +408,7 @@ export class ColorWidget {
         elem.data('yafowil-color', this);
 
         this.elem = elem;
-        this.color_picker = new ColorPicker(elem, options);
+        this.create_color_picker(elem, options);
 
         this.temp = options.temperature || {min: 2000, max: 11000};
         this.input_elem = new InputElement(
@@ -417,6 +424,10 @@ export class ColorWidget {
         this.elem.on('color_close', (e) => {
             this.elem.blur();
         })
+    }
+
+    create_color_picker(elem, options) {
+        this.color_picker = new ColorPicker(elem, options);
     }
 }
 

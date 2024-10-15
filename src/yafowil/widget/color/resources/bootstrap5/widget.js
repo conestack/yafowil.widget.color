@@ -1,4 +1,4 @@
-var yafowil_color = (function (exports, $) {
+var yafowil_color = (function (exports, $, Popper) {
     'use strict';
 
     class ColorSwatch {
@@ -333,7 +333,21 @@ var yafowil_color = (function (exports, $) {
                 parseInt(value) == value) || (typeof value == 'number'));
     }
 
-    function lookup_callback(path) {
+    class BS5LockedSwatchesContainer extends LockedSwatchesContainer {
+        constructor (widget, swatches = []) {
+            super(widget, swatches);
+            this.elem.addClass('mt-3');
+        }
+    }
+    class BS5UserSwatchesContainer extends UserSwatchesContainer {
+        constructor (widget) {
+            super(widget);
+            this.elem.addClass('mt-3');
+            this.buttons.addClass('buttons mt-2');
+        }
+    }
+
+    function lookup_callback$1(path) {
         if (!path) {
             return null;
         }
@@ -691,8 +705,8 @@ var yafowil_color = (function (exports, $) {
                     slider_length: elem.data('slider_length'),
                     layout_direction: elem.data('layout_direction'),
                     open_on_focus: elem.data('open_on_focus'),
-                    on_update: lookup_callback(elem.data('on_update')),
-                    on_close: lookup_callback(elem.data('on_close'))
+                    on_update: lookup_callback$1(elem.data('on_update')),
+                    on_close: lookup_callback$1(elem.data('on_close'))
                 };
                 new ColorWidget(elem, options);
             });
@@ -719,8 +733,144 @@ var yafowil_color = (function (exports, $) {
             this.color_picker = new ColorPicker(elem, options);
         }
     }
+
+    function lookup_callback(path) {
+        if (!path) {
+            return null;
+        }
+        let source = path.split('.'),
+            cb = window,
+            name;
+        for (const idx in source) {
+            name = source[idx];
+            if (cb[name] === undefined) {
+                throw "'" + name + "' not found.";
+            }
+            cb = cb[name];
+        }
+        return cb;
+    }
+    class BS5ColorPicker extends ColorPicker {
+        constructor(elem, options) {
+            super(elem, options);
+            this.dropdown_elem.addClass('card card-body p-4 pb-3');
+            const popper_modifiers = [
+                {
+                    name: 'preventOverflow',
+                    options: {
+                        boundary: 'viewport',
+                        padding: 10
+                    },
+                },
+                {
+                    name: 'flip'
+                },
+            ];
+            this.popper = Popper.createPopper(this.elem[0], this.dropdown_elem[0], {
+                placement: options.placement,
+                flipVariations: true,
+                modifiers: popper_modifiers
+            });
+        }
+        create_swatch_containers(options) {
+            if (options.locked_swatches) {
+                this.locked_swatches = new BS5LockedSwatchesContainer(
+                    this,
+                    options.locked_swatches
+                );
+            }
+            if (options.user_swatches) {
+                this.user_swatches = new BS5UserSwatchesContainer(this);
+            }
+        }
+        create_preview_element(options) {
+            let prev_elem;
+            if (options.preview_elem) {
+                prev_elem = $(options.preview_elem)
+                    .addClass('yafowil-color-picker-preview');
+            } else {
+                prev_elem = $('<span />')
+                    .addClass('yafowil-color-picker-color layer-transparent');
+                Popper.createPopper(this.elem[0], prev_elem[0], {
+                    placement: "right",
+                    modifiers: [
+                        {
+                            name: 'offset',
+                            options: {
+                                offset: [0, 10],
+                            },
+                        },
+                        {
+                            name: 'preventOverflow',
+                            options: {
+                                mainAxis: false
+                            },
+                        },
+                        {
+                            name: 'flip',
+                            options: {
+                                flipVariations: false
+                            }
+                        }
+                    ]
+                });
+            }
+            this.preview = new PreviewElement(this, prev_elem, this.color);
+        }
+        place() {
+        }
+        open(evt) {
+            if (this.dropdown_elem.css('display') === 'none') {
+                this.dropdown_elem.show();
+                $(window).on('keydown', this.on_keydown);
+                $(window).on('mousedown', this.on_click);
+            } else {
+                this.close();
+            }
+        }
+    }
+    class BS5ColorWidget extends ColorWidget {
+        static initialize(context) {
+            $('input.color-picker', context).each(function() {
+                let elem = $(this);
+                if (window.yafowil_array !== undefined &&
+                    window.yafowil_array.inside_template(elem)) {
+                    return;
+                }
+                let options = {
+                    format: elem.data('format'),
+                    placement: elem.data('placement'),
+                    auto_align: elem.data('auto_align'),
+                    preview_elem: elem.data('preview_elem'),
+                    sliders: elem.data('sliders'),
+                    box_width: elem.data('box_width'),
+                    box_height: elem.data('box_height'),
+                    slider_size: elem.data('slider_size'),
+                    color: elem.val(),
+                    locked_swatches: elem.data('locked_swatches'),
+                    user_swatches: elem.data('user_swatches'),
+                    temperature: elem.data('temperature'),
+                    disabled: elem.data('disabled'),
+                    show_inputs: elem.data('show_inputs'),
+                    show_labels: elem.data('show_labels'),
+                    slider_length: elem.data('slider_length'),
+                    layout_direction: elem.data('layout_direction'),
+                    open_on_focus: elem.data('open_on_focus'),
+                    on_update: lookup_callback(elem.data('on_update')),
+                    on_close: lookup_callback(elem.data('on_close'))
+                };
+                new BS5ColorWidget(elem, options);
+            });
+        }
+        constructor(elem, options) {
+            super(elem, options);
+        }
+        create_color_picker(elem, options) {
+            this.color_picker = new BS5ColorPicker(elem, options);
+        }
+    }
     function color_on_array_add(inst, context) {
-        ColorWidget.initialize(context);
+        BS5ColorWidget.initialize(context);
     }
     function register_array_subscribers() {
         if (window.yafowil_array === undefined) {
@@ -731,17 +881,17 @@ var yafowil_color = (function (exports, $) {
 
     $(function() {
         if (window.ts !== undefined) {
-            ts.ajax.register(ColorWidget.initialize, true);
+            ts.ajax.register(BS5ColorWidget.initialize, true);
         } else if (window.bdajax !== undefined) {
-            bdajax.register(ColorWidget.initialize, true);
+            bdajax.register(BS5ColorWidget.initialize, true);
         } else {
-            ColorWidget.initialize();
+            BS5ColorWidget.initialize();
         }
         register_array_subscribers();
     });
 
-    exports.ColorPicker = ColorPicker;
-    exports.ColorWidget = ColorWidget;
+    exports.BS5ColorPicker = BS5ColorPicker;
+    exports.BS5ColorWidget = BS5ColorWidget;
     exports.lookup_callback = lookup_callback;
     exports.register_array_subscribers = register_array_subscribers;
 
@@ -754,4 +904,4 @@ var yafowil_color = (function (exports, $) {
 
     return exports;
 
-})({}, jQuery);
+})({}, jQuery, Popper);
