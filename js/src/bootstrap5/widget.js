@@ -6,9 +6,9 @@ import {
 } from './components.js';
 import {
     PreviewElement
-} from '../components.js';
-import { ColorPicker } from '../widget.js';
-import { ColorWidget } from '../widget.js';
+} from '../default/components.js';
+import { ColorPicker } from '../default/widget.js';
+import { ColorWidget } from '../default/widget.js';
 
 export function lookup_callback(path) {
     if (!path) {

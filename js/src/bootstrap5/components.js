@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import { LockedSwatchesContainer } from '../components.js';
-import { UserSwatchesContainer } from '../components.js';
+import { LockedSwatchesContainer } from '../default/components.js';
+import { UserSwatchesContainer } from '../default/components.js';
 
 export class BS5LockedSwatchesContainer extends LockedSwatchesContainer {
 

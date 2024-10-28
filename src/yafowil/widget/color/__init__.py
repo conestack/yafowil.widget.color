@@ -28,12 +28,12 @@ resources.add(wr.ScriptResource(
 resources.add(wr.ScriptResource(
     name='yafowil-color-js',
     depends=['jquery-js', 'iro-js'],
-    resource='widget.js',
-    compressed='widget.min.js'
+    resource='default/widget.js',
+    compressed='default/widget.min.js'
 ))
 resources.add(wr.StyleResource(
     name='yafowil-color-css',
-    resource='widget.css'
+    resource='default/widget.css'
 ))
 
 # B/C resources ##############################################################
@@ -44,12 +44,12 @@ js = [{
     'order': 20,
 }, {
     'group': 'yafowil.widget.color.common',
-    'resource': 'widget.js',
+    'resource': 'default/widget.js',
     'order': 21,
 }]
 css = [{
     'group': 'yafowil.widget.color.common',
-    'resource': 'widget.css',
+    'resource': 'default/widget.css',
     'order': 21,
 }]
 
