@@ -1,5 +1,5 @@
-from .widget import ColorDatatypeConverter
-from .widget import color_builder
+from ..widget import ColorDatatypeConverter
+from ..widget import color_builder
 from importlib import reload
 from node.utils import UNSET
 from yafowil.base import ExtractionError
