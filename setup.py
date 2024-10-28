@@ -8,7 +8,7 @@ def read_file(name):
         return f.read()
 
 
-version = '1.0.dev0'
+version = '1.0a3.dev0'
 shortdesc = 'Color picker widget for YAFOWIL'
 longdesc = '\n\n'.join([read_file(name) for name in [
     'README.rst',
@@ -47,15 +47,10 @@ setup(
         'setuptools',
         'yafowil>2.2',
     ],
-    tests_require=[
-        'lxml',
-        'zope.testrunner'
-    ],
     extras_require=dict(test=[
         'lxml',
-        'zope.testrunner'
+        'pytest'
     ]),
-    test_suite="yafowil.widget.color.tests",
     entry_points="""
     [yafowil.plugin]
     register = yafowil.widget.color:register

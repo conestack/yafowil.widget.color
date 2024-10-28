@@ -544,7 +544,6 @@ var yafowil_color = (function (exports, $) {
                     break;
                 case 'bottom':
                     left = 0;
-                    console.log(this.elem.outerHeight());
                     top = auto_place(-this.elem.outerHeight(), 0);
                     break;
                 case 'static':

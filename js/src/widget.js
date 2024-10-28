@@ -30,10 +30,10 @@ export class ColorPicker {
         this.elem = elem;
 
         if (options.on_update) {
-            this.elem.on('color_update', options.on_update)
+            this.elem.on('color_update', options.on_update);
         }
         if (options.on_close) {
-            this.elem.on('color_close', options.on_close)
+            this.elem.on('color_close', options.on_close);
         }
 
         this.dropdown_elem = $('<div />')

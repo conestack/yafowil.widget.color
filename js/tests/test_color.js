@@ -2,16 +2,26 @@ import {ColorWidget, lookup_callback} from '../src/widget.js';
 import {ColorSwatch, LockedSwatchesContainer} from '../src/components.js';
 import {register_array_subscribers} from '../src/widget.js';
 import $ from 'jquery';
+import 'iro';
 
 let elem = $('<input class="color-picker"/>');
 let widget;
+let css_link;
 
 QUnit.module('ColorWidget', hooks => {
     let _array_subscribers = {
         on_add: []
     };
 
-    hooks.before(() => {
+    hooks.before(async () => {
+        css_link = document.createElement('link');
+        css_link.rel = 'stylesheet';
+        css_link.href = '../../src/yafowil/widget/color/resources/widget.css';
+        document.head.appendChild(css_link);
+        // Wait for required styles to load
+        await new Promise(resolve => {
+            css_link.onload = resolve;
+        });
         $('body').append('<div id="container" />');
     });
     hooks.beforeEach(() => {
@@ -30,6 +40,10 @@ QUnit.module('ColorWidget', hooks => {
     hooks.after(() => {
         $('#container').empty().remove();
         _array_subscribers = null;
+        // remove required css styles after test run has finished
+        if (css_link) {
+            document.head.removeChild(css_link);
+        }
     });
 
     QUnit.test('initialize', assert => {
