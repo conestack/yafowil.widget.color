@@ -27,13 +27,15 @@ resources.add(wr.ScriptResource(
 ))
 resources.add(wr.ScriptResource(
     name='yafowil-color-js',
+    directory=os.path.join(resources_dir, 'default'),
     depends=['jquery-js', 'iro-js'],
-    resource='default/widget.js',
-    compressed='default/widget.min.js'
+    resource='widget.js',
+    compressed='widget.min.js'
 ))
 resources.add(wr.StyleResource(
     name='yafowil-color-css',
-    resource='default/widget.css'
+    directory=os.path.join(resources_dir, 'default'),
+    resource='widget.min.css'
 ))
 
 # B/C resources ##############################################################
@@ -49,7 +51,7 @@ js = [{
 }]
 css = [{
     'group': 'yafowil.widget.color.common',
-    'resource': 'default/widget.css',
+    'resource': 'default/widget.min.css',
     'order': 21,
 }]
 
@@ -73,13 +75,15 @@ bootstrap5_resources.add(wr.ScriptResource(
 ))
 bootstrap5_resources.add(wr.ScriptResource(
     name='yafowil-color-js',
+    directory=os.path.join(resources_dir, 'bootstrap5'),
     depends=['jquery-js', 'iro-js'],
-    resource='bootstrap5/widget.js',
-    compressed='bootstrap5/widget.min.js'
+    resource='widget.js',
+    compressed='widget.min.js'
 ))
 bootstrap5_resources.add(wr.StyleResource(
     name='yafowil-color-css',
-    resource='bootstrap5/widget.css'
+    directory=os.path.join(resources_dir, 'bootstrap5'),
+    resource='widget.min.css'
 ))
 
 # B/C resources ##############################################################
@@ -95,7 +99,7 @@ bootstrap5_js = [{
 }]
 bootstrap5_css = [{
     'group': 'yafowil.widget.color.common',
-    'resource': 'bootstrap5/widget.css',
+    'resource': 'bootstrap5/widget.min.css',
     'order': 20,
 }]
 

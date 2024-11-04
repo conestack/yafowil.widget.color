@@ -16,7 +16,7 @@ QUnit.module('ColorWidget', hooks => {
     hooks.before(async () => {
         css_link = document.createElement('link');
         css_link.rel = 'stylesheet';
-        css_link.href = '../../src/yafowil/widget/color/resources/default/widget.css';
+        css_link.href = '../../src/yafowil/widget/color/resources/default/widget.min.css';
         document.head.appendChild(css_link);
         // Wait for required styles to load
         await new Promise(resolve => {
