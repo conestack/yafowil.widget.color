@@ -28,6 +28,7 @@ resources.add(wr.ScriptResource(
 resources.add(wr.ScriptResource(
     name='yafowil-color-js',
     directory=os.path.join(resources_dir, 'default'),
+    path='yafowil-color/default',
     depends=['jquery-js', 'iro-js'],
     resource='widget.js',
     compressed='widget.min.js'
@@ -35,6 +36,7 @@ resources.add(wr.ScriptResource(
 resources.add(wr.StyleResource(
     name='yafowil-color-css',
     directory=os.path.join(resources_dir, 'default'),
+    path='yafowil-color/default',
     resource='widget.min.css'
 ))
 
@@ -76,6 +78,7 @@ bootstrap5_resources.add(wr.ScriptResource(
 bootstrap5_resources.add(wr.ScriptResource(
     name='yafowil-color-js',
     directory=os.path.join(resources_dir, 'bootstrap5'),
+    path='yafowil-color/bootstrap5',
     depends=['jquery-js', 'iro-js'],
     resource='widget.js',
     compressed='widget.min.js'
@@ -83,6 +86,7 @@ bootstrap5_resources.add(wr.ScriptResource(
 bootstrap5_resources.add(wr.StyleResource(
     name='yafowil-color-css',
     directory=os.path.join(resources_dir, 'bootstrap5'),
+    path='yafowil-color/bootstrap5',
     resource='widget.min.css'
 ))
 
