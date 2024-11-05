@@ -1,27 +1,23 @@
 import $ from 'jquery';
 import Popper from 'popper';
-import {
-    BS5LockedSwatchesContainer,
-    BS5UserSwatchesContainer
-} from './components.js';
-import {
-    PreviewElement
-} from '../default/components.js';
+import { BS5LockedSwatchesContainer, BS5UserSwatchesContainer } from './components.js';
+import { PreviewElement } from '../default/components.js';
 import { ColorPicker } from '../default/widget.js';
 import { ColorWidget } from '../default/widget.js';
 
+/**
+ * Retrieves a callback function from a given string path in `window` object.
+ * 
+ * @param {string} path - Dot-separated path to the desired function.
+ * @returns {Function|null} - The callback function, or null if path is empty.
+ * @throws Will throw an error if a part of the path is undefined.
+ */
 export function lookup_callback(path) {
-    if (!path) {
-        return null;
-    }
-    let source = path.split('.'),
-        cb = window,
-        name;
+    if (!path) return null;
+    let source = path.split('.'), cb = window, name;
     for (const idx in source) {
         name = source[idx];
-        if (cb[name] === undefined) {
-            throw "'" + name + "' not found.";
-        }
+        if (cb[name] === undefined) throw `'${name}' not found.`;
         cb = cb[name];
     }
     return cb;
@@ -29,22 +25,17 @@ export function lookup_callback(path) {
 
 export class BS5ColorPicker extends ColorPicker {
 
+    /**
+     * @param {jQuery} elem - Color picker input element.
+     * @param {Object} options - Configuration options.
+     */
     constructor(elem, options) {
         super(elem, options);
         this.dropdown_elem.addClass('card card-body p-4 pb-3');
 
-        // Dropdown Popper
         const popper_modifiers = [
-            {
-                name: 'preventOverflow',
-                options: {
-                    boundary: 'viewport',
-                    padding: 10
-                },
-            },
-            {
-                name: 'flip'
-            },
+            { name: 'preventOverflow', options: { boundary: 'viewport', padding: 10 } },
+            { name: 'flip' }
         ];
         this.popper = Popper.createPopper(this.elem[0], this.dropdown_elem[0], {
             placement: options.placement,
@@ -53,59 +44,42 @@ export class BS5ColorPicker extends ColorPicker {
         });
     }
 
+    /**
+     * Creates containers for locked and user-added color swatches.
+     */
     create_swatch_containers(options) {
         if (options.locked_swatches) {
-            this.locked_swatches = new BS5LockedSwatchesContainer(
-                this,
-                options.locked_swatches
-            );
+            this.locked_swatches = new BS5LockedSwatchesContainer(this, options.locked_swatches);
         }
         if (options.user_swatches) {
             this.user_swatches = new BS5UserSwatchesContainer(this);
         }
     }
 
+    /**
+     * Creates the color preview element for the picker.
+     */
     create_preview_element(options) {
         let prev_elem;
         if (options.preview_elem) {
-            prev_elem = $(options.preview_elem)
-                .addClass('yafowil-color-picker-preview');
+            prev_elem = $(options.preview_elem).addClass('yafowil-color-picker-preview');
         } else {
-            prev_elem = $('<span />')
-                .addClass('yafowil-color-picker-color layer-transparent');
-
-            // Popper should automaticall cleanup, no unbind necessary
+            prev_elem = $('<span />').addClass('yafowil-color-picker-color layer-transparent');
             Popper.createPopper(this.elem[0], prev_elem[0], {
                 placement: "right",
                 modifiers: [
-                    {
-                        name: 'offset',
-                        options: {
-                            offset: [0, 10],
-                        },
-                    },
-                    {
-                        name: 'preventOverflow',
-                        options: {
-                            mainAxis: false
-                        },
-                    },
-                    {
-                        name: 'flip',
-                        options: {
-                            flipVariations: false
-                        }
-                    }
+                    { name: 'offset', options: { offset: [0, 10] } },
+                    { name: 'preventOverflow', options: { mainAxis: false } },
+                    { name: 'flip', options: { flipVariations: false } }
                 ]
             });
         }
         this.preview = new PreviewElement(this, prev_elem, this.color);
     }
 
-    place() {
-        // ...
-    }
-
+    /**
+     * Opens the color picker dropdown.
+     */
     open(evt) {
         if (this.dropdown_elem.css('display') === 'none') {
             this.dropdown_elem.show();
@@ -120,11 +94,13 @@ export class BS5ColorPicker extends ColorPicker {
 
 export class BS5ColorWidget extends ColorWidget {
 
+    /**
+     * @param {HTMLElement} context - DOM context for initialization.
+     */
     static initialize(context) {
         $('input.color-picker', context).each(function() {
             let elem = $(this);
-            if (window.yafowil_array !== undefined &&
-                window.yafowil_array.inside_template(elem)) {
+            if (window.yafowil_array !== undefined && window.yafowil_array.inside_template(elem)) {
                 return;
             }
             let options = {
@@ -153,10 +129,17 @@ export class BS5ColorWidget extends ColorWidget {
         });
     }
 
+    /**
+     * @param {jQuery} elem - The widget input element.
+     * @param {Object} options - Configuration options.
+     */
     constructor(elem, options) {
         super(elem, options);
     }
 
+    /**
+     * Creates an instance of BS5ColorPicker with specified options.
+     */
     create_color_picker(elem, options) {
         this.color_picker = new BS5ColorPicker(elem, options);
     }
@@ -166,13 +149,17 @@ export class BS5ColorWidget extends ColorWidget {
 // yafowil.widget.array integration
 //////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Re-initializes widget on array add event.
+ */
 function color_on_array_add(inst, context) {
     BS5ColorWidget.initialize(context);
 }
 
+/**
+ * Registers subscribers to yafowil array events.
+ */
 export function register_array_subscribers() {
-    if (window.yafowil_array === undefined) {
-        return;
-    }
+    if (window.yafowil_array === undefined) return;
     window.yafowil_array.on_array_event('on_add', color_on_array_add);
 }
