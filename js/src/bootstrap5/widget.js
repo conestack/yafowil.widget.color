@@ -26,13 +26,14 @@ export function lookup_callback(path) {
 export class BS5ColorPicker extends ColorPicker {
 
     /**
-     * @param {jQuery} elem - Color picker input element.
+     * @param {jQuery} elem    - Color picker input element.
      * @param {Object} options - Configuration options.
      */
     constructor(elem, options) {
         super(elem, options);
         this.dropdown_elem.addClass('card card-body p-4 pb-3');
 
+        // create dropdown Popper instance
         const popper_modifiers = [
             { name: 'preventOverflow', options: { boundary: 'viewport', padding: 10 } },
             { name: 'flip' }
@@ -49,7 +50,8 @@ export class BS5ColorPicker extends ColorPicker {
      */
     create_swatch_containers(options) {
         if (options.locked_swatches) {
-            this.locked_swatches = new BS5LockedSwatchesContainer(this, options.locked_swatches);
+            this.locked_swatches =
+                new BS5LockedSwatchesContainer(this, options.locked_swatches);
         }
         if (options.user_swatches) {
             this.user_swatches = new BS5UserSwatchesContainer(this);
@@ -62,9 +64,13 @@ export class BS5ColorPicker extends ColorPicker {
     create_preview_element(options) {
         let prev_elem;
         if (options.preview_elem) {
-            prev_elem = $(options.preview_elem).addClass('yafowil-color-picker-preview');
+            prev_elem = $(options.preview_elem)
+                .addClass('yafowil-color-picker-preview');
         } else {
-            prev_elem = $('<span />').addClass('yafowil-color-picker-color layer-transparent');
+            prev_elem = $('<span />')
+                .addClass('yafowil-color-picker-color layer-transparent');
+
+            // create preview element Popper instance
             Popper.createPopper(this.elem[0], prev_elem[0], {
                 placement: "right",
                 modifiers: [
@@ -100,7 +106,10 @@ export class BS5ColorWidget extends ColorWidget {
     static initialize(context) {
         $('input.color-picker', context).each(function() {
             let elem = $(this);
-            if (window.yafowil_array !== undefined && window.yafowil_array.inside_template(elem)) {
+            if (
+                window.yafowil_array !== undefined
+                && window.yafowil_array.inside_template(elem)
+            ) {
                 return;
             }
             let options = {
