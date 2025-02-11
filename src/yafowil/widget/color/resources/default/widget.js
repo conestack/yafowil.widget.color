@@ -714,6 +714,12 @@ var yafowil_color = (function (exports, $) {
             this.elem.on('color_close', (e) => {
                 this.elem.blur();
             });
+            if (window.ts !== undefined) {
+                window.ts.ajax.attach(this, elem);
+            }
+        }
+        destroy() {
+            this.color_picker.dropdown_elem.remove();
         }
         create_color_picker(elem, options) {
             this.color_picker = new ColorPicker(elem, options);

@@ -334,13 +334,13 @@ var yafowil_color = (function (exports, $, Popper) {
     }
 
     class BS5LockedSwatchesContainer extends LockedSwatchesContainer {
-        constructor (widget, swatches = []) {
+        constructor(widget, swatches = []) {
             super(widget, swatches);
             this.elem.addClass('mt-3');
         }
     }
     class BS5UserSwatchesContainer extends UserSwatchesContainer {
-        constructor (widget) {
+        constructor(widget) {
             super(widget);
             this.elem.addClass('mt-3');
             this.buttons.addClass('buttons mt-2');
@@ -728,6 +728,12 @@ var yafowil_color = (function (exports, $, Popper) {
             this.elem.on('color_close', (e) => {
                 this.elem.blur();
             });
+            if (window.ts !== undefined) {
+                window.ts.ajax.attach(this, elem);
+            }
+        }
+        destroy() {
+            this.color_picker.dropdown_elem.remove();
         }
         create_color_picker(elem, options) {
             this.color_picker = new ColorPicker(elem, options);
@@ -735,17 +741,11 @@ var yafowil_color = (function (exports, $, Popper) {
     }
 
     function lookup_callback(path) {
-        if (!path) {
-            return null;
-        }
-        let source = path.split('.'),
-            cb = window,
-            name;
+        if (!path) return null;
+        let source = path.split('.'), cb = window, name;
         for (const idx in source) {
             name = source[idx];
-            if (cb[name] === undefined) {
-                throw "'" + name + "' not found.";
-            }
+            if (cb[name] === undefined) throw `'${name}' not found.`;
             cb = cb[name];
         }
         return cb;
@@ -755,16 +755,8 @@ var yafowil_color = (function (exports, $, Popper) {
             super(elem, options);
             this.dropdown_elem.addClass('card card-body p-4 pb-3');
             const popper_modifiers = [
-                {
-                    name: 'preventOverflow',
-                    options: {
-                        boundary: 'viewport',
-                        padding: 10
-                    },
-                },
-                {
-                    name: 'flip'
-                },
+                { name: 'preventOverflow', options: { boundary: 'viewport', padding: 10 } },
+                { name: 'flip' }
             ];
             this.popper = Popper.createPopper(this.elem[0], this.dropdown_elem[0], {
                 placement: options.placement,
@@ -774,10 +766,8 @@ var yafowil_color = (function (exports, $, Popper) {
         }
         create_swatch_containers(options) {
             if (options.locked_swatches) {
-                this.locked_swatches = new BS5LockedSwatchesContainer(
-                    this,
-                    options.locked_swatches
-                );
+                this.locked_swatches =
+                    new BS5LockedSwatchesContainer(this, options.locked_swatches);
             }
             if (options.user_swatches) {
                 this.user_swatches = new BS5UserSwatchesContainer(this);
@@ -794,30 +784,13 @@ var yafowil_color = (function (exports, $, Popper) {
                 Popper.createPopper(this.elem[0], prev_elem[0], {
                     placement: "right",
                     modifiers: [
-                        {
-                            name: 'offset',
-                            options: {
-                                offset: [0, 10],
-                            },
-                        },
-                        {
-                            name: 'preventOverflow',
-                            options: {
-                                mainAxis: false
-                            },
-                        },
-                        {
-                            name: 'flip',
-                            options: {
-                                flipVariations: false
-                            }
-                        }
+                        { name: 'offset', options: { offset: [0, 10] } },
+                        { name: 'preventOverflow', options: { mainAxis: false } },
+                        { name: 'flip', options: { flipVariations: false } }
                     ]
                 });
             }
             this.preview = new PreviewElement(this, prev_elem, this.color);
-        }
-        place() {
         }
         open(evt) {
             if (this.dropdown_elem.css('display') === 'none') {
@@ -834,8 +807,10 @@ var yafowil_color = (function (exports, $, Popper) {
         static initialize(context) {
             $('input.color-picker', context).each(function() {
                 let elem = $(this);
-                if (window.yafowil_array !== undefined &&
-                    window.yafowil_array.inside_template(elem)) {
+                if (
+                    window.yafowil_array !== undefined
+                    && window.yafowil_array.inside_template(elem)
+                ) {
                     return;
                 }
                 let options = {
@@ -874,9 +849,7 @@ var yafowil_color = (function (exports, $, Popper) {
         BS5ColorWidget.initialize(context);
     }
     function register_array_subscribers() {
-        if (window.yafowil_array === undefined) {
-            return;
-        }
+        if (window.yafowil_array === undefined) return;
         window.yafowil_array.on_array_event('on_add', color_on_array_add);
     }
 

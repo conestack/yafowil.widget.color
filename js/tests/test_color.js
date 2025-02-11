@@ -1097,4 +1097,11 @@ QUnit.module('ColorWidget', hooks => {
         assert.strictEqual(widget.elem.attr('maxlength'), "9");
         assert.true(widget.color_picker.type_alpha);
     });
+
+    QUnit.test('destroy', assert => {
+        widget = new ColorWidget(elem, {});
+        assert.strictEqual($('.color-picker-wrapper').length, 1);
+        widget.destroy();
+        assert.strictEqual($('.color-picker-wrapper').length, 0);
+    });
 });
