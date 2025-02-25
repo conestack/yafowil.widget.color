@@ -367,6 +367,27 @@ export class ColorPicker {
             return true;
         }
     }
+
+    destroy() {
+        this.elem.off('color_update');
+        this.elem.off('color_close');
+        if (this.switch_btn) {
+            this.switch_btn.off('click');
+            this.picker.off('color:change', this.update_color);
+            this.close_btn.off('click', this.close);
+        }
+        if (this.locked_swatches) {
+            this.locked_swatches.destroy();
+        }
+        if (this.user_swatches) {
+            this.user_swatches.destroy();
+        }
+        this.locked_swatches = null;
+        this.user_swatches = null;
+        this.color = null;
+        this.preview = null;
+        this.picker = null;
+    }
 }
 
 export class ColorWidget {
@@ -430,7 +451,13 @@ export class ColorWidget {
     }
 
     destroy() {
-        this.color_picker.dropdown_elem.remove();
+        this.input_elem.destroy();
+        this.color_picker.destroy();
+        this.elem.off('color_update');
+        this.elem.off('color_close');
+        this.elem.removeData('yafowil-color');
+        this.input_elem = null;
+        this.color_picker = null;
     }
 
     create_color_picker(elem, options) {

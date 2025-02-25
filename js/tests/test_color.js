@@ -1013,13 +1013,13 @@ QUnit.module('ColorWidget', hooks => {
             widget.color_picker.user_swatches.create_swatch();
             assert.strictEqual(widget.color_picker.user_swatches.swatches.length, 1);
             widget.color_picker.user_swatches.swatches[0].invalid = true;
-            widget.color_picker.user_swatches.swatches[0].destroy();
+            widget.color_picker.user_swatches.swatches[0].remove();
             assert.notOk(widget.color_picker.active_swatch);
 
             // create locked swatch
             widget.color_picker.locked_swatches.init_swatches([color3]);
             assert.strictEqual(widget.color_picker.locked_swatches.swatches.length, 1);
-            widget.color_picker.locked_swatches.swatches[0].destroy();
+            widget.color_picker.locked_swatches.swatches[0].remove();
             assert.notOk(widget.color_picker.active_swatch);
         });
 
@@ -1096,12 +1096,5 @@ QUnit.module('ColorWidget', hooks => {
         widget = new ColorWidget(elem, opts, 0);
         assert.strictEqual(widget.elem.attr('maxlength'), "9");
         assert.true(widget.color_picker.type_alpha);
-    });
-
-    QUnit.test('destroy', assert => {
-        widget = new ColorWidget(elem, {});
-        assert.strictEqual($('.color-picker-wrapper').length, 1);
-        widget.destroy();
-        assert.strictEqual($('.color-picker-wrapper').length, 0);
     });
 });

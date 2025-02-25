@@ -71,7 +71,7 @@ export class BS5ColorPicker extends ColorPicker {
                 .addClass('yafowil-color-picker-color layer-transparent');
 
             // create preview element Popper instance
-            Popper.createPopper(this.elem[0], prev_elem[0], {
+            this.preview_popper = Popper.createPopper(this.elem[0], prev_elem[0], {
                 placement: "right",
                 modifiers: [
                     { name: 'offset', options: { offset: [0, 10] } },
@@ -95,6 +95,21 @@ export class BS5ColorPicker extends ColorPicker {
             this.close();
         }
         this.popper.forceUpdate();
+    }
+
+    /**
+     * Destroys the color picker and removes event listeners.
+     */
+    destroy() {
+        this.popper.destroy();
+        if (this.preview_popper) {
+            this.preview_popper.destroy();
+        }
+        $(window).off('keydown', this.on_keydown);
+        $(window).off('mousedown', this.on_click);
+        super.destroy();
+        this.popper = null;
+        this.preview_popper = null;
     }
 }
 
