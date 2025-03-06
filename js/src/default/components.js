@@ -383,7 +383,8 @@ export class PreviewElement {
     }
 
     destroy() {
-        this.elem.off('click', this.on_click);
+        this.layer.remove();
+        this.elem.off('click', this.on_click).remove();
         this.widget = null;
         this.color = null;
     }

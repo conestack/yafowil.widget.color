@@ -507,6 +507,7 @@ color_options = [
     'sliders',
     'placement',
     'auto_align',
+    'strategy',
     'box_width',
     'box_height',
     'slider_size',
@@ -593,6 +594,12 @@ factory.doc['props']['color.auto_align'] = """\
 Whether the color picker's dropdown will change placement depending on available
 space.
 Values: [True|False]
+"""
+
+factory.defaults['color.strategy'] = 'absolute'
+factory.doc['props']['color.strategy'] = """\
+Popper.js positioning strategy.
+Values: ['absolute' | 'fixed'].
 """
 
 factory.defaults['color.format'] = 'hex'

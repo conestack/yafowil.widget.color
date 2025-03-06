@@ -41,7 +41,8 @@ export class BS5ColorPicker extends ColorPicker {
         this.popper = Popper.createPopper(this.elem[0], this.dropdown_elem[0], {
             placement: options.placement,
             flipVariations: true,
-            modifiers: popper_modifiers
+            modifiers: popper_modifiers,
+            strategy: options.strategy
         });
     }
 
@@ -72,10 +73,13 @@ export class BS5ColorPicker extends ColorPicker {
 
             // create preview element Popper instance
             this.preview_popper = Popper.createPopper(this.elem[0], prev_elem[0], {
-                placement: "right",
+                placement: 'right',
+                strategy: 'fixed',
                 modifiers: [
                     { name: 'offset', options: { offset: [0, 10] } },
-                    { name: 'preventOverflow', options: { mainAxis: false } },
+                    { name: 'preventOverflow', options: {
+                        mainAxis: false
+                    } },
                     { name: 'flip', options: { flipVariations: false } }
                 ]
             });
@@ -95,6 +99,11 @@ export class BS5ColorPicker extends ColorPicker {
             this.close();
         }
         this.popper.forceUpdate();
+        this.preview_popper.forceUpdate();
+    }
+
+    place(placement, custom_preview) {
+        // ...
     }
 
     /**
@@ -107,9 +116,9 @@ export class BS5ColorPicker extends ColorPicker {
         }
         $(window).off('keydown', this.on_keydown);
         $(window).off('mousedown', this.on_click);
-        super.destroy();
         this.popper = null;
         this.preview_popper = null;
+        super.destroy();
     }
 }
 
@@ -131,6 +140,7 @@ export class BS5ColorWidget extends ColorWidget {
                 format: elem.data('format'),
                 placement: elem.data('placement'),
                 auto_align: elem.data('auto_align'),
+                strategy: elem.data('strategy'),
                 preview_elem: elem.data('preview_elem'),
                 sliders: elem.data('sliders'),
                 box_width: elem.data('box_width'),

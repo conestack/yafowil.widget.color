@@ -341,7 +341,8 @@ var yafowil_color = (function (exports, $) {
             this.widget.open();
         }
         destroy() {
-            this.elem.off('click', this.on_click);
+            this.layer.remove();
+            this.elem.off('click', this.on_click).remove();
             this.widget = null;
             this.color = null;
         }
@@ -383,9 +384,11 @@ var yafowil_color = (function (exports, $) {
         constructor(elem, options) {
             this.elem = elem;
             if (options.on_update) {
+                this._on_update = options.on_update;
                 this.elem.on('color_update', options.on_update);
             }
             if (options.on_close) {
+                this._on_close = options.on_close;
                 this.elem.on('color_close', options.on_close);
             }
             this.dropdown_elem = $('<div />')
@@ -410,15 +413,12 @@ var yafowil_color = (function (exports, $) {
                 } else {
                     $('div.IroBox', this.picker_container).hide();
                 }
+                this.toggle_widget = this.toggle_widget.bind(this);
                 this.switch_btn = $('<button />')
                     .addClass('iro-switch-toggle')
                     .append($('<i class="glyphicon glyphicon-refresh" />'))
                     .appendTo(this.dropdown_elem);
-                this.switch_btn.on('click', (e) => {
-                    e.preventDefault();
-                    $('div.IroWheel', this.picker_container).toggle();
-                    $('div.IroBox', this.picker_container).toggle();
-                });
+                this.switch_btn.on('click', this.toggle_widget);
             } else if (!sliders) {
                 this.picker_container.hide();
             }
@@ -693,14 +693,24 @@ var yafowil_color = (function (exports, $) {
                 return true;
             }
         }
+        toggle_widget(e) {
+            e.preventDefault();
+            $('div.IroWheel', this.picker_container).toggle();
+            $('div.IroBox', this.picker_container).toggle();
+        }
         destroy() {
-            this.elem.off('color_update');
-            this.elem.off('color_close');
-            if (this.switch_btn) {
-                this.switch_btn.off('click');
-                this.picker.off('color:change', this.update_color);
-                this.close_btn.off('click', this.close);
+            this.preview.destroy();
+            if (this._on_update) {
+                this.elem.off('color_update', this._on_update);
             }
+            if (this._on_close) {
+                this.elem.off('color_close', this._on_close);
+            }
+            if (this.switch_btn) {
+                this.switch_btn.off('click', this.toggle_widget);
+            }
+            this.picker.off('color:change', this.update_color);
+            this.close_btn.off('click', this.close);
             if (this.locked_swatches) {
                 this.locked_swatches.destroy();
             }
@@ -712,6 +722,7 @@ var yafowil_color = (function (exports, $) {
             this.color = null;
             this.preview = null;
             this.picker = null;
+            this.dropdown_elem.remove();
         }
     }
     class ColorWidget {
@@ -758,22 +769,27 @@ var yafowil_color = (function (exports, $) {
             if (options.open_on_focus) {
                 this.elem.on('focus', this.color_picker.open);
             }
-            this.elem.on('color_update', (e) => {
-                this.input_elem.update_color(this.color_picker.color);
-            });
-            this.elem.on('color_close', (e) => {
-                this.elem.blur();
-            });
+            this.update_color = this.update_color.bind(this);
+            this.elem.on('color_update', this.update_color);
+            this.blur_elem = this.blur_elem.bind(this);
+            this.elem.on('color_close', this.blur_elem);
             if (window.ts !== undefined) {
                 window.ts.ajax.attach(this, elem);
             }
         }
+        update_color(e) {
+            this.input_elem.update_color(this.color_picker.color);
+        }
+        blur_elem(e) {
+            this.elem.blur();
+        }
         destroy() {
             this.input_elem.destroy();
             this.color_picker.destroy();
-            this.elem.off('color_update');
-            this.elem.off('color_close');
+            this.elem.off('color_update', this.update_color);
+            this.elem.off('color_close', this.blur_elem);
             this.elem.removeData('yafowil-color');
+            this.elem.remove();
             this.input_elem = null;
             this.color_picker = null;
         }
