@@ -4,7 +4,23 @@ Changes
 1.0a3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add ``strategy`` widget property for positioning dropdown via popper.js.
+  [lenadax]
+
+- Update jQuery to version ``4.0.0-beta.2``.
+  [lenadax]
+
+- Use rollup for bundling scss. Use ``make rollup`` to compile js and scss.
+  [lenadax]
+
+- Use ``webtestrunner`` instead of ``karma`` for js tests. Use ``make wtr`` to run tests.
+  [lenadax]
+
+- Use ``pnpm`` as package manager.
+  [lenadax]
+
+- Add ``placement`` and ``auto-align`` widget properties.
+  [lenadax]
 
 
 1.0a2 (2024-02-12)
