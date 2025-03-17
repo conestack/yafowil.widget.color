@@ -328,7 +328,9 @@ var yafowil_color = (function (exports, $) {
                 .insertAfter(this.widget.elem);
             this.color = color ? color.rgbaString : undefined;
             this.on_click = this.on_click.bind(this);
-            this.elem.on('click', this.on_click);
+            if (!this.widget.elem.attr('disabled')) {
+                this.elem.on('click', this.on_click);
+            }
         }
         get color() {
             return this._color;
