@@ -33,8 +33,8 @@ class TestColorWidget(YafowilTestCase):
         data-disabled='false' data-format='hexString' data-layout_direction='vertical'
         data-open_on_focus='true' data-placement='bottom' data-show_inputs='false'
         data-show_labels='false' data-slider_size='10' data-sliders='["box", "h"]'
-        data-temperature='{"min": 2000, "max": 12000}' data-user_swatches='true'
-        id="input-colorwidget" name="colorwidget" type="text" />
+        data-strategy='absolute' data-temperature='{"min": 2000, "max": 12000}'
+        data-user_swatches='true' id="input-colorwidget" name="colorwidget" type="text" />
         """, widget())
 
         # Render with JS config properties
@@ -55,8 +55,8 @@ class TestColorWidget(YafowilTestCase):
         data-disabled='false' data-format='rgbaString' data-layout_direction='horizontal'
         data-open_on_focus='false' data-placement='bottom' data-show_inputs='true'
         data-show_labels='true' data-slider_size='50' data-sliders='["box", "h"]'
-        data-temperature='{"min": 2000, "max": 12000}' data-user_swatches='true'
-        id="input-colorwidget" name="colorwidget" type="text" />
+        data-strategy='absolute' data-temperature='{"min": 2000, "max": 12000}'
+        data-user_swatches='true' id="input-colorwidget" name="colorwidget" type="text" />
         """, widget())
 
     def test_display_renderer(self):
@@ -747,17 +747,17 @@ class TestColorWidget(YafowilTestCase):
         self.assertEqual(scripts[0].file_name, 'iro.min.js')
         self.assertTrue(os.path.exists(scripts[0].file_path))
 
-        self.assertTrue(scripts[1].directory.endswith(np('/color/resources')))
-        self.assertEqual(scripts[1].path, 'yafowil-color')
+        self.assertTrue(scripts[1].directory.endswith(np('/color/resources/default')))
+        self.assertEqual(scripts[1].path, 'yafowil-color/default')
         self.assertEqual(scripts[1].file_name, 'widget.min.js')
         self.assertTrue(os.path.exists(scripts[1].file_path))
 
         styles = resources.styles
         self.assertEqual(len(styles), 1)
 
-        self.assertTrue(styles[0].directory.endswith(np('/color/resources')))
-        self.assertEqual(styles[0].path, 'yafowil-color')
-        self.assertEqual(styles[0].file_name, 'widget.css')
+        self.assertTrue(styles[0].directory.endswith(np('/color/resources/default')))
+        self.assertEqual(styles[0].path, 'yafowil-color/default')
+        self.assertEqual(styles[0].file_name, 'widget.min.css')
         self.assertTrue(os.path.exists(styles[0].file_path))
 
 

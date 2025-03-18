@@ -30,9 +30,11 @@ export class ColorPicker {
         this.elem = elem;
 
         if (options.on_update) {
+            this._on_update = options.on_update;
             this.elem.on('color_update', options.on_update);
         }
         if (options.on_close) {
+            this._on_close = options.on_close;
             this.elem.on('color_close', options.on_close);
         }
 
@@ -60,15 +62,12 @@ export class ColorPicker {
             } else {
                 $('div.IroBox', this.picker_container).hide();
             }
+            this.toggle_widget = this.toggle_widget.bind(this);
             this.switch_btn = $('<button />')
                 .addClass('iro-switch-toggle')
                 .append($('<i class="glyphicon glyphicon-refresh" />'))
                 .appendTo(this.dropdown_elem);
-            this.switch_btn.on('click', (e) => {
-                e.preventDefault();
-                $('div.IroWheel', this.picker_container).toggle();
-                $('div.IroBox', this.picker_container).toggle();
-            });
+            this.switch_btn.on('click', this.toggle_widget);
         } else if (!sliders) {
             this.picker_container.hide();
         }
@@ -89,27 +88,8 @@ export class ColorPicker {
         } else {
             this.color = null;
         }
-        if (options.locked_swatches) {
-            this.locked_swatches = new LockedSwatchesContainer(
-                this,
-                options.locked_swatches
-            );
-        }
-        if (options.user_swatches) {
-            this.user_swatches = new UserSwatchesContainer(this);
-        }
-
-        let prev_elem;
-        if (options.preview_elem) {
-            prev_elem = $(options.preview_elem)
-                .addClass('yafowil-color-picker-preview');
-        } else {
-            let elem_width = this.elem.outerWidth();
-            prev_elem = $('<span />')
-                .addClass('yafowil-color-picker-color layer-transparent')
-                .css('left', `${elem_width}px`);
-        }
-        this.preview = new PreviewElement(this, prev_elem, this.color);
+        this.create_swatch_containers(options);
+        this.create_preview_element(options);
 
         this.open = this.open.bind(this);
         this.update_color = this.update_color.bind(this);
@@ -178,6 +158,32 @@ export class ColorPicker {
             }
         });
         return iro_opts;
+    }
+
+    create_swatch_containers(options) {
+        if (options.locked_swatches) {
+            this.locked_swatches = new LockedSwatchesContainer(
+                this,
+                options.locked_swatches
+            );
+        }
+        if (options.user_swatches) {
+            this.user_swatches = new UserSwatchesContainer(this);
+        }
+    }
+
+    create_preview_element(options) {
+        let prev_elem;
+        if (options.preview_elem) {
+            prev_elem = $(options.preview_elem)
+                .addClass('yafowil-color-picker-preview');
+        } else {
+            let elem_width = this.elem.outerWidth();
+            prev_elem = $('<span />')
+                .addClass('yafowil-color-picker-color layer-transparent')
+                .css('left', `${elem_width}px`);
+        }
+        this.preview = new PreviewElement(this, prev_elem, this.color);
     }
 
     place(placement, custom_preview) {
@@ -360,6 +366,39 @@ export class ColorPicker {
             return true;
         }
     }
+
+    toggle_widget(e) {
+        e.preventDefault();
+        $('div.IroWheel', this.picker_container).toggle();
+        $('div.IroBox', this.picker_container).toggle();
+    }
+
+    destroy() {
+        this.preview.destroy();
+        if (this._on_update) {
+            this.elem.off('color_update', this._on_update);
+        }
+        if (this._on_close) {
+            this.elem.off('color_close', this._on_close);
+        }
+        if (this.switch_btn) {
+            this.switch_btn.off('click', this.toggle_widget);
+        }
+        this.picker.off('color:change', this.update_color);
+        this.close_btn.off('click', this.close);
+        if (this.locked_swatches) {
+            this.locked_swatches.destroy();
+        }
+        if (this.user_swatches) {
+            this.user_swatches.destroy();
+        }
+        this.locked_swatches = null;
+        this.user_swatches = null;
+        this.color = null;
+        this.preview = null;
+        this.picker = null;
+        this.dropdown_elem.remove();
+    }
 }
 
 export class ColorWidget {
@@ -401,7 +440,7 @@ export class ColorWidget {
         elem.data('yafowil-color', this);
 
         this.elem = elem;
-        this.color_picker = new ColorPicker(elem, options);
+        this.create_color_picker(elem, options);
 
         this.temp = options.temperature || {min: 2000, max: 11000};
         this.input_elem = new InputElement(
@@ -411,12 +450,36 @@ export class ColorWidget {
         if (options.open_on_focus) {
             this.elem.on('focus', this.color_picker.open);
         }
-        this.elem.on('color_update', (e) => {
-            this.input_elem.update_color(this.color_picker.color);
-        })
-        this.elem.on('color_close', (e) => {
-            this.elem.blur();
-        })
+        this.update_color = this.update_color.bind(this);
+        this.elem.on('color_update', this.update_color);
+        this.blur_elem = this.blur_elem.bind(this);
+        this.elem.on('color_close', this.blur_elem);
+        if (window.ts !== undefined) {
+            window.ts.ajax.attach(this, elem);
+        }
+    }
+
+    update_color(e) {
+        this.input_elem.update_color(this.color_picker.color);
+    }
+
+    blur_elem(e) {
+        this.elem.blur();
+    }
+
+    destroy() {
+        this.input_elem.destroy();
+        this.color_picker.destroy();
+        this.elem.off('color_update', this.update_color);
+        this.elem.off('color_close', this.blur_elem);
+        this.elem.removeData('yafowil-color');
+        this.elem.remove();
+        this.input_elem = null;
+        this.color_picker = null;
+    }
+
+    create_color_picker(elem, options) {
+        this.color_picker = new ColorPicker(elem, options);
     }
 }
 

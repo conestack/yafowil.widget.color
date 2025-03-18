@@ -1,6 +1,6 @@
-import {ColorWidget, lookup_callback} from '../src/widget.js';
-import {ColorSwatch, LockedSwatchesContainer} from '../src/components.js';
-import {register_array_subscribers} from '../src/widget.js';
+import {ColorWidget, lookup_callback} from '../src/default/widget.js';
+import {ColorSwatch, LockedSwatchesContainer} from '../src/default/components.js';
+import {register_array_subscribers} from '../src/default/widget.js';
 import $ from 'jquery';
 import 'iro';
 
@@ -16,7 +16,7 @@ QUnit.module('ColorWidget', hooks => {
     hooks.before(async () => {
         css_link = document.createElement('link');
         css_link.rel = 'stylesheet';
-        css_link.href = '../../src/yafowil/widget/color/resources/widget.css';
+        css_link.href = '../../src/yafowil/widget/color/resources/default/widget.min.css';
         document.head.appendChild(css_link);
         // Wait for required styles to load
         await new Promise(resolve => {
@@ -1013,13 +1013,13 @@ QUnit.module('ColorWidget', hooks => {
             widget.color_picker.user_swatches.create_swatch();
             assert.strictEqual(widget.color_picker.user_swatches.swatches.length, 1);
             widget.color_picker.user_swatches.swatches[0].invalid = true;
-            widget.color_picker.user_swatches.swatches[0].destroy();
+            widget.color_picker.user_swatches.swatches[0].remove();
             assert.notOk(widget.color_picker.active_swatch);
 
             // create locked swatch
             widget.color_picker.locked_swatches.init_swatches([color3]);
             assert.strictEqual(widget.color_picker.locked_swatches.swatches.length, 1);
-            widget.color_picker.locked_swatches.swatches[0].destroy();
+            widget.color_picker.locked_swatches.swatches[0].remove();
             assert.notOk(widget.color_picker.active_swatch);
         });
 

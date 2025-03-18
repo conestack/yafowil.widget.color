@@ -507,6 +507,7 @@ color_options = [
     'sliders',
     'placement',
     'auto_align',
+    'strategy',
     'box_width',
     'box_height',
     'slider_size',
@@ -547,7 +548,20 @@ def color_edit_renderer(widget, data):
 
 
 def color_display_renderer(widget, data):
-    pass
+    input_attrs = input_attributes_common(widget, data)
+    custom_attrs = data_attrs_helper(widget, data, color_options)
+    format = custom_attrs['data-format']
+    custom_attrs['data-format'] = format_mapping[format]
+    input_attrs.update(custom_attrs)
+    input_attrs['type'] = 'text'
+    input_attrs['disabled'] = True
+    input_attrs['data-color'] = input_attrs['value']
+    cssclasses = [
+        attr_value("display_class", widget, data),
+        f'display-{attr_value("class", widget, data) or "generic"}'
+    ]
+    input_attrs['class_'] += ' ' + ' '.join([_ for _ in cssclasses if _ is not None])
+    return data.tag('input', **input_attrs)
 
 
 factory.register(
@@ -593,6 +607,12 @@ factory.doc['props']['color.auto_align'] = """\
 Whether the color picker's dropdown will change placement depending on available
 space.
 Values: [True|False]
+"""
+
+factory.defaults['color.strategy'] = 'absolute'
+factory.doc['props']['color.strategy'] = """\
+Popper.js positioning strategy.
+Values: ['absolute' | 'fixed'].
 """
 
 factory.defaults['color.format'] = 'hex'

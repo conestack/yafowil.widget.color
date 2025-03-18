@@ -9,6 +9,7 @@ export class ColorSwatch {
         this.locked = locked;
         this.selected = false;
         this.kelvin = kelvin;
+        this.remove = this.remove.bind(this);
         this.destroy = this.destroy.bind(this);
 
         if (kelvin && !this.widget.type_kelvin || 
@@ -62,13 +63,19 @@ export class ColorSwatch {
         this._selected = selected;
     }
 
-    destroy() {
+    remove() {
         this.widget.active_swatch = null;
         if (this.locked || this.invalid) {
             return;
         }
-        this.elem.off('click', this.select);
+        this.destroy();
         this.elem.remove();
+    }
+
+    destroy() {
+        this.elem.off('click', this.select);
+        this.widget = null;
+        this.color = null;
     }
 
     select(e) {
@@ -140,6 +147,13 @@ export class LockedSwatchesContainer {
             this.elem.show();
         }
     }
+
+    destroy() {
+        for (let swatch of this.swatches) {
+            swatch.destroy();
+        }
+        this.widget = null;
+    }
 }
 
 export class UserSwatchesContainer {
@@ -177,7 +191,7 @@ export class UserSwatchesContainer {
         let json_str = localStorage.getItem('yafowil-color-swatches');
 
         for (let swatch of this.swatches) {
-            swatch.destroy();
+            swatch.remove();
         }
         this.swatches = [];
         if (json_str) {
@@ -195,7 +209,7 @@ export class UserSwatchesContainer {
                 ));
             }
             if (this.swatches.length > 10) {
-                this.swatches[0].destroy();
+                this.swatches[0].remove();
                 this.swatches.shift();
             }
         } else {
@@ -237,7 +251,7 @@ export class UserSwatchesContainer {
             return;
         }
         let index = this.swatches.indexOf(this.widget.active_swatch);
-        this.widget.active_swatch.destroy();
+        this.widget.active_swatch.remove();
         this.swatches.splice(index, 1);
 
         if (!this.swatches.length) {
@@ -264,6 +278,15 @@ export class UserSwatchesContainer {
         }
         let evt = new $.Event('yafowil-color-swatches:changed', {origin: this});
         $('input.color-picker').trigger(evt);
+    }
+
+    destroy() {
+        for (let swatch of this.swatches) {
+            swatch.destroy();
+        }
+        this.add_color_btn.off('click', this.create_swatch);
+        this.remove_color_btn.off('click', this.remove_swatch);
+        widget.elem.off('yafowil-color-swatches:changed', this.init_swatches);
     }
 }
 
@@ -323,6 +346,12 @@ export class InputElement {
             this.elem.val(color[this.format]);
         }
     }
+
+    destroy() {
+        this.elem.off('input', this.on_input);
+        this.elem.off('focusout', this.on_focusout);
+        this.widget = null;
+    }
 }
 
 export class PreviewElement {
@@ -337,7 +366,9 @@ export class PreviewElement {
             .insertAfter(this.widget.elem);
         this.color = color ? color.rgbaString : undefined;
         this.on_click = this.on_click.bind(this);
-        this.elem.on('click', this.on_click);
+        if (!this.widget.elem.attr('disabled')) {
+            this.elem.on('click', this.on_click);
+        }
     }
 
     get color() {
@@ -351,6 +382,13 @@ export class PreviewElement {
 
     on_click() {
         this.widget.open();
+    }
+
+    destroy() {
+        this.layer.remove();
+        this.elem.off('click', this.on_click).remove();
+        this.widget = null;
+        this.color = null;
     }
 }
 
