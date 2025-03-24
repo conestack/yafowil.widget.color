@@ -707,6 +707,44 @@ def value_conversion_example():
     }
 
 
+DOC_DISPLAY = """
+Display Mode
+------------
+
+Display Mode prevents interactions on the widget.
+
+The wrapper div can receive additional classes via the ``display_class``
+widget attribute.
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='displaywidget',
+        value='#ff0000',
+        mode='display',
+        props={
+            # 'display_class': 'my_additional_class'
+        })
+"""
+
+
+def display_example():
+    part = factory(u'fieldset', name='yafowil.widget.color.display')
+    part['color'] = factory(
+        '#field:color',
+        mode='display',
+        value='#ff0000',
+        props={
+            'label': 'Display Mode'
+        })
+    return {
+        'widget': part,
+        'doc': DOC_DISPLAY,
+        'title': 'Display Mode'
+    }
+
+
 def get_example():
     return [
         default_example(),
@@ -723,4 +761,5 @@ def get_example():
         hsv_example(),
         value_conversion_example(),
         kelvin_example(),
+        display_example()
     ]
