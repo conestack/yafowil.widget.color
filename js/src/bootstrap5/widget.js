@@ -99,7 +99,9 @@ export class BS5ColorPicker extends ColorPicker {
             this.close();
         }
         this.popper.forceUpdate();
-        this.preview_popper.forceUpdate();
+        if (this.preview_popper) {
+            this.preview_popper.forceUpdate();
+        }
     }
 
     place(placement, custom_preview) {

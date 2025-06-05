@@ -879,7 +879,9 @@ var yafowil_color = (function (exports, $, Popper) {
                 this.close();
             }
             this.popper.forceUpdate();
-            this.preview_popper.forceUpdate();
+            if (this.preview_popper) {
+                this.preview_popper.forceUpdate();
+            }
         }
         place(placement, custom_preview) {
         }
