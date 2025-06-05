@@ -257,7 +257,7 @@ var yafowil_color = (function (exports, $) {
             }
             this.add_color_btn.off('click', this.create_swatch);
             this.remove_color_btn.off('click', this.remove_swatch);
-            widget.elem.off('yafowil-color-swatches:changed', this.init_swatches);
+            this.widget.elem.off('yafowil-color-swatches:changed', this.init_swatches);
         }
     }
     class InputElement {
