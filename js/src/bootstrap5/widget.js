@@ -39,7 +39,7 @@ export class BS5ColorPicker extends ColorPicker {
             { name: 'flip' }
         ];
         this.popper = Popper.createPopper(this.elem[0], this.dropdown_elem[0], {
-            placement: options.placement,
+            placement: options.placement || 'bottom',
             flipVariations: true,
             modifiers: popper_modifiers,
             strategy: options.strategy
