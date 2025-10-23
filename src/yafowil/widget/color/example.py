@@ -64,6 +64,90 @@ def wheel_example():
     }
 
 
+DOC_PLACEMENT = """
+Placement
+---------
+
+The color widget can be initialized with a variety of placement options.
+'auto', 'auto-top', 'left' and 'right' options will automatically horizontally
+align the widget on top or bottom of the input field, depending on available
+space within the viewport.
+
+Supported options:
+
+- top
+- bottom
+- left
+- right
+- static
+
+To specify whether or not the dropdown will change position when there is not
+enough available space, use the auto_align option with [True|False]
+(defaults to True).
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='colorwidget',
+        props={
+            'label': 'Placement on right side',
+            'placement': 'right'
+        }
+    )
+"""
+
+
+def placement_example():
+    part = factory(u'fieldset', name='yafowil.widget.color.default')
+    part['color'] = factory(
+        '#field:color',
+        props={
+            'label': 'Placement on right side',
+            'placement': 'right'
+        })
+    return {
+        'widget': part,
+        'doc': DOC_PLACEMENT,
+        'title': 'Placement on right side'
+    }
+
+
+DOC_PLACEMENT_BS5 = """
+Placement
+---------
+
+The color widget can be initialized with a variety of placement options,
+which can be found in the <a href="https://popper.js.org/docs/v2/" target="_blank">Popper.js documentation</a>.
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='colorwidget',
+        props={
+            'label': 'Placement on right side',
+            'placement': 'right-start'
+        }
+    )
+"""
+
+
+def placement_example_bs5():
+    part = factory(u'fieldset', name='yafowil.widget.color.default')
+    part['color'] = factory(
+        '#field:color',
+        props={
+            'label': 'Placement on right side',
+            'placement': 'right-start'
+        })
+    return {
+        'widget': part,
+        'doc': DOC_PLACEMENT_BS5,
+        'title': 'Placement on right side'
+    }
+
+
 DOC_DIM = """
 Custom dimensions
 -----------------
@@ -623,10 +707,49 @@ def value_conversion_example():
     }
 
 
+DOC_DISPLAY = """
+Display Mode
+------------
+
+Display Mode prevents interactions on the widget.
+
+The wrapper div can receive additional classes via the ``display_class``
+widget attribute.
+
+.. code-block:: python
+
+    color = factory(
+        'color',
+        name='displaywidget',
+        value='#ff0000',
+        mode='display',
+        props={
+            # 'display_class': 'my_additional_class'
+        })
+"""
+
+
+def display_example():
+    part = factory(u'fieldset', name='yafowil.widget.color.display')
+    part['color'] = factory(
+        '#field:color',
+        mode='display',
+        value='#ff0000',
+        props={
+            'label': 'Display Mode'
+        })
+    return {
+        'widget': part,
+        'doc': DOC_DISPLAY,
+        'title': 'Display Mode'
+    }
+
+
 def get_example():
     return [
         default_example(),
         wheel_example(),
+        placement_example_bs5() if factory.theme == 'bootstrap5' else placement_example(),
         layout_example(),
         dim_example(),
         length_example(),
@@ -638,4 +761,5 @@ def get_example():
         hsv_example(),
         value_conversion_example(),
         kelvin_example(),
+        display_example()
     ]
