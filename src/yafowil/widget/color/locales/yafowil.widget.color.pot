@@ -1,12 +1,12 @@
 #
 # SOME DESCRIPTIVE TITLE
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-03-27 11:18+0200\n"
+"POT-Creation-Date: 2025-03-21 10:44+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,118 +17,113 @@ msgstr ""
 "Generated-By: Lingua 4.15.0\n"
 
 #. Default: Unknown Format. Supported formats: ${formats}
-#: ./src/yafowil/widget/color/widget.py:40
-#: ./src/yafowil/widget/color/widget.py:233
+#: ./src/yafowil/widget/color/widget.py:308
+#: ./src/yafowil/widget/color/widget.py:493
 msgid "unknown_color_format"
 msgstr ""
 
 #. Default: Incorrect hex Color String length: string length must be 7
-#: ./src/yafowil/widget/color/widget.py:47
+#: ./src/yafowil/widget/color/widget.py:315
 msgid "incorrect_hex_length"
 msgstr ""
 
 #. Default: Incorrect hex8 Color String length: string length must be 9
-#: ./src/yafowil/widget/color/widget.py:53
+#: ./src/yafowil/widget/color/widget.py:321
 msgid "incorrect_hex8_length"
 msgstr ""
 
 #. Default: Incorrect Hex Value: ${args}
-#: ./src/yafowil/widget/color/widget.py:72
+#: ./src/yafowil/widget/color/widget.py:340
 msgid "incorrect_hex_value"
 msgstr ""
 
 #. Default: Incorrect Color String:  Unclosed bracket.
 #. Default: Incorrect Color String: Unclosed bracket.
-#: ./src/yafowil/widget/color/widget.py:83
-#: ./src/yafowil/widget/color/widget.py:153
+#: ./src/yafowil/widget/color/widget.py:352
+#: ./src/yafowil/widget/color/widget.py:422
 msgid "unclosed_brace"
 msgstr ""
 
 #. Default: Incorrect Color String: String must start with 'hsl'
-#: ./src/yafowil/widget/color/widget.py:89
+#: ./src/yafowil/widget/color/widget.py:357
 msgid "hsl_str_start"
 msgstr ""
 
 #. Default: Incorrect Color String: String must start with 'hsla'
-#: ./src/yafowil/widget/color/widget.py:95
+#: ./src/yafowil/widget/color/widget.py:362
 msgid "hsla_str_start"
 msgstr ""
 
 #. Default: Incorrect Color String: expected format: ${hsl_format}
-#: ./src/yafowil/widget/color/widget.py:105
+#: ./src/yafowil/widget/color/widget.py:371
 msgid "hsl_str_length"
 msgstr ""
 
 #. Default: Incorrect Color String: expected format: ${hsla_format}
-#: ./src/yafowil/widget/color/widget.py:112
+#: ./src/yafowil/widget/color/widget.py:377
 msgid "hsla_str_length"
 msgstr ""
 
-#. Default: Incorrect Color String: value for hue must be between 0 and 360.
-#: ./src/yafowil/widget/color/widget.py:125
+#: ./src/yafowil/widget/color/widget.py:389
 msgid "incorrect_hue_value"
 msgstr ""
 
-#. Default: Incorrect Color String: value for saturation must be between 0 and
-#. 100 followed by "%".
-#: ./src/yafowil/widget/color/widget.py:131
+#: ./src/yafowil/widget/color/widget.py:396
 msgid "incorrect_saturation_value"
 msgstr ""
 
-#. Default: Incorrect Color String: value for lightness must be between 0 and
-#. 100 followed by "%".
-#: ./src/yafowil/widget/color/widget.py:137
+#: ./src/yafowil/widget/color/widget.py:404
 msgid "incorrect_lightness_value"
 msgstr ""
 
 #. Default: Incorrect Color String: Alpha value must be between 0 and 1.
-#: ./src/yafowil/widget/color/widget.py:143
-#: ./src/yafowil/widget/color/widget.py:212
+#: ./src/yafowil/widget/color/widget.py:412
+#: ./src/yafowil/widget/color/widget.py:473
 msgid "incorrect_alpha_value"
 msgstr ""
 
 #. Default: Incorrect Color String: String must start with 'rgb'
-#: ./src/yafowil/widget/color/widget.py:159
+#: ./src/yafowil/widget/color/widget.py:427
 msgid "rgb_str_start"
 msgstr ""
 
 #. Default: Incorrect Color String: String must start with 'rgba'
-#: ./src/yafowil/widget/color/widget.py:165
+#: ./src/yafowil/widget/color/widget.py:432
 msgid "rgba_str_start"
 msgstr ""
 
 #. Default: Incorrect Color String: expected format: ${rgb_format}
-#: ./src/yafowil/widget/color/widget.py:175
+#: ./src/yafowil/widget/color/widget.py:441
 msgid "rgb_str_length"
 msgstr ""
 
 #. Default: Incorrect Color String: expected format: ${rgba_format}
-#: ./src/yafowil/widget/color/widget.py:182
+#: ./src/yafowil/widget/color/widget.py:447
 msgid "rgba_str_length"
 msgstr ""
 
 #. Default: Incorrect Color String: value for red must be between 0 and 255.
-#: ./src/yafowil/widget/color/widget.py:194
+#: ./src/yafowil/widget/color/widget.py:458
 msgid "incorrect_red_value"
 msgstr ""
 
 #. Default: Incorrect Color String: value for green must be between 0 and 255.
-#: ./src/yafowil/widget/color/widget.py:200
+#: ./src/yafowil/widget/color/widget.py:463
 msgid "incorrect_green_value"
 msgstr ""
 
 #. Default: Incorrect Color String: value for blue must be between 0 and 255.
-#: ./src/yafowil/widget/color/widget.py:206
+#: ./src/yafowil/widget/color/widget.py:468
 msgid "incorrect_blue_value"
 msgstr ""
 
 #. Default: Unknown Format, expected format: int(1000 - 40000) or str(1000 -
 #. 40000)
-#: ./src/yafowil/widget/color/widget.py:221
+#: ./src/yafowil/widget/color/widget.py:482
 msgid "incorrect_kelvin_format"
 msgstr ""
 
 #. Default: Kelvin Temperature out of range (1000-40000)
-#: ./src/yafowil/widget/color/widget.py:227
+#: ./src/yafowil/widget/color/widget.py:487
 msgid "incorrect_kelvin_number"
 msgstr ""
