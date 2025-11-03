@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.0a3 (unreleased)
+2.0.0 (unreleased)
 ------------------
 
 - Add ``strategy`` widget property for positioning dropdown via popper.js.
