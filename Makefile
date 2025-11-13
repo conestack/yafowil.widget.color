@@ -173,7 +173,7 @@ PACKAGES_ALLOW_PRERELEASES?=false
 # The command which gets executed. Defaults to the location the
 # :ref:`run-tests` template gets rendered to if configured.
 # Default: .mxmake/files/run-tests.sh
-TEST_COMMAND?=$(VENV_FOLDER)/bin/pytest src/yafowil/widget/color/tests
+TEST_COMMAND?=.mxmake/files/run-tests.sh
 
 # Additional Python requirements for running tests to be
 # installed (via pip).
@@ -189,12 +189,7 @@ TEST_DEPENDENCY_TARGETS?=
 # The command which gets executed. Defaults to the location the
 # :ref:`run-coverage` template gets rendered to if configured.
 # Default: .mxmake/files/run-coverage.sh
-COVERAGE_COMMAND?=\
-	$(VENV_FOLDER)/bin/coverage run \
-		--omit src/yafowil/widget/color/example.py \
-		--source src/yafowil/widget/color \
-		-m pytest src/yafowil/widget/color/tests \
-	&& $(VENV_FOLDER)/bin/coverage report --fail-under=99
+COVERAGE_COMMAND?=.mxmake/files/run-coverage.sh
 
 ## applications.zest-releaser
 
