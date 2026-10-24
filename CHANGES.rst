@@ -4,6 +4,11 @@ Changes
 2.0.1 (unreleased)
 ------------------
 
+- Fix destroying a color widget with an invalid locked or stored user swatch,
+  e.g. a swatch with alpha for a format without alpha. ``ColorSwatch.destroy``
+  threw a ``TypeError`` because invalid swatches have no element.
+  [rnix]
+
 - Add ``@popperjs/core`` as dev dependency for testing the bootstrap5 widget.
   [rnix]
 

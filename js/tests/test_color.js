@@ -1075,6 +1075,40 @@ QUnit.module('ColorWidget', (hooks) => {
             assert.strictEqual(user_swatch.widget, null);
         });
 
+        QUnit.test('with invalid locked swatch', (assert) => {
+            // swatch with alpha is invalid for a format without alpha
+            widget = new ColorWidget(elem, {
+                locked_swatches: [[255, 0, 0, 0.5]],
+            });
+            const picker = widget.color_picker;
+            const locked_swatch = picker.locked_swatches.swatches[0];
+            assert.true(locked_swatch.invalid);
+
+            widget.destroy();
+
+            assert.strictEqual(widget.color_picker, null);
+            assert.strictEqual(picker.locked_swatches, null);
+            assert.strictEqual(locked_swatch.widget, null);
+        });
+
+        QUnit.test('with invalid user swatch', (assert) => {
+            // stored swatch with alpha is invalid for a format without alpha
+            localStorage.setItem(
+                'yafowil-color-swatches',
+                JSON.stringify([{ color: { h: 0, s: 100, v: 100, a: 0.5 }, kelvin: false }]),
+            );
+            widget = new ColorWidget(elem, { user_swatches: true });
+            const picker = widget.color_picker;
+            const user_swatch = picker.user_swatches.swatches[0];
+            assert.true(user_swatch.invalid);
+
+            widget.destroy();
+
+            assert.strictEqual(widget.color_picker, null);
+            assert.strictEqual(picker.user_swatches, null);
+            assert.strictEqual(user_swatch.widget, null);
+        });
+
         QUnit.test('without optional components', (assert) => {
             widget = new ColorWidget(elem, {});
             const picker = widget.color_picker;

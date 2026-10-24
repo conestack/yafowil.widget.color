@@ -65,7 +65,7 @@ var yafowil_color = (function (exports, $) {
             this.elem.remove();
         }
         destroy() {
-            this.elem.off('click', this.select);
+            this.elem?.off('click', this.select);
             this.widget = null;
             this.color = null;
         }
