@@ -374,6 +374,8 @@ export class ColorPicker {
         }
         this.picker.off('color:change', this.update_color);
         this.close_btn.off('click', this.close);
+        $(window).off('keydown', this.on_keydown);
+        $(window).off('mousedown', this.on_click);
         if (this.locked_swatches) {
             this.locked_swatches.destroy();
         }
@@ -459,11 +461,11 @@ export class ColorWidget {
 
     destroy() {
         this.input_elem.destroy();
+        this.elem.off('focus', this.color_picker.open);
         this.color_picker.destroy();
         this.elem.off('color_update', this.update_color);
         this.elem.off('color_close', this.blur_elem);
         this.elem.removeData('yafowil-color');
-        this.elem.remove();
         this.input_elem = null;
         this.color_picker = null;
     }

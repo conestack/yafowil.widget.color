@@ -1,6 +1,11 @@
 import $ from 'jquery';
 import { LockedSwatchesContainer } from '../src/default/components.js';
-import { ColorWidget, lookup_callback, register_array_subscribers } from '../src/default/widget.js';
+import {
+    ColorPicker,
+    ColorWidget,
+    lookup_callback,
+    register_array_subscribers,
+} from '../src/default/widget.js';
 import 'iro';
 
 const elem = $('<input class="color-picker"/>');
@@ -1034,7 +1039,13 @@ QUnit.module('ColorWidget', (hooks) => {
         });
     });
 
-    QUnit.module('destroy', () => {
+    QUnit.module('destroy', (hooks) => {
+        const orig_open = ColorPicker.prototype.open;
+
+        hooks.afterEach(() => {
+            ColorPicker.prototype.open = orig_open;
+        });
+
         QUnit.test('with all components', (assert) => {
             const calls = [];
             widget = new ColorWidget(elem, {
@@ -1063,7 +1074,7 @@ QUnit.module('ColorWidget', (hooks) => {
             assert.strictEqual(widget.color_picker, null);
             assert.strictEqual(widget.input_elem, null);
             assert.strictEqual(elem.data('yafowil-color'), undefined);
-            assert.notOk($.contains(document, elem[0]));
+            assert.ok($.contains(document, elem[0]));
             assert.strictEqual(picker.picker, null);
             assert.strictEqual(picker.preview, null);
             assert.strictEqual(picker.color, null);
@@ -1073,6 +1084,52 @@ QUnit.module('ColorWidget', (hooks) => {
             assert.notOk($.contains(document, preview[0]));
             assert.strictEqual(locked_swatch.widget, null);
             assert.strictEqual(user_swatch.widget, null);
+        });
+
+        QUnit.test('keeps the input and unbinds only own handlers', (assert) => {
+            let opened = 0;
+            ColorPicker.prototype.open = () => {
+                opened++;
+            };
+            let changes = 0;
+            elem.on('change', () => {
+                changes++;
+            });
+            widget = new ColorWidget(elem, { open_on_focus: true });
+
+            widget.destroy();
+
+            assert.ok($.contains(document, elem[0]));
+            elem.trigger('focus');
+            assert.strictEqual(opened, 0);
+            elem.trigger('change');
+            assert.strictEqual(changes, 1);
+        });
+
+        QUnit.test('keeps next sibling reachable for ajax destroy walk', (assert) => {
+            const next = $('<span />').insertAfter(elem);
+            widget = new ColorWidget(elem, {});
+            const visited = [];
+            // treibstoff's Parser.walk iterates the live childNodes of the parent
+            for (const child of $('#container')[0].childNodes) {
+                visited.push(child);
+                if (child === elem[0]) {
+                    widget.destroy();
+                }
+            }
+            assert.true(visited.includes(next[0]));
+        });
+
+        QUnit.test('unbinds window handlers of open picker', (assert) => {
+            widget = new ColorWidget(elem, {});
+            const picker = widget.color_picker;
+            const dropdown = picker.dropdown_elem;
+            picker.open();
+
+            widget.destroy();
+
+            $(window).trigger($.Event('keydown', { key: 'Escape' }));
+            assert.strictEqual(dropdown.css('display'), 'block');
         });
 
         QUnit.test('with invalid locked swatch', (assert) => {

@@ -4,6 +4,16 @@ Changes
 2.0.1 (unreleased)
 ------------------
 
+- Fix the documentation of the ``preview_elem`` property. It expects the HTML
+  markup of a custom preview element, not a boolean.
+  [rnix]
+
+- Fix ``ColorWidget.destroy`` removing the server rendered input. Outside ajax
+  this dropped the form field, during ajax destroy treibstoff skipped the
+  following sibling node. Destroy now also unbinds the ``open_on_focus``
+  handler and the window handlers of an open picker in the default variant.
+  [rnix]
+
 - Fix destroying a color widget with an invalid locked or stored user swatch,
   e.g. a swatch with alpha for a format without alpha. ``ColorSwatch.destroy``
   threw a ``TypeError`` because invalid swatches have no element.

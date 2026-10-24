@@ -204,6 +204,7 @@ QUnit.module('bootstrap5 ColorWidget', (hooks) => {
         assert.strictEqual(picker.popper, null);
         assert.strictEqual(picker.preview_popper, null);
         assert.notOk($.contains(document, dropdown[0]));
+        assert.ok($.contains(document, elem[0]));
         // window handlers are unbound
         $(window).trigger($.Event('keydown', { key: 'Escape' }));
         assert.strictEqual(dropdown.css('display'), 'block');

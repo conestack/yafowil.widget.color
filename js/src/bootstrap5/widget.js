@@ -116,8 +116,6 @@ export class BS5ColorPicker extends ColorPicker {
         if (this.preview_popper) {
             this.preview_popper.destroy();
         }
-        $(window).off('keydown', this.on_keydown);
-        $(window).off('mousedown', this.on_click);
         this.popper = null;
         this.preview_popper = null;
         super.destroy();

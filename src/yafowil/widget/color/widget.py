@@ -614,8 +614,10 @@ Available options:
 
 factory.defaults['color.preview_elem'] = None
 factory.doc['props']['color.preview_elem'] = """\
-Add an optional preview elem.
-Values: [True|False|None (default)].
+Optional custom preview element as HTML string, e.g.
+``'<div class="my-preview" />'``. The element is inserted after the input and
+shows the selected color. If ``None``, a default preview element is used.
+Values: [Str|None (default)].
 """
 
 factory.defaults['color.box_width'] = 250
