@@ -14,17 +14,9 @@ This is the default hex color picker widget.
 
 
 def default_example():
-    part = factory(u'fieldset', name='yafowil.widget.color.default')
-    part['color'] = factory(
-        '#field:color',
-        props={
-            'label': 'Default Color Picker'
-        })
-    return {
-        'widget': part,
-        'doc': DOC_COLOR,
-        'title': 'Default Color Picker'
-    }
+    part = factory('fieldset', name='yafowil.widget.color.default')
+    part['color'] = factory('#field:color', props={'label': 'Default Color Picker'})
+    return {'widget': part, 'doc': DOC_COLOR, 'title': 'Default Color Picker'}
 
 
 DOC_WHEEL = """
@@ -49,18 +41,12 @@ Passing both 'box' and 'wheel' allows the user to switch between components.
 
 
 def wheel_example():
-    part = factory(u'fieldset', name='yafowil.widget.color.wheel')
+    part = factory('fieldset', name='yafowil.widget.color.wheel')
     part['color'] = factory(
         '#field:color',
-        props={
-            'label': 'Picker with wheel',
-            'sliders': ['wheel', 'box', 'v']
-        })
-    return {
-        'widget': part,
-        'doc': DOC_WHEEL,
-        'title': 'Color wheel'
-    }
+        props={'label': 'Picker with wheel', 'sliders': ['wheel', 'box', 'v']},
+    )
+    return {'widget': part, 'doc': DOC_WHEEL, 'title': 'Color wheel'}
 
 
 DOC_PLACEMENT = """
@@ -98,18 +84,11 @@ enough available space, use the auto_align option with [True|False]
 
 
 def placement_example():
-    part = factory(u'fieldset', name='yafowil.widget.color.default')
+    part = factory('fieldset', name='yafowil.widget.color.default')
     part['color'] = factory(
-        '#field:color',
-        props={
-            'label': 'Placement on right side',
-            'placement': 'right'
-        })
-    return {
-        'widget': part,
-        'doc': DOC_PLACEMENT,
-        'title': 'Placement on right side'
-    }
+        '#field:color', props={'label': 'Placement on right side', 'placement': 'right'}
+    )
+    return {'widget': part, 'doc': DOC_PLACEMENT, 'title': 'Placement on right side'}
 
 
 DOC_PLACEMENT_BS5 = """
@@ -133,18 +112,12 @@ which can be found in the <a href="https://popper.js.org/docs/v2/" target="_blan
 
 
 def placement_example_bs5():
-    part = factory(u'fieldset', name='yafowil.widget.color.default')
+    part = factory('fieldset', name='yafowil.widget.color.default')
     part['color'] = factory(
         '#field:color',
-        props={
-            'label': 'Placement on right side',
-            'placement': 'right-start'
-        })
-    return {
-        'widget': part,
-        'doc': DOC_PLACEMENT_BS5,
-        'title': 'Placement on right side'
-    }
+        props={'label': 'Placement on right side', 'placement': 'right-start'},
+    )
+    return {'widget': part, 'doc': DOC_PLACEMENT_BS5, 'title': 'Placement on right side'}
 
 
 DOC_DIM = """
@@ -173,19 +146,16 @@ All values are defined in pixels.
 
 
 def dim_example():
-    part = factory(u'fieldset', name='yafowil.widget.color.dimensions')
+    part = factory('fieldset', name='yafowil.widget.color.dimensions')
     part['color'] = factory(
         '#field:color',
         props={
             'label': 'Picker with custom dimensions',
             'box_width': 400,
-            'box_height': 100
-        })
-    return {
-        'widget': part,
-        'doc': DOC_DIM,
-        'title': 'Custom dimensions'
-    }
+            'box_height': 100,
+        },
+    )
+    return {'widget': part, 'doc': DOC_DIM, 'title': 'Custom dimensions'}
 
 
 DOC_LENGTH = """
@@ -214,7 +184,7 @@ All values are defined in pixels.
 
 
 def length_example():
-    part = factory(u'fieldset', name='yafowil.widget.color.length')
+    part = factory('fieldset', name='yafowil.widget.color.length')
     part['color'] = factory(
         '#field:color',
         props={
@@ -222,13 +192,10 @@ def length_example():
             'box_width': 200,
             'sliders': ['box', 'h', 'a'],
             'slider_size': 20,
-            'slider_length': 100
-        })
-    return {
-        'widget': part,
-        'doc': DOC_LENGTH,
-        'title': 'Slider length'
-    }
+            'slider_length': 100,
+        },
+    )
+    return {'widget': part, 'doc': DOC_LENGTH, 'title': 'Slider length'}
 
 
 DOC_LAYOUT = """
@@ -256,7 +223,7 @@ by setting 'layout_direction' to 'horizontal'.
 
 
 def layout_example():
-    part = factory(u'fieldset', name='yafowil.widget.color.horizontal')
+    part = factory('fieldset', name='yafowil.widget.color.horizontal')
     part['color'] = factory(
         '#field:color',
         props={
@@ -265,13 +232,10 @@ def layout_example():
             'layout_direction': 'horizontal',
             'show_inputs': True,
             'show_labels': True,
-            'locked_swatches': False
-        })
-    return {
-        'widget': part,
-        'doc': DOC_LAYOUT,
-        'title': 'Horizontal Layout'
-    }
+            'locked_swatches': False,
+        },
+    )
+    return {'widget': part, 'doc': DOC_LAYOUT, 'title': 'Horizontal Layout'}
 
 
 DOC_PREVIEW = """
@@ -298,19 +262,16 @@ The color of your element is set by css 'background-color' attribute.
 
 
 def preview_example():
-    part = factory(u'fieldset', name='yafowil.widget.color.preview')
+    part = factory('fieldset', name='yafowil.widget.color.preview')
     part['color'] = factory(
         '#field:color',
         props={
             'label': 'Picker with custom preview',
             'sliders': ['box', 'h', 'a'],
             'preview_elem': '<div id="my-preview" style="border-radius: 50%; width:100px; height:100px; margin:20px; border: 1px solid gray;" />',
-        })
-    return {
-        'widget': part,
-        'doc': DOC_PREVIEW,
-        'title': 'Preview element'
-    }
+        },
+    )
+    return {'widget': part, 'doc': DOC_PREVIEW, 'title': 'Preview element'}
 
 
 DOC_SWATCHES = """
@@ -369,7 +330,7 @@ Supported formats (locked swatches):
 
 
 def swatches_example():
-    part = factory(u'fieldset', name='yafowil.widget.color.swatches')
+    part = factory('fieldset', name='yafowil.widget.color.swatches')
     part['color'] = factory(
         '#field:color',
         value='#ff0000',
@@ -377,28 +338,26 @@ def swatches_example():
             'label': 'Picker with locked swatches',
             'sliders': ['h', 's', 'v', 'a'],
             'locked_swatches': [
-                [255, 0, 0],            # default interpretation as rgb
-                [255, 150, 0, 0.5],     # default interpretation as rgba
-                'rgb(255,255,0)',       # rgb string
+                [255, 0, 0],  # default interpretation as rgb
+                [255, 150, 0, 0.5],  # default interpretation as rgba
+                'rgb(255,255,0)',  # rgb string
                 'rgba(255,255,0,0.5)',  # rgba string
                 'hsl(100, 100%, 50%)',  # hsl string
-                '#00fff0',              # hex string
-                {                       # hsl dict
+                '#00fff0',  # hex string
+                {  # hsl dict
                     'h': '200',
                     's': '100',
-                    'l': '50'
-                }, {                    # rgb[a] dict
+                    'l': '50',
+                },
+                {  # rgb[a] dict
                     'r': 150,
                     'g': 0,
-                    'b': 255
-                }
-            ]
-        })
-    return {
-        'widget': part,
-        'doc': DOC_SWATCHES,
-        'title': 'Locked swatches'
-    }
+                    'b': 255,
+                },
+            ],
+        },
+    )
+    return {'widget': part, 'doc': DOC_SWATCHES, 'title': 'Locked swatches'}
 
 
 DOC_INPUT = """
@@ -428,22 +387,19 @@ Input fields can be set as read-only with the 'disabled' property.
 
 
 def input_example():
-    part = factory(u'fieldset', name='yafowil.widget.color.inputs')
+    part = factory('fieldset', name='yafowil.widget.color.inputs')
     part['color'] = factory(
         '#field:color',
         props={
             'label': 'Picker with input fields',
             'sliders': ['h', 's', 'v'],
-            'show_inputs' : True,
+            'show_inputs': True,
             'show_labels': True,
             # 'disabled': True,
-            'format': 'hex'
-        })
-    return {
-        'widget': part,
-        'doc': DOC_INPUT,
-        'title': 'Input Fields'
-    }
+            'format': 'hex',
+        },
+    )
+    return {'widget': part, 'doc': DOC_INPUT, 'title': 'Input Fields'}
 
 
 DOC_RGB = """
@@ -476,7 +432,7 @@ Pass 'a' in the 'sliders' option to edit alpha channel value.
 
 
 def rgb_example():
-    part = factory(u'fieldset', name='yafowil.widget.color.rgb_example')
+    part = factory('fieldset', name='yafowil.widget.color.rgb_example')
     part['color'] = factory(
         '#field:color',
         value='rgba(100, 100, 255, .5)',
@@ -485,13 +441,10 @@ def rgb_example():
             'sliders': ['r', 'g', 'b', 'a'],
             'format': 'rgba',
             'show_labels': True,
-            'show_inputs': True
-        })
-    return {
-        'widget': part,
-        'doc': DOC_RGB,
-        'title': 'Example: RGBA'
-    }
+            'show_inputs': True,
+        },
+    )
+    return {'widget': part, 'doc': DOC_RGB, 'title': 'Example: RGBA'}
 
 
 DOC_HSV = """
@@ -517,7 +470,7 @@ Pass the following values to create a HSV/HSVA color picker.
 
 
 def hsv_example():
-    part = factory(u'fieldset', name='yafowil.widget.color.hsv_example')
+    part = factory('fieldset', name='yafowil.widget.color.hsv_example')
     part['color'] = factory(
         '#field:color',
         value='hsl(260, 100, 50)',
@@ -525,13 +478,10 @@ def hsv_example():
             'label': 'Example: HSV Picker',
             'sliders': ['h', 's', 'v', 'a'],
             'format': 'hsla',
-            'show_labels': True
-        })
-    return {
-        'widget': part,
-        'doc': DOC_HSV,
-        'title': 'Example: HSV'
-    }
+            'show_labels': True,
+        },
+    )
+    return {'widget': part, 'doc': DOC_HSV, 'title': 'Example: HSV'}
 
 
 DOC_KELVIN = """
@@ -566,7 +516,7 @@ The possible kelvin temperature ranges from 1000 to 40000.
 
 
 def kelvin_example():
-    part = factory(u'fieldset', name='yafowil.widget.color.temperature_example')
+    part = factory('fieldset', name='yafowil.widget.color.temperature_example')
     part['color'] = factory(
         '#field:color',
         value=5000,
@@ -577,13 +527,10 @@ def kelvin_example():
             'format': 'kelvin',
             'temperature': {'min': 4000, 'max': 8000},
             'locked_swatches': False,
-            'user_swatches': False
-        })
-    return {
-        'widget': part,
-        'doc': DOC_KELVIN,
-        'title': 'Example: Temperature'
-    }
+            'user_swatches': False,
+        },
+    )
+    return {'widget': part, 'doc': DOC_KELVIN, 'title': 'Example: Temperature'}
 
 
 DOC_SWATCHES_ONLY = """
@@ -622,7 +569,7 @@ widget.
 
 
 def swatches_only_example():
-    part = factory(u'fieldset', name='yafowil.widget.color.swatches_only')
+    part = factory('fieldset', name='yafowil.widget.color.swatches_only')
     part['color'] = factory(
         '#field:color',
         value='#80dbad',
@@ -640,15 +587,12 @@ def swatches_only_example():
                 '#f18a1e',
                 '#9c171c',
                 '#37e3a4',
-                '#72d910'
+                '#72d910',
             ],
-            'user_swatches': False
-        })
-    return {
-        'widget': part,
-        'doc': DOC_SWATCHES_ONLY,
-        'title': 'Example: Temperature'
-    }
+            'user_swatches': False,
+        },
+    )
+    return {'widget': part, 'doc': DOC_SWATCHES_ONLY, 'title': 'Example: Temperature'}
 
 
 DOC_VALUE_CONVERSION = """
@@ -687,22 +631,22 @@ the 'datatype_range' property specifies the desired range, Either '0-1' or
 
 
 def value_conversion_example():
-    part = factory(u'fieldset', name='yafowil.widget.color.value_conversion')
+    part = factory('fieldset', name='yafowil.widget.color.value_conversion')
     part['color'] = factory(
         '#field:color',
         name='colorwidget',
-        value=(.5, 0, 1, .5),
+        value=(0.5, 0, 1, 0.5),
         props={
             'label': 'Example: Value Conversion',
             'format': 'rgba',
             'datatype': tuple,
-            'datatype_range': '0-1'
-        }
+            'datatype_range': '0-1',
+        },
     )
     return {
         'widget': part,
         'doc': DOC_VALUE_CONVERSION,
-        'title': 'Example: Value Conversion'
+        'title': 'Example: Value Conversion',
     }
 
 
@@ -729,19 +673,11 @@ widget attribute.
 
 
 def display_example():
-    part = factory(u'fieldset', name='yafowil.widget.color.display')
+    part = factory('fieldset', name='yafowil.widget.color.display')
     part['color'] = factory(
-        '#field:color',
-        mode='display',
-        value='#ff0000',
-        props={
-            'label': 'Display Mode'
-        })
-    return {
-        'widget': part,
-        'doc': DOC_DISPLAY,
-        'title': 'Display Mode'
-    }
+        '#field:color', mode='display', value='#ff0000', props={'label': 'Display Mode'}
+    )
+    return {'widget': part, 'doc': DOC_DISPLAY, 'title': 'Display Mode'}
 
 
 def get_example():
@@ -760,5 +696,5 @@ def get_example():
         hsv_example(),
         value_conversion_example(),
         kelvin_example(),
-        display_example()
+        display_example(),
     ]

@@ -25,9 +25,9 @@ class ColorDatatypeConverter(DatatypeConverter):
     def to_value(self, value):
         if isinstance(value, str):
             # XXX: more checks if value is correct type
-            if self.type_ == str:
+            if self.type_ is str:
                 return value
-            elif self.type_ == int and self.format == 'kelvin':
+            elif self.type_ is int and self.format == 'kelvin':
                 return int(value)
             elif self.type_ in [list, tuple]:
                 if self.format == 'rgba':
@@ -66,35 +66,22 @@ class ColorDatatypeConverter(DatatypeConverter):
                             value[0] = value[0] / 360
                             value[1] = value[1] / 100
                             value[2] = value[2] / 100
-            if isinstance(value, list) and self.type_ == tuple:
+            if isinstance(value, list) and self.type_ is tuple:
                 return tuple(value)
             return value
         elif isinstance(value, int) and self.format == 'kelvin':
-            if self.type_ == int:
+            if self.type_ is int:
                 return value
             return str(value)
         else:
-            raise TypeError(
-                'Not supported type: {}'
-                .format(type(value).__name__)
-            )
+            raise TypeError(f'Not supported type: {type(value).__name__}')
 
     def to_form(self, value):
         type_name = type(value).__name__
-        accepted_formats = [
-            'hex',
-            'hex8',
-            'hsl',
-            'hsla',
-            'rgb',
-            'rgba',
-            'kelvin'
-        ]
+        accepted_formats = ['hex', 'hex8', 'hsl', 'hsla', 'rgb', 'rgba', 'kelvin']
 
-        if not self.format in accepted_formats:
-            raise TypeError(
-                'Not supported format: {}'.format(self.format)
-            )
+        if self.format not in accepted_formats:
+            raise TypeError(f'Not supported format: {self.format}')
         if not value:
             return value
         if isinstance(value, (tuple, list)):
@@ -106,139 +93,122 @@ class ColorDatatypeConverter(DatatypeConverter):
             if self.format == 'rgba':
                 if length != 4:
                     raise ValueError(
-                        '{} must contain 4 items, contains: {}'
-                        .format(type_name, length)
+                        f'{type_name} must contain 4 items, contains: {length}'
                     )
                 for item in value:
                     index = value.index(item)
                     if self.range == '0-1' and index < 3:
                         if item < 0 or item > 1:
-                            raise ValueError((
-                                'Value out of bounds at index {}. '
-                                '0-1 expected value between 0 and 1, value is: {}'
-                            ).format(index, item))
+                            raise ValueError(
+                                f'Value out of bounds at index {index}. '
+                                f'0-1 expected value between 0 and 1, value is: {item}'
+                            )
                         value[index] = item * 255
                     elif value.index(item) == 3:
                         if item < 0 or item > 1:
-                            raise ValueError((
-                                'Value out of bounds at index {}. '
-                                'Expected value between 0 and 1, value is: {}'
-                            ).format(value.index(item), item))
+                            raise ValueError(
+                                f'Value out of bounds at index {value.index(item)}. '
+                                f'Expected value between 0 and 1, value is: {item}'
+                            )
                     elif item < 0 or item > 255:
-                        raise ValueError((
-                            'Value out of bounds at index {}. '
-                            'Expected value between 0 and 255, value is: {}'
-                        ).format(value.index(item), item))
-                return 'rgba({}, {}, {}, {})'.format(
-                    value[0],
-                    value[1],
-                    value[2],
-                    value[3]
-                )
+                        raise ValueError(
+                            f'Value out of bounds at index {value.index(item)}. '
+                            f'Expected value between 0 and 255, value is: {item}'
+                        )
+                return f'rgba({value[0]}, {value[1]}, {value[2]}, {value[3]})'
             elif self.format == 'rgb':
                 if length != 3:
                     raise ValueError(
-                        '{} must contain 3 items, contains: {}'
-                        .format(type_name, length)
+                        f'{type_name} must contain 3 items, contains: {length}'
                     )
                 for item in value:
                     index = value.index(item)
                     if self.range == '0-1':
                         if item < 0 or item > 1:
-                            raise ValueError((
-                                'Value out of bounds at index {}. '
-                                '0-1 expected value between 0 and 1, value is: {}'
-                            ).format(value.index(item), item))
+                            raise ValueError(
+                                f'Value out of bounds at index {value.index(item)}. '
+                                f'0-1 expected value between 0 and 1, value is: {item}'
+                            )
                         value[index] = item * 255
                     elif item < 0 or item > 255:
-                        raise ValueError((
-                            'Value out of bounds at index {}. '
-                            'Expected value between 0 and 255, value is: {}'
-                        ).format(value.index(item), item))
-                return 'rgb({}, {}, {})'.format(value[0], value[1], value[2])
+                        raise ValueError(
+                            f'Value out of bounds at index {value.index(item)}. '
+                            f'Expected value between 0 and 255, value is: {item}'
+                        )
+                return f'rgb({value[0]}, {value[1]}, {value[2]})'
             elif self.format == 'hsl':
                 if length != 3:
                     raise ValueError(
-                        '{} must contain 3 items, contains: {}'
-                        .format(type_name, length)
+                        f'{type_name} must contain 3 items, contains: {length}'
                     )
                 for item in value:
                     index = value.index(item)
                     if self.range == '0-1':
                         if item < 0 or item > 1:
-                            raise ValueError((
-                                'Value out of bounds at index {}. '
-                                '0-1 expected value between 0 and 1, value is: {}'
-                            ).format(value.index(item), item))
+                            raise ValueError(
+                                f'Value out of bounds at index {value.index(item)}. '
+                                f'0-1 expected value between 0 and 1, value is: {item}'
+                            )
                         if index == 0:
                             value[index] = item * 360
                         else:
                             value[index] = item * 100
                     if index == 0 and item < 0 or item > 360:
-                        raise ValueError((
-                            'Value out of bounds at index {}. '
-                            'Expected Hue value between 0 and 360, value is: {}'
-                        ).format(index, item))
+                        raise ValueError(
+                            f'Value out of bounds at index {index}. '
+                            f'Expected Hue value between 0 and 360, value is: {item}'
+                        )
                     if (index == 1 or index == 2) and (item < 0 or item > 100):
-                        raise ValueError((
-                            'Value out of bounds at index {}. '
-                            'Expected value between 0 and 100, value is: {}'
-                        ).format(index, item))
-                return 'hsl({}, {}%, {}%)'.format(value[0], value[1], value[2])
+                        raise ValueError(
+                            f'Value out of bounds at index {index}. '
+                            f'Expected value between 0 and 100, value is: {item}'
+                        )
+                return f'hsl({value[0]}, {value[1]}%, {value[2]}%)'
             elif self.format == 'hsla':
                 if length != 4:
                     raise ValueError(
-                        '{} must contain 4 items, contains: {}'
-                        .format(type_name, length)
+                        f'{type_name} must contain 4 items, contains: {length}'
                     )
                 for item in value:
                     index = value.index(item)
                     if self.range == '0-1':
                         if item < 0 or item > 1:
-                            raise ValueError((
-                                'Value out of bounds at index {}. '
-                                '0-1 expected value between 0 and 1, value is: {}'
-                            ).format(value.index(item), item))
+                            raise ValueError(
+                                f'Value out of bounds at index {value.index(item)}. '
+                                f'0-1 expected value between 0 and 1, value is: {item}'
+                            )
                         if index == 0:
                             value[index] = item * 360
                         elif index < 3:
                             value[index] = item * 100
                     if index == 0 and (item < 0 or item > 360):
-                        raise ValueError((
-                            'Value out of bounds at index {}. '
-                            'Expected Hue value between 0 and 360, value is: {}'
-                        ).format(index, item))
+                        raise ValueError(
+                            f'Value out of bounds at index {index}. '
+                            f'Expected Hue value between 0 and 360, value is: {item}'
+                        )
                     if index == 1 and (item < 0 or item > 100):
-                        raise ValueError((
-                            'Value out of bounds at index {}. '
-                            'Expected Saturation value between 0 and 100, value is: {}'
-                        ).format(index, item))
+                        raise ValueError(
+                            f'Value out of bounds at index {index}. '
+                            f'Expected Saturation value between 0 and 100, value is: {item}'
+                        )
                     if index == 2 and (item < 0 or item > 100):
-                        raise ValueError((
-                            'Value out of bounds at index {}. '
-                            'Expected Lightness value between 0 and 100, value is: {}'
-                        ).format(index, item))
+                        raise ValueError(
+                            f'Value out of bounds at index {index}. '
+                            f'Expected Lightness value between 0 and 100, value is: {item}'
+                        )
                     if index == 3 and (item < 0 or item > 1):
                         raise ValueError(
-                            'Value out of bounds at index {}. '
-                             'Expected Alpha value between 0 and 1, value is: {}'
-                             .format(index, item)
+                            f'Value out of bounds at index {index}. '
+                            f'Expected Alpha value between 0 and 1, value is: {item}'
                         )
-                return 'hsla({}, {}%, {}%, {})'.format(
-                    value[0],
-                    value[1],
-                    value[2],
-                    value[3]
-                )
+                return f'hsla({value[0]}, {value[1]}%, {value[2]}%, {value[3]})'
             elif self.format == 'hex' or self.format == 'hex8':
                 raise ValueError(
-                    'Format {} does not accept type {}, accepted type: string'
-                     .format(self.format, type_name)
+                    f'Format {self.format} does not accept type {type_name}, accepted type: string'
                 )
             elif self.format == 'kelvin':
                 raise ValueError(
-                    'Format {} does not accept type {}, accepted type: string | number'
-                     .format(self.format, type_name)
+                    f'Format {self.format} does not accept type {type_name}, accepted type: string | number'
                 )
         elif isinstance(value, str):
             return value
@@ -247,14 +217,10 @@ class ColorDatatypeConverter(DatatypeConverter):
                 return value
             else:
                 raise ValueError(
-                    'Format {} does not accept type {}, accepted type: string'
-                     .format(self.format, type_name)
+                    f'Format {self.format} does not accept type {type_name}, accepted type: string'
                 )
         else:
-            raise ValueError(
-                'Unsupported value type: {}'
-                 .format(type_name)
-            )
+            raise ValueError(f'Unsupported value type: {type_name}')
 
 
 def color_builder(widget, factory):
@@ -264,22 +230,17 @@ def color_builder(widget, factory):
     format = widget.attrs['format']
     range_ = widget.attrs['datatype_range']
     if datatype in [tuple, list]:
-        if not format in ['rgb', 'rgba', 'hsl', 'hsla']:
+        if format not in ['rgb', 'rgba', 'hsl', 'hsla']:
             raise ValueError(
-                'Format {} does not support datatype {}' \
-                .format(format, datatype.__name__)
+                f'Format {format} does not support datatype {datatype.__name__}'
             )
-    elif datatype == int:
+    elif datatype is int:
         if format != 'kelvin':
             raise ValueError(
-                'Format {} does not support datatype {}' \
-                .format(format, datatype.__name__)
+                f'Format {format} does not support datatype {datatype.__name__}'
             )
-    elif datatype != str:
-        raise ValueError(
-            'Not supported value datatype: {}' \
-            .format(datatype.__name__)
-        )
+    elif datatype is not str:
+        raise ValueError(f'Not supported value datatype: {datatype.__name__}')
     widget.attrs['datatype'] = ColorDatatypeConverter(datatype, format, range_)
 
 
@@ -289,37 +250,27 @@ def color_extractor(widget, data):
     if not extracted:
         return extracted
     format = attr_value('format', widget, data)
-    formats = ', '.join(
-        [
-            'hex',
-            'hex8',
-            'hsl',
-            'hsla',
-            'rgb',
-            'rgba',
-            'kelvin'
-        ]
-    )
+    formats = ', '.join(['hex', 'hex8', 'hsl', 'hsla', 'rgb', 'rgba', 'kelvin'])
 
     # hex
     if format == 'hex' or format == 'hex8':
-        if (not extracted.startswith('#')):
+        if not extracted.startswith('#'):
             msg = _(
                 'unknown_color_format',
                 default='Unknown Format. Supported formats: ${formats}',
-                mapping={'formats':formats}
+                mapping={'formats': formats},
             )
             raise ExtractionError(msg)
         elif format == 'hex' and len(extracted) != 7:
             msg = _(
                 'incorrect_hex_length',
-                default='Incorrect hex Color String length: string length must be 7'
+                default='Incorrect hex Color String length: string length must be 7',
             )
             raise ExtractionError(msg)
         elif format == 'hex8' and len(extracted) != 9:
             msg = _(
                 'incorrect_hex8_length',
-                default='Incorrect hex8 Color String length: string length must be 9'
+                default='Incorrect hex8 Color String length: string length must be 9',
             )
             raise ExtractionError(msg)
         color = extracted[1:]
@@ -339,7 +290,7 @@ def color_extractor(widget, data):
             msg = _(
                 'incorrect_hex_value',
                 default='Incorrect Hex Value: ${args}',
-                mapping={'args':args}
+                mapping={'args': args},
             )
             raise ExtractionError(msg)
     # hsl
@@ -348,152 +299,188 @@ def color_extractor(widget, data):
         hsla_format = 'hsla([0-360], [0-100]%, [0-100]%, [0-1])'
 
         if not extracted.endswith(')'):
-            raise ExtractionError(_(
-                'unclosed_brace',
-                default='Incorrect Color String:  Unclosed bracket.'
-            ))
+            raise ExtractionError(
+                _('unclosed_brace', default='Incorrect Color String:  Unclosed bracket.')
+            )
         elif format == 'hsl' and not extracted.startswith('hsl('):
-            raise ExtractionError(_(
-                'hsl_str_start',
-                default="Incorrect Color String: String must start with 'hsl'"
-            ))
+            raise ExtractionError(
+                _(
+                    'hsl_str_start',
+                    default="Incorrect Color String: String must start with 'hsl'",
+                )
+            )
         elif format == 'hsla' and not extracted.startswith('hsla('):
-            raise ExtractionError(_(
-                'hsla_str_start',
-                default="Incorrect Color String: String must start with 'hsla'"
-            ))
+            raise ExtractionError(
+                _(
+                    'hsla_str_start',
+                    default="Incorrect Color String: String must start with 'hsla'",
+                )
+            )
         length = 3 if format == 'hsl' else 4
-        color = extracted[length + 1:-1]
+        color = extracted[length + 1 : -1]
         color = [channel.strip() for channel in color.split(',')]
 
         if format == 'hsl' and len(color) != 3:
-            raise ExtractionError(_(
-                'hsl_str_length',
-                default='Incorrect Color String: expected format: ${hsl_format}',
-                mapping={'hsl_format':hsl_format}
-            ))
+            raise ExtractionError(
+                _(
+                    'hsl_str_length',
+                    default='Incorrect Color String: expected format: ${hsl_format}',
+                    mapping={'hsl_format': hsl_format},
+                )
+            )
         if format == 'hsla' and len(color) != 4:
-            raise ExtractionError(_(
-                'hsla_str_length',
-                default='Incorrect Color String: expected format: ${hsla_format}',
-                mapping={'hsla_format':hsla_format}
-            ))
+            raise ExtractionError(
+                _(
+                    'hsla_str_length',
+                    default='Incorrect Color String: expected format: ${hsla_format}',
+                    mapping={'hsla_format': hsla_format},
+                )
+            )
 
         h = color[0]
         s = color[1]
-        l = color[2]
+        lightness = color[2]
         a = color[3] if format == 'hsla' else False
 
         if int(h) < 0 or int(h) > 360:
-            raise ExtractionError(_(
-                'incorrect_hue_value',
-                default=(
-                    'Incorrect Color String: value for hue must be between 0 and 360.'
+            raise ExtractionError(
+                _(
+                    'incorrect_hue_value',
+                    default=(
+                        'Incorrect Color String: value for hue must be between 0 and 360.'
+                    ),
                 )
-            ))
+            )
         elif not s.endswith('%') or int(s[0:-1]) not in range(0, 101):
-            raise ExtractionError(_(
-                'incorrect_saturation_value',
-                default=(
-                    'Incorrect Color String: value for saturation must be '
-                    'between 0 and 100 followed by "%".'
+            raise ExtractionError(
+                _(
+                    'incorrect_saturation_value',
+                    default=(
+                        'Incorrect Color String: value for saturation must be '
+                        'between 0 and 100 followed by "%".'
+                    ),
                 )
-            ))
-        elif not l.endswith('%') or int(l[0:-1]) not in range(0, 101):
-            raise ExtractionError(_(
-                'incorrect_lightness_value',
-                default=(
-                    'Incorrect Color String: value for lightness must be '
-                    'between 0 and 100 followed by "%".'
+            )
+        elif not lightness.endswith('%') or int(lightness[0:-1]) not in range(0, 101):
+            raise ExtractionError(
+                _(
+                    'incorrect_lightness_value',
+                    default=(
+                        'Incorrect Color String: value for lightness must be '
+                        'between 0 and 100 followed by "%".'
+                    ),
                 )
-            ))
+            )
         elif a and float(a) < 0 or float(a) > 1:
-            raise ExtractionError(_(
-                'incorrect_alpha_value',
-                default='Incorrect Color String: Alpha value must be between 0 and 1.'
-            ))
+            raise ExtractionError(
+                _(
+                    'incorrect_alpha_value',
+                    default='Incorrect Color String: Alpha value must be between 0 and 1.',
+                )
+            )
     # rgb
     elif format == 'rgb' or format == 'rgba':
         rgb_format = 'rgb([0-255], [0-255], [0-255])'
         rgba_format = 'rgba([0-255], [0-255], [0-255], [0-1])'
 
         if not extracted.endswith(')'):
-            raise ExtractionError(_(
-                'unclosed_brace',
-                default='Incorrect Color String: Unclosed bracket.'
-            ))
+            raise ExtractionError(
+                _('unclosed_brace', default='Incorrect Color String: Unclosed bracket.')
+            )
         elif format == 'rgb' and not extracted.startswith('rgb('):
-            raise ExtractionError(_(
-                'rgb_str_start',
-                default="Incorrect Color String: String must start with 'rgb'"
-            ))
+            raise ExtractionError(
+                _(
+                    'rgb_str_start',
+                    default="Incorrect Color String: String must start with 'rgb'",
+                )
+            )
         elif format == 'rgba' and not extracted.startswith('rgba('):
-            raise ExtractionError(_(
-                'rgba_str_start',
-                default="Incorrect Color String: String must start with 'rgba'"
-            ))
+            raise ExtractionError(
+                _(
+                    'rgba_str_start',
+                    default="Incorrect Color String: String must start with 'rgba'",
+                )
+            )
         length = 3 if format == 'rgb' else 4
-        color = extracted[length + 1:-1]
+        color = extracted[length + 1 : -1]
         color = [channel.strip() for channel in color.split(',')]
 
         if format == 'rgb' and len(color) != 3:
-            raise ExtractionError(_(
-                'rgb_str_length',
-                default='Incorrect Color String: expected format: ${rgb_format}',
-                mapping={'rgb_format':rgb_format}
-            ))
+            raise ExtractionError(
+                _(
+                    'rgb_str_length',
+                    default='Incorrect Color String: expected format: ${rgb_format}',
+                    mapping={'rgb_format': rgb_format},
+                )
+            )
         elif format == 'rgba' and len(color) != 4:
-            raise ExtractionError(_(
-                'rgba_str_length',
-                default='Incorrect Color String: expected format: ${rgba_format}',
-                mapping={'rgba_format':rgba_format}
-            ))
+            raise ExtractionError(
+                _(
+                    'rgba_str_length',
+                    default='Incorrect Color String: expected format: ${rgba_format}',
+                    mapping={'rgba_format': rgba_format},
+                )
+            )
         r = color[0]
         g = color[1]
         b = color[2]
         a = color[3] if format == 'rgba' else False
 
         if int(r) < 0 or int(r) > 255:
-            raise ExtractionError(_(
-                'incorrect_red_value',
-                default='Incorrect Color String: value for red must be between 0 and 255.'
-            ))
+            raise ExtractionError(
+                _(
+                    'incorrect_red_value',
+                    default='Incorrect Color String: value for red must be between 0 and 255.',
+                )
+            )
         elif int(g) < 0 or int(g) > 255:
-            raise ExtractionError(_(
-                'incorrect_green_value',
-                default='Incorrect Color String: value for green must be between 0 and 255.'
-            ))
+            raise ExtractionError(
+                _(
+                    'incorrect_green_value',
+                    default='Incorrect Color String: value for green must be between 0 and 255.',
+                )
+            )
         elif int(b) < 0 or int(b) > 255:
-            raise ExtractionError(_(
-                'incorrect_blue_value',
-                default='Incorrect Color String: value for blue must be between 0 and 255.'
-            ))
+            raise ExtractionError(
+                _(
+                    'incorrect_blue_value',
+                    default='Incorrect Color String: value for blue must be between 0 and 255.',
+                )
+            )
         elif a and float(a) < 0 or float(a) > 1:
-            raise ExtractionError(_(
-                'incorrect_alpha_value',
-                default='Incorrect Color String: Alpha value must be between 0 and 1.'
-            ))
+            raise ExtractionError(
+                _(
+                    'incorrect_alpha_value',
+                    default='Incorrect Color String: Alpha value must be between 0 and 1.',
+                )
+            )
     # kelvin
     elif format == 'kelvin':
         try:
             color = int(extracted)
         except ValueError:
-            raise ExtractionError(_(
-                'incorrect_kelvin_format',
-                default='Unknown Format, expected format: int(1000 - 40000) or str(1000 - 40000)'
-            ))
+            raise ExtractionError(
+                _(
+                    'incorrect_kelvin_format',
+                    default='Unknown Format, expected format: int(1000 - 40000) or str(1000 - 40000)',
+                )
+            )
         if color < 1000 or color > 40000:
-            raise ExtractionError(_(
-                'incorrect_kelvin_number',
-                default='Kelvin Temperature out of range (1000-40000)'
-            ))
+            raise ExtractionError(
+                _(
+                    'incorrect_kelvin_number',
+                    default='Kelvin Temperature out of range (1000-40000)',
+                )
+            )
     # other
     else:
-        raise ExtractionError(_(
-            'unknown_color_format',
-            default='Unknown Format. Supported formats: ${formats}',
-            mapping={'formats':formats}
-        ))
+        raise ExtractionError(
+            _(
+                'unknown_color_format',
+                default='Unknown Format. Supported formats: ${formats}',
+                mapping={'formats': formats},
+            )
+        )
 
     converter = widget.attrs['datatype']
     if converter:
@@ -519,7 +506,7 @@ color_options = [
     'show_labels',
     'slider_length',
     'layout_direction',
-    'open_on_focus'
+    'open_on_focus',
 ]
 
 
@@ -530,7 +517,7 @@ format_mapping = {
     'hsla': 'hslaString',
     'rgb': 'rgbString',
     'rgba': 'rgbaString',
-    'kelvin': 'kelvin'
+    'kelvin': 'kelvin',
 }
 
 
@@ -556,8 +543,8 @@ def color_display_renderer(widget, data):
     input_attrs['disabled'] = True
     input_attrs['data-color'] = input_attrs['value']
     cssclasses = [
-        attr_value("display_class", widget, data),
-        f'display-{attr_value("class", widget, data) or "generic"}'
+        attr_value('display_class', widget, data),
+        f'display-{attr_value("class", widget, data) or "generic"}',
     ]
     input_attrs['class_'] += ' ' + ' '.join([_ for _ in cssclasses if _ is not None])
     return data.tag('input', **input_attrs)
@@ -569,15 +556,11 @@ factory.register(
         generic_extractor,
         generic_required_extractor,
         generic_emptyvalue_extractor,
-        color_extractor
+        color_extractor,
     ],
-    edit_renderers=[
-        color_edit_renderer
-    ],
-    display_renderers=[
-        color_display_renderer
-    ],
-    builders=[color_builder]
+    edit_renderers=[color_edit_renderer],
+    display_renderers=[color_display_renderer],
+    builders=[color_builder],
 )
 
 
