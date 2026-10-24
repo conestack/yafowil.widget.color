@@ -6,7 +6,6 @@ from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.tests import YafowilTestCase
 import os
-import unittest
 
 
 def np(path):
@@ -60,7 +59,37 @@ class TestColorWidget(YafowilTestCase):
         """, widget())
 
     def test_display_renderer(self):
-        pass
+        widget = factory(
+            'color',
+            name='colorwidget',
+            value='#ff0000',
+            props={
+                'format': 'hex',
+                'display_class': 'display-color'
+            },
+            mode='display')
+        self.checkOutput("""
+        <input class="color-picker display-color display-color-picker"
+        data-auto_align='true' data-box_width='250' data-color='#ff0000'
+        data-disabled='false' data-format='hexString' data-layout_direction='vertical'
+        data-open_on_focus='true' data-placement='bottom' data-show_inputs='false'
+        data-show_labels='false' data-slider_size='10' data-sliders='["box", "h"]'
+        data-strategy='absolute' data-temperature='{"min": 2000, "max": 12000}'
+        data-user_swatches='true' disabled="True" id="input-colorwidget"
+        name="colorwidget" type="text" value="#ff0000" />
+        """, widget())
+
+    def test_color_extractor_datatype(self):
+        widget = factory(
+            'color',
+            name='colorwidget',
+            props={
+                'format': 'rgb',
+                'datatype': tuple
+            })
+        data = widget.extract({'colorwidget': 'rgb(255, 0, 0)'})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, (255, 0, 0))
 
     def test_color_extractor(self):
         # empty value
@@ -759,7 +788,3 @@ class TestColorWidget(YafowilTestCase):
         self.assertEqual(styles[0].path, 'yafowil-color/default')
         self.assertEqual(styles[0].file_name, 'widget.min.css')
         self.assertTrue(os.path.exists(styles[0].file_path))
-
-
-if __name__ == '__main__':
-    unittest.main()
