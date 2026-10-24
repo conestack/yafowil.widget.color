@@ -4,7 +4,7 @@ import {
     LockedSwatchesContainer,
     PreviewElement,
     slider_components,
-    UserSwatchesContainer
+    UserSwatchesContainer,
 } from './components';
 
 export function lookup_callback(path) {
@@ -17,7 +17,7 @@ export function lookup_callback(path) {
     for (const idx in source) {
         name = source[idx];
         if (cb[name] === undefined) {
-            throw "'" + name + "' not found.";
+            throw `'${name}' not found.`;
         }
         cb = cb[name];
     }
@@ -25,7 +25,6 @@ export function lookup_callback(path) {
 }
 
 export class ColorPicker {
-
     constructor(elem, options) {
         this.elem = elem;
 
@@ -38,9 +37,7 @@ export class ColorPicker {
             this.elem.on('color_close', options.on_close);
         }
 
-        this.dropdown_elem = $('<div />')
-            .addClass('color-picker-wrapper')
-            .insertAfter(this.elem);
+        this.dropdown_elem = $('<div />').addClass('color-picker-wrapper').insertAfter(this.elem);
         this.picker_container = $('<div />')
             .addClass('color-picker-container')
             .appendTo(this.dropdown_elem);
@@ -52,11 +49,11 @@ export class ColorPicker {
         this.placement = options.placement;
         this.auto_align = options.auto_align;
         this.slider_size = options.slider_size;
-        let iro_opts = this.init_opts(options);
+        const iro_opts = this.init_opts(options);
         this.picker = new iro.ColorPicker(this.picker_container.get(0), iro_opts);
 
-        let sliders = options.sliders;
-        if (sliders && sliders.includes('box') && sliders.includes('wheel')) {
+        const sliders = options.sliders;
+        if (sliders?.includes('box') && sliders.includes('wheel')) {
             if (sliders.indexOf('box') < sliders.indexOf('wheel')) {
                 $('div.IroWheel', this.picker_container).hide();
             } else {
@@ -77,7 +74,7 @@ export class ColorPicker {
             this.min = options.temperature.min;
             this.max = options.temperature.max;
         }
-        let alpha_types = ['rgbaString', 'hex8String', 'hslaString'];
+        const alpha_types = ['rgbaString', 'hex8String', 'hslaString'];
         this.type_alpha = alpha_types.includes(options.format);
 
         if (!options.locked_swatches && !options.user_swatches) {
@@ -116,30 +113,30 @@ export class ColorPicker {
     }
 
     init_opts(opts) {
-        let iro_opts = {
+        const iro_opts = {
             width: opts.box_width,
             boxHeight: opts.box_height || opts.box_width,
             layoutDirection: opts.layout_direction || 'vertical',
-            layout: []
-        }
+            layout: [],
+        };
         if (opts.format === 'kelvin') {
             iro_opts.color = iro.Color.kelvinToRgb(opts.color);
         } else {
             iro_opts.color = opts.color ? opts.color : '#fff';
         }
         const sliders = opts.sliders || [];
-        sliders.forEach(name => {
-            let type = slider_components[name];
+        sliders.forEach((name) => {
+            const type = slider_components[name];
 
             if (type === 'box') {
                 iro_opts.layout.push({
                     component: iro.ui.Box,
-                    options: {}
+                    options: {},
                 });
             } else if (type === 'wheel') {
                 iro_opts.layout.push({
                     component: iro.ui.Wheel,
-                    options: {}
+                    options: {},
                 });
             } else {
                 iro_opts.layout.push({
@@ -152,8 +149,8 @@ export class ColorPicker {
                         maxTemperature: opts.temperature ? opts.temperature.max : undefined,
                         disabled: opts.disabled,
                         showInput: opts.show_inputs,
-                        showLabel: opts.show_labels
-                    }
+                        showLabel: opts.show_labels,
+                    },
                 });
             }
         });
@@ -162,10 +159,7 @@ export class ColorPicker {
 
     create_swatch_containers(options) {
         if (options.locked_swatches) {
-            this.locked_swatches = new LockedSwatchesContainer(
-                this,
-                options.locked_swatches
-            );
+            this.locked_swatches = new LockedSwatchesContainer(this, options.locked_swatches);
         }
         if (options.user_swatches) {
             this.user_swatches = new UserSwatchesContainer(this);
@@ -175,10 +169,9 @@ export class ColorPicker {
     create_preview_element(options) {
         let prev_elem;
         if (options.preview_elem) {
-            prev_elem = $(options.preview_elem)
-                .addClass('yafowil-color-picker-preview');
+            prev_elem = $(options.preview_elem).addClass('yafowil-color-picker-preview');
         } else {
-            let elem_width = this.elem.outerWidth();
+            const elem_width = this.elem.outerWidth();
             prev_elem = $('<span />')
                 .addClass('yafowil-color-picker-color layer-transparent')
                 .css('left', `${elem_width}px`);
@@ -223,11 +216,11 @@ export class ColorPicker {
                 }
             }
             return on_top;
-        }
+        };
 
         switch (placement) {
             case 'left':
-                left = - this.dropdown_elem.outerWidth();
+                left = -this.dropdown_elem.outerWidth();
                 top = auto_place(0, -this.elem.outerHeight());
                 break;
             case 'right':
@@ -256,20 +249,17 @@ export class ColorPicker {
                 break;
         }
 
-        this.dropdown_elem.css(
-            'transform',
-            `translate(${left}px, ${top}px)`
-        );
+        this.dropdown_elem.css('transform', `translate(${left}px, ${top}px)`);
     }
 
     update_color() {
         this.color = this.picker.color.clone();
         this.preview.color = this.color.rgbaString;
-        let evt = new $.Event('color_update', {origin: this});
+        const evt = new $.Event('color_update', { origin: this });
         this.elem.trigger(evt);
     }
 
-    open(evt) {
+    open(_evt) {
         if (this.placement !== 'static' && this.auto_align) {
             this.place(this.placement);
         }
@@ -292,8 +282,7 @@ export class ColorPicker {
                 this.user_swatches.remove_swatch();
             }
         } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-            if ((!this.locked_swatches && !this.user_swatches ) ||
-                !this.active_swatch) {
+            if ((!this.locked_swatches && !this.user_swatches) || !this.active_swatch) {
                 return;
             }
             let swatch = this.active_swatch,
@@ -303,12 +292,12 @@ export class ColorPicker {
                 valid_locked_swatches;
 
             if (user_swatches) {
-                valid_user_swatches = this.user_swatches.swatches.filter(el => {
+                valid_user_swatches = this.user_swatches.swatches.filter((el) => {
                     return !el.invalid;
                 });
             }
             if (locked_swatches) {
-                valid_locked_swatches = this.locked_swatches.swatches.filter(el => {
+                valid_locked_swatches = this.locked_swatches.swatches.filter((el) => {
                     return !el.invalid;
                 });
             }
@@ -317,16 +306,12 @@ export class ColorPicker {
             let index = ctx.indexOf(swatch);
             index = e.key === 'ArrowLeft' ? index - 1 : index + 1;
             if (index < 0) {
-                if (!swatch.locked
-                    && locked_swatches
-                    && valid_locked_swatches.length) {
-                    this.active_swatch = valid_locked_swatches[valid_locked_swatches.length -1];
+                if (!swatch.locked && locked_swatches && valid_locked_swatches.length) {
+                    this.active_swatch = valid_locked_swatches[valid_locked_swatches.length - 1];
                 }
             } else if (index >= ctx.length) {
-                if (swatch.locked
-                    && user_swatches
-                    && valid_user_swatches.length) {
-                        this.active_swatch = valid_user_swatches[0];
+                if (swatch.locked && user_swatches && valid_user_swatches.length) {
+                    this.active_swatch = valid_user_swatches[0];
                 }
             } else {
                 this.active_swatch = ctx[index];
@@ -335,12 +320,13 @@ export class ColorPicker {
     }
 
     on_click(e) {
-        let target = this.dropdown_elem;
-        if (!target.is(e.target) &&
+        const target = this.dropdown_elem;
+        if (
+            !target.is(e.target) &&
             target.has(e.target).length === 0 &&
             !this.preview.elem.is(e.target) &&
-            target.css('display') === 'block') 
-        {
+            target.css('display') === 'block'
+        ) {
             this.close();
         }
     }
@@ -352,17 +338,19 @@ export class ColorPicker {
         this.dropdown_elem.hide();
         $(window).off('keydown', this.on_keydown);
         $(window).off('mousedown', this.on_click);
-        let evt = new $.Event('color_close', {origin: this});
+        const evt = new $.Event('color_close', { origin: this });
         this.elem.trigger(evt);
     }
 
     color_equals(color) {
-        if (this.color &&
-            (color instanceof iro.Color) &&
+        if (
+            this.color &&
+            color instanceof iro.Color &&
             color.hsva.h === this.color.hsva.h &&
             color.hsva.s === this.color.hsva.s &&
             color.hsva.v === this.color.hsva.v &&
-            color.hsva.a === this.color.hsva.a) {
+            color.hsva.a === this.color.hsva.a
+        ) {
             return true;
         }
     }
@@ -402,15 +390,13 @@ export class ColorPicker {
 }
 
 export class ColorWidget {
-
     static initialize(context) {
-        $('input.color-picker', context).each(function() {
-            let elem = $(this);
-            if (window.yafowil_array !== undefined &&
-                window.yafowil_array.inside_template(elem)) {
+        $('input.color-picker', context).each(function () {
+            const elem = $(this);
+            if (window.yafowil_array?.inside_template(elem)) {
                 return;
             }
-            let options = {
+            const options = {
                 format: elem.data('format'),
                 placement: elem.data('placement'),
                 auto_align: elem.data('auto_align'),
@@ -430,7 +416,7 @@ export class ColorWidget {
                 layout_direction: elem.data('layout_direction'),
                 open_on_focus: elem.data('open_on_focus'),
                 on_update: lookup_callback(elem.data('on_update')),
-                on_close: lookup_callback(elem.data('on_close'))
+                on_close: lookup_callback(elem.data('on_close')),
             };
             new ColorWidget(elem, options);
         });
@@ -442,9 +428,13 @@ export class ColorWidget {
         this.elem = elem;
         this.create_color_picker(elem, options);
 
-        this.temp = options.temperature || {min: 2000, max: 11000};
+        this.temp = options.temperature || { min: 2000, max: 11000 };
         this.input_elem = new InputElement(
-            this, this.elem, this.color_picker.color, options.format, this.temp
+            this,
+            this.elem,
+            this.color_picker.color,
+            options.format,
+            this.temp,
         );
 
         if (options.open_on_focus) {
@@ -459,11 +449,11 @@ export class ColorWidget {
         }
     }
 
-    update_color(e) {
+    update_color(_e) {
         this.input_elem.update_color(this.color_picker.color);
     }
 
-    blur_elem(e) {
+    blur_elem(_e) {
         this.elem.blur();
     }
 
@@ -487,7 +477,7 @@ export class ColorWidget {
 // yafowil.widget.array integration
 //////////////////////////////////////////////////////////////////////////////
 
-function color_on_array_add(inst, context) {
+function color_on_array_add(_inst, context) {
     ColorWidget.initialize(context);
 }
 

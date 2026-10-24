@@ -1,7 +1,6 @@
 import $ from 'jquery';
 
 export class ColorSwatch {
-
     constructor(widget, container, color, kelvin = false, locked = false) {
         this.widget = widget;
         this.container = container;
@@ -12,17 +11,21 @@ export class ColorSwatch {
         this.remove = this.remove.bind(this);
         this.destroy = this.destroy.bind(this);
 
-        if (kelvin && !this.widget.type_kelvin || 
-            this.widget.type_kelvin && !kelvin || 
-            !this.widget.type_alpha && color.alpha < 1) {
-                this.invalid = true;
-                return;
+        if (
+            (kelvin && !this.widget.type_kelvin) ||
+            (this.widget.type_kelvin && !kelvin) ||
+            (!this.widget.type_alpha && color.alpha < 1)
+        ) {
+            this.invalid = true;
+            return;
         }
-        if (kelvin && this.widget.type_kelvin &&
-            (color.kelvin < this.widget.min ||
-             color.kelvin > this.widget.max)) {
-                this.invalid = true;
-                return;
+        if (
+            kelvin &&
+            this.widget.type_kelvin &&
+            (color.kelvin < this.widget.min || color.kelvin > this.widget.max)
+        ) {
+            this.invalid = true;
+            return;
         }
 
         this.elem = $('<div />')
@@ -35,9 +38,7 @@ export class ColorSwatch {
             .appendTo(this.elem);
 
         if (locked) {
-            this.elem
-                .addClass('locked')
-                .append($('<div class="swatch-mark" />'));
+            this.elem.addClass('locked').append($('<div class="swatch-mark" />'));
         }
         if (this.widget.color_equals(color)) {
             this.selected = true;
@@ -53,8 +54,7 @@ export class ColorSwatch {
 
     set selected(selected) {
         if (selected) {
-            $('div.color-swatch', this.widget.dropdown_elem)
-            .removeClass('selected');
+            $('div.color-swatch', this.widget.dropdown_elem).removeClass('selected');
             this.elem.addClass('selected');
             this.widget.picker.color.set(this.color);
         } else if (this.elem) {
@@ -78,12 +78,12 @@ export class ColorSwatch {
         this.color = null;
     }
 
-    select(e) {
+    select(_e) {
         if (this.widget.active_swatch !== this) {
-            let previous = this.widget.picker.color.clone();
+            const previous = this.widget.picker.color.clone();
             this.previous_color = previous.rgbaString;
             this.widget.active_swatch = this;
-        } else if (this.widget.active_swatch == this) {
+        } else {
             this.widget.active_swatch = null;
             this.selected = false;
             this.widget.picker.color.set(this.previous_color);
@@ -92,12 +92,9 @@ export class ColorSwatch {
 }
 
 export class LockedSwatchesContainer {
-
-    constructor (widget, swatches = []) {
+    constructor(widget, swatches = []) {
         this.widget = widget;
-        this.elem = $('<div />')
-            .addClass('color-picker-recent')
-            .appendTo(widget.dropdown_elem);
+        this.elem = $('<div />').addClass('color-picker-recent').appendTo(widget.dropdown_elem);
         this.swatches = [];
         this.init_swatches(swatches);
     }
@@ -107,12 +104,12 @@ export class LockedSwatchesContainer {
             kelvin = false,
             valid_type = typeof swatch === 'string' || typeof swatch === 'object';
 
-        if (swatch instanceof Array) {
+        if (Array.isArray(swatch)) {
             color = {
                 r: swatch[0],
                 g: swatch[1],
-                b: swatch[2]
-            }
+                b: swatch[2],
+            };
             if (swatch[3]) {
                 color.a = swatch[3];
             }
@@ -125,31 +122,31 @@ export class LockedSwatchesContainer {
             console.log(`ERROR: not supported color format at ${swatch}`);
             return;
         }
-        return {'color': new iro.Color(color), 'kelvin': kelvin};
+        return { color: new iro.Color(color), kelvin: kelvin };
     }
 
     init_swatches(swatches) {
-        if (!swatches || !swatches.length) {
+        if (!swatches?.length) {
             this.elem.hide();
             return;
         }
-        for (let swatch of swatches) {
-            let swatch_color = this.parse_swatch(swatch);
+        for (const swatch of swatches) {
+            const swatch_color = this.parse_swatch(swatch);
             this.swatches.push(
                 new ColorSwatch(
                     this.widget,
                     this.elem,
                     swatch_color.color,
                     swatch_color.kelvin,
-                    true
-                )
+                    true,
+                ),
             );
             this.elem.show();
         }
     }
 
     destroy() {
-        for (let swatch of this.swatches) {
+        for (const swatch of this.swatches) {
             swatch.destroy();
         }
         this.widget = null;
@@ -157,19 +154,11 @@ export class LockedSwatchesContainer {
 }
 
 export class UserSwatchesContainer {
-
-    constructor (widget) {
+    constructor(widget) {
         this.widget = widget;
-        this.elem = $('<div />')
-            .addClass('color-picker-recent')
-            .appendTo(widget.dropdown_elem);
-        this.add_color_btn = $('<button />')
-            .addClass('add_color')
-            .text('+ Add');
-        this.remove_color_btn = $('<button />')
-            .addClass('remove_color')
-            .text('- Remove')
-            .hide();
+        this.elem = $('<div />').addClass('color-picker-recent').appendTo(widget.dropdown_elem);
+        this.add_color_btn = $('<button />').addClass('add_color').text('+ Add');
+        this.remove_color_btn = $('<button />').addClass('remove_color').text('- Remove').hide();
         this.buttons = $('<div />')
             .addClass('buttons')
             .append(this.add_color_btn)
@@ -187,26 +176,23 @@ export class UserSwatchesContainer {
         widget.elem.on('yafowil-color-swatches:changed', this.init_swatches);
     }
 
-    init_swatches(e) {
-        let json_str = localStorage.getItem('yafowil-color-swatches');
+    init_swatches(_e) {
+        const json_str = localStorage.getItem('yafowil-color-swatches');
 
-        for (let swatch of this.swatches) {
+        for (const swatch of this.swatches) {
             swatch.remove();
         }
         this.swatches = [];
         if (json_str) {
             this.elem.show();
             this.remove_color_btn.show();
-            let colors = JSON.parse(json_str);
+            const colors = JSON.parse(json_str);
 
-            for (let color_elem of colors) {
-                let iro_color = new iro.Color(color_elem.color);
-                this.swatches.push(new ColorSwatch(
-                    this.widget,
-                    this.elem,
-                    iro_color,
-                    color_elem.kelvin
-                ));
+            for (const color_elem of colors) {
+                const iro_color = new iro.Color(color_elem.color);
+                this.swatches.push(
+                    new ColorSwatch(this.widget, this.elem, iro_color, color_elem.kelvin),
+                );
             }
             if (this.swatches.length > 10) {
                 this.swatches[0].remove();
@@ -222,22 +208,22 @@ export class UserSwatchesContainer {
             e.preventDefault();
         }
         if (this.widget.locked_swatches) {
-            for (let swatch of this.widget.locked_swatches.swatches) {
+            for (const swatch of this.widget.locked_swatches.swatches) {
                 if (this.widget.color_equals(swatch.color)) {
                     return;
                 }
             }
         }
-        for (let swatch of this.swatches) {
+        for (const swatch of this.swatches) {
             if (this.widget.color_equals(swatch.color)) {
                 return;
             }
         }
-        let swatch = new ColorSwatch(
+        const swatch = new ColorSwatch(
             this.widget,
             this.elem,
             this.widget.picker.color.clone(),
-            this.widget.type_kelvin
+            this.widget.type_kelvin,
         );
         this.swatches.push(swatch);
         this.set_swatches();
@@ -250,7 +236,7 @@ export class UserSwatchesContainer {
         if (!this.widget.active_swatch || this.widget.active_swatch.locked) {
             return;
         }
-        let index = this.swatches.indexOf(this.widget.active_swatch);
+        const index = this.swatches.indexOf(this.widget.active_swatch);
         this.widget.active_swatch.remove();
         this.swatches.splice(index, 1);
 
@@ -267,21 +253,21 @@ export class UserSwatchesContainer {
     }
 
     set_swatches() {
-        let swatches = [];
-        for (let swatch of this.swatches) {
-            swatches.push({color: swatch.color.hsva, kelvin: swatch.kelvin});
+        const swatches = [];
+        for (const swatch of this.swatches) {
+            swatches.push({ color: swatch.color.hsva, kelvin: swatch.kelvin });
         }
         if (swatches.length) {
             localStorage.setItem('yafowil-color-swatches', JSON.stringify(swatches));
         } else {
             localStorage.removeItem('yafowil-color-swatches');
         }
-        let evt = new $.Event('yafowil-color-swatches:changed', {origin: this});
+        const evt = new $.Event('yafowil-color-swatches:changed', { origin: this });
         $('input.color-picker').trigger(evt);
     }
 
     destroy() {
-        for (let swatch of this.swatches) {
+        for (const swatch of this.swatches) {
             swatch.destroy();
         }
         this.add_color_btn.off('click', this.create_swatch);
@@ -291,8 +277,7 @@ export class UserSwatchesContainer {
 }
 
 export class InputElement {
-
-    constructor(widget, elem, color, format, temperature = {min: 1000, max:40000}) {
+    constructor(widget, elem, color, format, temperature = { min: 1000, max: 40000 }) {
         this.widget = widget;
         this.elem = elem;
         this.elem.attr('spellcheck', 'false');
@@ -316,8 +301,8 @@ export class InputElement {
         this.update_color = this.update_color.bind(this);
     }
 
-    on_input(e) {
-        let val = this.elem.val();
+    on_input(_e) {
+        const val = this.elem.val();
         this._color = val;
     }
 
@@ -325,9 +310,9 @@ export class InputElement {
         let color = this._color;
         if (color) {
             if (this.format === 'kelvin') {
-                if (parseInt(color) < this.temperature.min) {
+                if (parseInt(color, 10) < this.temperature.min) {
                     color = this.temperature.min;
-                } else if (parseInt(color) > this.temperature.max) {
+                } else if (parseInt(color, 10) > this.temperature.max) {
                     color = this.temperature.max;
                 }
                 this.widget.color_picker.picker.color.kelvin = color;
@@ -355,11 +340,9 @@ export class InputElement {
 }
 
 export class PreviewElement {
-
     constructor(widget, elem, color) {
         this.widget = widget;
-        this.layer = $('<div />')
-            .addClass('layer-color');
+        this.layer = $('<div />').addClass('layer-color');
         this.elem = elem
             .addClass('layer-transparent')
             .append(this.layer)
@@ -402,10 +385,14 @@ export const slider_components = {
     h: 'hue',
     s: 'saturation',
     v: 'value',
-    k: 'kelvin'
-}
+    k: 'kelvin',
+};
 
 export function is_kelvin(value) {
-    return ((typeof value === 'string' && !value.startsWith('#') &&
-            parseInt(value) == value) || (typeof value == 'number'));
+    return (
+        (typeof value === 'string' &&
+            !value.startsWith('#') &&
+            parseInt(value, 10) === Number(value)) ||
+        typeof value === 'number'
+    );
 }

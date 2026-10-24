@@ -1,12 +1,9 @@
-import $ from 'jquery';
-import { LockedSwatchesContainer } from '../default/components.js';
-import { UserSwatchesContainer } from '../default/components.js';
+import { LockedSwatchesContainer, UserSwatchesContainer } from '../default/components.js';
 
 /**
  * Container class for Bootstrap 5 styled locked swatches.
  */
 export class BS5LockedSwatchesContainer extends LockedSwatchesContainer {
-
     /**
      * @param {Object} widget - The associated color picker widget.
      * @param {Array} swatches - Initial array of swatches.
@@ -21,7 +18,6 @@ export class BS5LockedSwatchesContainer extends LockedSwatchesContainer {
  * Container class for Bootstrap 5 styled user-defined swatches.
  */
 export class BS5UserSwatchesContainer extends UserSwatchesContainer {
-
     /**
      * @param {Object} widget - The associated color picker widget.
      */
