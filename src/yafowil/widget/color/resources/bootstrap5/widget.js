@@ -358,19 +358,22 @@ var yafowil_color = (function (exports, $, Popper) {
         );
     }
 
-    function lookup_callback$1(path) {
+    const REFUSED_CALLBACKS = ['eval', 'Function', 'setTimeout', 'setInterval'].map(
+        (name) => window[name],
+    );
+    function lookup_callback(path) {
         if (!path) {
             return null;
         }
-        let source = path.split('.'),
-            cb = window,
-            name;
-        for (const idx in source) {
-            name = source[idx];
-            if (cb[name] === undefined) {
+        let cb = window;
+        for (const name of path.split('.')) {
+            if (!Object.hasOwn(Object(cb), name)) {
                 throw `'${name}' not found.`;
             }
             cb = cb[name];
+        }
+        if (typeof cb !== 'function' || REFUSED_CALLBACKS.includes(cb)) {
+            throw `'${path}' is no callback.`;
         }
         return cb;
     }
@@ -736,8 +739,8 @@ var yafowil_color = (function (exports, $, Popper) {
                     slider_length: elem.data('slider_length'),
                     layout_direction: elem.data('layout_direction'),
                     open_on_focus: elem.data('open_on_focus'),
-                    on_update: lookup_callback$1(elem.data('on_update')),
-                    on_close: lookup_callback$1(elem.data('on_close')),
+                    on_update: lookup_callback(elem.data('on_update')),
+                    on_close: lookup_callback(elem.data('on_close')),
                 };
                 new ColorWidget(elem, options);
             });
@@ -800,18 +803,6 @@ var yafowil_color = (function (exports, $, Popper) {
         }
     }
 
-    function lookup_callback(path) {
-        if (!path) return null;
-        let source = path.split('.'),
-            cb = window,
-            name;
-        for (const idx in source) {
-            name = source[idx];
-            if (cb[name] === undefined) throw `'${name}' not found.`;
-            cb = cb[name];
-        }
-        return cb;
-    }
     class BS5ColorPicker extends ColorPicker {
         constructor(elem, options) {
             super(elem, options);

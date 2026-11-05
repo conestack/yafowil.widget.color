@@ -56,6 +56,24 @@ QUnit.module('bootstrap5 lookup_callback', () => {
         }, /'missing' not found\./);
         delete window.yafowil_color_test;
     });
+
+    QUnit.test('lookup_callback only returns own functions', (assert) => {
+        window.yafowil_color_test = { callback: () => {}, value: 1 };
+        assert.strictEqual(
+            lookup_callback('yafowil_color_test.callback'),
+            window.yafowil_color_test.callback,
+        );
+        assert.throws(() => lookup_callback('yafowil_color_test.toString'), /'toString' not found/);
+        assert.throws(() => lookup_callback('yafowil_color_test.value'), /is no callback/);
+        assert.throws(() => lookup_callback('yafowil_color_test'), /is no callback/);
+        delete window.yafowil_color_test;
+    });
+
+    QUnit.test('lookup_callback refuses functions which run code', (assert) => {
+        for (const name of ['eval', 'Function', 'setTimeout', 'setInterval']) {
+            assert.throws(() => lookup_callback(name), /is no callback/);
+        }
+    });
 });
 
 QUnit.module('bootstrap5 ColorWidget', (hooks) => {

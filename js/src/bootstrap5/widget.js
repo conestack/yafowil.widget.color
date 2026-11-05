@@ -1,28 +1,10 @@
 import $ from 'jquery';
 import Popper from 'popper';
 import { PreviewElement } from '../default/components.js';
-import { ColorPicker, ColorWidget } from '../default/widget.js';
+import { ColorPicker, ColorWidget, lookup_callback } from '../default/widget.js';
 import { BS5LockedSwatchesContainer, BS5UserSwatchesContainer } from './components.js';
 
-/**
- * Retrieves a callback function from a given string path in `window` object.
- *
- * @param {string} path - Dot-separated path to the desired function.
- * @returns {Function|null} - The callback function, or null if path is empty.
- * @throws Will throw an error if a part of the path is undefined.
- */
-export function lookup_callback(path) {
-    if (!path) return null;
-    let source = path.split('.'),
-        cb = window,
-        name;
-    for (const idx in source) {
-        name = source[idx];
-        if (cb[name] === undefined) throw `'${name}' not found.`;
-        cb = cb[name];
-    }
-    return cb;
-}
+export { lookup_callback };
 
 export class BS5ColorPicker extends ColorPicker {
     /**

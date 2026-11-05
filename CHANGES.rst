@@ -4,7 +4,9 @@ Changes
 2.0.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Callback paths resolve own properties only and have to point to a function.
+  ``eval``, ``Function``, ``setTimeout`` and ``setInterval`` are refused.
+  [rnix]
 
 
 2.0.1 (2026-10-31)
