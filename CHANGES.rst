@@ -1,7 +1,7 @@
 Changes
 =======
 
-2.0.2 (unreleased)
+2.0.2 (2026-11-09)
 ------------------
 
 - Callback paths resolve own properties only and have to point to a function.
